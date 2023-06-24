@@ -12,10 +12,20 @@
 <!-- Sidenav and Main Content -->
 <mat-sidenav-container>
   <mat-sidenav #sidenav mode="side" opened="true" role="navigation">
-    <p>Sidenav</p>
+    <mat-nav-list>
+      <a
+        mat-list-item
+        *ngFor="let route of sidenavRoutes"
+        [routerLink]="route.path"
+        [routerLinkActive]="['active-link']"
+      >
+        <span matListItemTitle>
+          {{ route.title }}
+        </span>
+      </a>
+    </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content role="main">
-    <p>Main Content</p>
     <router-outlet></router-outlet>
   </mat-sidenav-content>
 </mat-sidenav-container>
