@@ -29,7 +29,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "dev.jrobiche.australis",
+      "identifier": "com.github.jrobiche.australis",
       "longDescription": "",
       "macOS": {
         "entitlements": null,

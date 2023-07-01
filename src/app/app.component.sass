@@ -1,0 +1,27 @@
+@use "@angular/material" as mat
+
+@import '../custom-theme'
+
+mat-sidenav-container
+  min-width: 500px
+  position: absolute
+  top: 64px
+  bottom: 0
+  left: 0
+  right: 0
+
+mat-sidenav
+  width: 280px
+
+mat-toolbar
+  height: 64px
+
+.brand
+  font-size: 20px
+  font-weight: 400
+  margin-left: 8px
+
+.mdc-list-item.active-link
+  background-color: mat.get-color-from-palette($australis-accent, 500)
+  .mat-mdc-list-item-title
+    color: mat.get-contrast-color-from-palette($australis-accent, 500)
