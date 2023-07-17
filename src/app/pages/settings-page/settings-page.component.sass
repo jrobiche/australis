@@ -1,0 +1,27 @@
+$list-item-display-count: 5.5
+$list-item-height: 48px
+
+.mat-mdc-selection-list
+  border: 1px solid black
+  height: $list-item-display-count * $list-item-height
+  overflow: auto
+  padding: 0px
+  .mat-mdc-list-item
+    height: $list-item-height
+
+.button-group
+  margin-bottom: 16px
+  margin-top: 16px
+  .mdc-button
+    margin-bottom: 4px
+  .mdc-button:not(:last-child)
+    margin-right: 4px
+
+.responsive-layout
+  margin-top: 20px
+  margin-bottom: 20px
+
+.single-line
+  overflow: hidden
+  text-overflow: ellipsis
+  white-space: nowrap
