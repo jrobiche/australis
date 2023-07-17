@@ -1,1 +1,54 @@
-<p>settings-page works!</p>
+<div class="responsive-layout">
+  <h1>Settings</h1>
+  <h2>Consoles</h2>
+  <div class="button-group">
+    <button mat-raised-button color="accent" (click)="onAddConsoleClick()">
+      Add Console
+    </button>
+    <button
+      *ngIf="selectedGameConsoleConfiguration !== null"
+      mat-raised-button
+      color="accent"
+      (click)="onEditConsoleClick(selectedGameConsoleConfiguration)"
+    >
+      Edit Console
+    </button>
+    <button
+      *ngIf="selectedGameConsoleConfiguration !== null"
+      mat-raised-button
+      color="warn"
+      (click)="onDeleteConsoleClick(selectedGameConsoleConfiguration)"
+    >
+      Delete Console
+    </button>
+  </div>
+  <p class="single-line">
+    Selected Console:
+    {{
+      selectedGameConsoleConfiguration === null
+        ? "None"
+        : selectedGameConsoleConfiguration.name
+    }}
+  </p>
+  <mat-selection-list
+    #gameConsoleList
+    [multiple]="false"
+    (selectionChange)="onGameConsoleListSelectionChange($event)"
+    aria-label="Console Selection"
+  >
+    <mat-list-option
+      [value]="null"
+      [selected]="isSelectedGameConsoleConfiguration(null)"
+      >None</mat-list-option
+    >
+    <mat-list-option
+      *ngFor="let gameConsole of gameConsoleConfigurations"
+      [value]="gameConsole"
+      [selected]="isSelectedGameConsoleConfiguration(gameConsole)"
+    >
+      <p matListOptionLine>
+        {{ gameConsole.name }}
+      </p>
+    </mat-list-option>
+  </mat-selection-list>
+</div>
