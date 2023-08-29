@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { SidenavRoute } from './interfaces/sidenav-route';
+import { SidenavRouteGroup } from './interfaces/sidenav-route-group';
 
 @Component({
   selector: 'app-root',
@@ -8,11 +8,19 @@ import { SidenavRoute } from './interfaces/sidenav-route';
 })
 export class AppComponent {
   title = 'australis';
-  sidenavRoutes: SidenavRoute[] = [
-    { title: 'Game Library', path: '/games' },
-    { title: 'File Browser', path: '/files' },
-    { title: 'Console Information', path: '/console' },
-    { title: 'Settings', path: '/settings' },
-    { title: 'About', path: '/about' },
+  sidenavRouteGroups: SidenavRouteGroup[] = [
+    {
+      routes: [
+        { title: 'Game Library', path: '/games' },
+        { title: 'File Browser', path: '/files' },
+        { title: 'Console Information', path: '/console' },
+      ],
+    },
+    {
+      routes: [
+        { title: 'Settings', path: '/settings' },
+        { title: 'About', path: '/about' },
+      ],
+    },
   ];
 }
