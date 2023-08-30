@@ -13,16 +13,25 @@
 <mat-sidenav-container>
   <mat-sidenav #sidenav mode="side" opened="true" role="navigation">
     <mat-nav-list>
-      <a
-        mat-list-item
-        *ngFor="let route of sidenavRoutes"
-        [routerLink]="route.path"
-        [routerLinkActive]="['active-link']"
-      >
-        <span matListItemTitle>
-          {{ route.title }}
-        </span>
-      </a>
+      <div *ngFor="let sidenavRouteGroup of sidenavRouteGroups; let i = index">
+        <mat-divider *ngIf="i > 0"></mat-divider>
+        <div mat-subheader *ngIf="sidenavRouteGroup.name">
+          {{ sidenavRouteGroup.name }}
+        </div>
+        <a
+          mat-list-item
+          *ngFor="let route of sidenavRouteGroup.routes"
+          [routerLink]="route.path"
+          [routerLinkActive]="['active-link']"
+        >
+          <mat-icon matListItemIcon *ngIf="route.icon">{{
+            route.icon
+          }}</mat-icon>
+          <div matListItemTitle>
+            {{ route.title }}
+          </div>
+        </a>
+      </div>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content role="main">
