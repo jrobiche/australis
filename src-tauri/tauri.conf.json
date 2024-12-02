@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "identifier": "com.github.jrobiche.australis",
   "build": {
-    "frontendDist": "../dist/australis",
+    "frontendDist": "../dist/australis/browser",
     "devUrl": "http://localhost:4200",
     "beforeDevCommand": "npm run start",
     "beforeBuildCommand": "npm run build"
