@@ -1,6 +1,11 @@
 {
   "name": "australis",
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "license": "GPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jrobiche/australis.git"
+  },
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -12,13 +17,17 @@
   "private": true,
   "dependencies": {
     "@angular/animations": "^19.0.0",
+    "@angular/cdk": "^19.0.1",
     "@angular/common": "^19.0.0",
     "@angular/compiler": "^19.0.0",
     "@angular/core": "^19.0.0",
     "@angular/forms": "^19.0.0",
+    "@angular/material": "^19.0.1",
     "@angular/platform-browser": "^19.0.0",
     "@angular/platform-browser-dynamic": "^19.0.0",
     "@angular/router": "^19.0.0",
+    "@tauri-apps/api": "^2.1.1",
+    "material-icons": "^1.13.12",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
