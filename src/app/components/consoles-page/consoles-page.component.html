@@ -1,1 +1,5 @@
-<p>consoles-page works!</p>
+@if (selectedConsole() === null) {
+  <app-console-manager></app-console-manager>
+} @else {
+  <app-console-dashboard></app-console-dashboard>
+}
