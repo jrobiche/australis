@@ -1,12 +1,12 @@
 [package]
-name = "app"
+name = "australis"
 version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
-license = ""
+description = "A desktop client for the Aurora Xbox 360 Dashboard"
+authors = ["jrobiche"]
+license = "GPL-3.0-or-later"
 repository = ""
 edition = "2021"
-rust-version = "1.77.2"
+rust-version = "1.83.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -23,3 +23,5 @@ serde = { version = "1.0", features = ["derive"] }
 log = "0.4"
 tauri = { version = "2.1.0", features = [] }
 tauri-plugin-log = "2.0.0-rc"
+uuid = { version = "1.11.0", features = ["v4", "fast-rng"] }
+libaustralis = { git = "https://github.com/jrobiche/libaustralis.git", branch = "next" }
