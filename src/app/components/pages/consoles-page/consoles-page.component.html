@@ -1,0 +1,75 @@
+@if (uiService.isHandset$ | async) {
+  <app-page-toolbar heading="Consoles" [backButton]="false">
+    <button mat-icon-button aria-label="About" [routerLink]="['/about']">
+      <mat-icon fontSet="material-icons-outlined">info</mat-icon>
+    </button>
+  </app-page-toolbar>
+  <button
+    aria-label="Add console"
+    class="add-console-fab"
+    mat-fab
+    (click)="onAddConsoleClick()"
+  >
+    <mat-icon fontSet="material-icons-round">add</mat-icon>
+  </button>
+} @else if (uiService.isTablet$ | async) {
+  <app-page-toolbar heading="Consoles" [backButton]="false">
+    <a mat-stroked-button aria-label="About" [routerLink]="['/about']">
+      <mat-icon fontSet="material-icons-outlined">info</mat-icon>
+      About
+    </a>
+  </app-page-toolbar>
+  <button
+    aria-label="Add console"
+    class="add-console-fab"
+    mat-fab
+    extended
+    (click)="onAddConsoleClick()"
+  >
+    <mat-icon fontSet="material-icons-round">add</mat-icon>
+    Add Console
+  </button>
+} @else {
+  <app-page-toolbar heading="Consoles" [backButton]="false">
+    <button
+      aria-label="Add console"
+      class="trailing-button"
+      mat-flat-button
+      (click)="onAddConsoleClick()"
+    >
+      <mat-icon fontSet="material-icons-round">add</mat-icon>
+      Add Console
+    </button>
+    <a
+      aria-label="About"
+      class="trailing-button"
+      mat-stroked-button
+      [routerLink]="['/about']"
+    >
+      <mat-icon fontSet="material-icons-outlined">info</mat-icon>
+      About
+    </a>
+  </app-page-toolbar>
+}
+<div
+  class="content-wrapper responsive-width-container"
+  [class.handset]="uiService.isHandset$ | async"
+  [class.tablet]="uiService.isTablet$ | async"
+  [class.web]="uiService.isWeb$ | async"
+>
+  @if (gameConsoleConfigurations.length == 0) {
+    <span class="no-consoles-text">Add a console and it will show up here</span>
+  } @else {
+    <mat-nav-list aria-label="Select a game console">
+      @for (
+        config of gameConsoleConfigurations;
+        track config.id;
+        let idx = $index
+      ) {
+        <a mat-list-item [routerLink]="['/', 'consoles', config.id]">
+          {{ config.name }}
+        </a>
+      }
+    </mat-nav-list>
+  }
+</div>

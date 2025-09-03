@@ -1,0 +1,21 @@
+<mat-card appearance="raised">
+  <mat-card-header>
+    <mat-card-title-group>
+      <mat-card-title>{{ titleText }}</mat-card-title>
+    </mat-card-title-group>
+  </mat-card-header>
+  <mat-card-content>
+    @if (imageUrl) {
+      <!-- TODO alt text -->
+      <img class="cover-image" [src]="imageUrl" />
+    } @else {
+      <p class="centered-text">No image available.</p>
+    }
+  </mat-card-content>
+  <mat-card-actions align="end">
+    <button mat-button (click)="onViewLargeCoverClick()">
+      Load Large Cover
+    </button>
+    <button mat-button (click)="onSelectCoverClick()">Select Cover</button>
+  </mat-card-actions>
+</mat-card>

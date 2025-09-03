@@ -1,0 +1,13 @@
+<app-page-toolbar heading="Not Found" [backButton]="false" />
+<div
+  class="content-wrapper responsive-width-container"
+  [class.small]="uiService.isFontSizeSmall"
+  [class.medium]="uiService.isFontSizeMedium"
+  [class.large]="uiService.isFontSizeLarge"
+>
+  <h1>Resource Not Found</h1>
+  <p>Could not find the requested resource.</p>
+  <a type="button" aria-label="Return home" mat-flat-button routerLink="/">
+    Return Home
+  </a>
+</div>

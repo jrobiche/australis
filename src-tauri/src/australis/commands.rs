@@ -4,7 +4,7 @@ use sqlite;
 use uuid::Uuid;
 
 use crate::australis::structs::{
-    AuroraAssetImageData, AuroraGame, AuroraGameListEntry, GameConsoleConfiguration,
+    AuroraGame, GameAssetTypes, GameConsoleConfiguration, GameListEntry,
 };
 use crate::australis::utils::{
     delete_directory, determine_title_launch_data, path_game_console_aurora_asset,
@@ -258,83 +258,83 @@ pub async fn aurora_game_asset_image_delete(
     Ok(())
 }
 
-#[tauri::command(async)]
-pub async fn aurora_game_asset_image_read(
-    app_handle: tauri::AppHandle,
-    console_configuration: GameConsoleConfiguration,
-    game: AuroraGame,
-    asset_type_usize: usize,
-) -> Result<Option<AuroraAssetImageData>, String> {
-    let asset_type = match libaustralis::aurora::assets::AssetType::from_usize(asset_type_usize) {
-        Ok(x) => x,
-        Err(err) => {
-            let msg = format!(
-                "Failed to create AssetType from '{}'. Got the following error: {}",
-                asset_type_usize, err
-            );
-            error!("{}", &msg);
-            return Err(msg);
-        }
-    };
-    let asset_path = path_game_console_aurora_asset(
-        &app_handle,
-        &console_configuration,
-        (game.title_id & 0xFFFFFFFF) as u32,
-        (game.id & 0xFFFFFFFF) as u32,
-        asset_type,
-    )?;
-    // TODO warn?
-    if !asset_path.is_file() {
-        return Ok(None);
-    }
-    let asset = match libaustralis::aurora::assets::Asset::load(&asset_path) {
-        Ok(x) => x,
-        Err(err) => {
-            let msg = format!(
-                "Failed to read asset at '{}'. Got the following error: {}",
-                &asset_path.display(),
-                err
-            );
-            error!("{}", &msg);
-            return Err(msg);
-        }
-    };
-    if !asset.is_image_set(asset_type) {
-        return Ok(None);
-    }
-    let (width, height) = match asset.image_dimensions(asset_type) {
-        (Some(w), Some(h), None) => (w, h),
-        _ => {
-            let msg = format!("Failed to read '{}' image in asset at '{}'. Could not determine image width and height.",
-                &asset_type.display(),
-                &asset_path.display()
-            );
-            error!("{}", &msg);
-            return Err(msg);
-        }
-    };
-    let rgba8 = match asset.image_rgba8(asset_type) {
-        Ok(x) => match x {
-            Some(y) => y,
-            None => Vec::new(),
-        },
-        Err(err) => {
-            let msg = format!(
-                "Failed to read '{}' image in asset at '{}'. Failed to get image RGBA8. Got the following error: {}",
-                &asset_type.display(),
-                &asset_path.display(),
-                err
-            );
-            error!("{}", &msg);
-            return Err(msg);
-        }
-    };
-    Ok(Some(AuroraAssetImageData {
-        width,
-        height,
-        rgba8,
-    }))
-}
+// #[tauri::command(async)]
+// pub async fn aurora_game_asset_image_read(
+//     app_handle: tauri::AppHandle,
+//     console_configuration: GameConsoleConfiguration,
+//     game: AuroraGame,
+//     asset_type_usize: usize,
+// ) -> Result<Option<AuroraAssetImageData>, String> {
+//     let asset_type = match libaustralis::aurora::assets::AssetType::from_usize(asset_type_usize) {
+//         Ok(x) => x,
+//         Err(err) => {
+//             let msg = format!(
+//                 "Failed to create AssetType from '{}'. Got the following error: {}",
+//                 asset_type_usize, err
+//             );
+//             error!("{}", &msg);
+//             return Err(msg);
+//         }
+//     };
+//     let asset_path = path_game_console_aurora_asset(
+//         &app_handle,
+//         &console_configuration,
+//         (game.title_id & 0xFFFFFFFF) as u32,
+//         (game.id & 0xFFFFFFFF) as u32,
+//         asset_type,
+//     )?;
+//     // TODO warn?
+//     if !asset_path.is_file() {
+//         return Ok(None);
+//     }
+//     let asset = match libaustralis::aurora::assets::Asset::load(&asset_path) {
+//         Ok(x) => x,
+//         Err(err) => {
+//             let msg = format!(
+//                 "Failed to read asset at '{}'. Got the following error: {}",
+//                 &asset_path.display(),
+//                 err
+//             );
+//             error!("{}", &msg);
+//             return Err(msg);
+//         }
+//     };
+//     if !asset.is_image_set(asset_type) {
+//         return Ok(None);
+//     }
+//     let (width, height) = match asset.image_dimensions(asset_type) {
+//         (Some(w), Some(h), None) => (w, h),
+//         _ => {
+//             let msg = format!("Failed to read '{}' image in asset at '{}'. Could not determine image width and height.",
+//                 &asset_type.display(),
+//                 &asset_path.display()
+//             );
+//             error!("{}", &msg);
+//             return Err(msg);
+//         }
+//     };
+//     let rgba8 = match asset.image_rgba8(asset_type) {
+//         Ok(x) => match x {
+//             Some(y) => y,
+//             None => Vec::new(),
+//         },
+//         Err(err) => {
+//             let msg = format!(
+//                 "Failed to read '{}' image in asset at '{}'. Failed to get image RGBA8. Got the following error: {}",
+//                 &asset_type.display(),
+//                 &asset_path.display(),
+//                 err
+//             );
+//             error!("{}", &msg);
+//             return Err(msg);
+//         }
+//     };
+//     Ok(Some(AuroraAssetImageData {
+//         width,
+//         height,
+//         rgba8,
+//     }))
+// }
 
 #[tauri::command(async)]
 pub async fn aurora_game_asset_image_read_url(
@@ -509,13 +509,180 @@ pub async fn aurora_game_asset_image_update(
     Ok(())
 }
 
+#[tauri::command(async)]
+pub async fn aurora_game_asset_types_read_all(
+    app_handle: tauri::AppHandle,
+    console_configuration: GameConsoleConfiguration,
+) -> Result<Vec<GameAssetTypes>, String> {
+    // TODO move some db logic into libaustralis
+    // TODO this logic can be simplified
+    let mut all_game_asset_types: Vec<GameAssetTypes> = Vec::new();
+    let game_list_entries =
+        aurora_game_entry_read_all(app_handle.clone(), console_configuration.clone()).await?;
+    for game_list_entry in game_list_entries {
+        let game = match aurora_game_read(
+            app_handle.clone(),
+            console_configuration.clone(),
+            (game_list_entry.id & 0xFFFFFFFF) as u32,
+        )
+        .await?
+        {
+            Some(x) => x,
+            None => continue,
+        };
+        let mut game_asset_types = GameAssetTypes {
+            id: game.id,
+            has_icon: false,
+            has_banner: false,
+            has_boxart: false,
+            has_slot: false,
+            has_background: false,
+            has_screenshot1: false,
+            has_screenshot2: false,
+            has_screenshot3: false,
+            has_screenshot4: false,
+            has_screenshot5: false,
+            has_screenshot6: false,
+            has_screenshot7: false,
+            has_screenshot8: false,
+            has_screenshot9: false,
+            has_screenshot10: false,
+            has_screenshot11: false,
+            has_screenshot12: false,
+            has_screenshot13: false,
+            has_screenshot14: false,
+            has_screenshot15: false,
+            has_screenshot16: false,
+            has_screenshot17: false,
+            has_screenshot18: false,
+            has_screenshot19: false,
+            has_screenshot20: false,
+        };
+        for asset_type in libaustralis::aurora::assets::AssetType::into_iter() {
+            let asset_path = match path_game_console_aurora_asset(
+                &app_handle,
+                &console_configuration,
+                (game.title_id & 0xFFFFFFFF) as u32,
+                (game.id & 0xFFFFFFFF) as u32,
+                asset_type,
+            ) {
+                Ok(x) => x,
+                Err(_) => {
+                    // TODO message
+                    continue;
+                }
+            };
+            // TODO warn?
+            if !asset_path.is_file() {
+                // return Ok(None);
+                continue;
+            }
+            let asset = match libaustralis::aurora::assets::Asset::load(&asset_path) {
+                Ok(x) => x,
+                Err(_) => {
+                    // TODO
+                    // let msg = format!(
+                    //     "Failed to read asset file at '{}'. Got the following error: {}",
+                    //     &asset_path.display(),
+                    //     err
+                    // );
+                    continue;
+                    // error!("{}", &msg);
+                    // return Err(msg);
+                }
+            };
+            if asset.is_image_set(asset_type) {
+                match asset_type {
+                    libaustralis::aurora::assets::AssetType::Icon => {
+                        game_asset_types.has_icon = true
+                    }
+                    libaustralis::aurora::assets::AssetType::Banner => {
+                        game_asset_types.has_banner = true
+                    }
+                    libaustralis::aurora::assets::AssetType::Boxart => {
+                        game_asset_types.has_boxart = true
+                    }
+                    libaustralis::aurora::assets::AssetType::Slot => {
+                        game_asset_types.has_slot = true
+                    }
+                    libaustralis::aurora::assets::AssetType::Background => {
+                        game_asset_types.has_background = true
+                    }
+                    libaustralis::aurora::assets::AssetType::Screenshot1 => {
+                        game_asset_types.has_screenshot1 = true
+                    }
+                    libaustralis::aurora::assets::AssetType::Screenshot2 => {
+                        game_asset_types.has_screenshot2 = true
+                    }
+                    libaustralis::aurora::assets::AssetType::Screenshot3 => {
+                        game_asset_types.has_screenshot3 = true
+                    }
+                    libaustralis::aurora::assets::AssetType::Screenshot4 => {
+                        game_asset_types.has_screenshot4 = true
+                    }
+                    libaustralis::aurora::assets::AssetType::Screenshot5 => {
+                        game_asset_types.has_screenshot5 = true
+                    }
+                    libaustralis::aurora::assets::AssetType::Screenshot6 => {
+                        game_asset_types.has_screenshot6 = true
+                    }
+                    libaustralis::aurora::assets::AssetType::Screenshot7 => {
+                        game_asset_types.has_screenshot7 = true
+                    }
+                    libaustralis::aurora::assets::AssetType::Screenshot8 => {
+                        game_asset_types.has_screenshot8 = true
+                    }
+                    libaustralis::aurora::assets::AssetType::Screenshot9 => {
+                        game_asset_types.has_screenshot9 = true
+                    }
+                    libaustralis::aurora::assets::AssetType::Screenshot10 => {
+                        game_asset_types.has_screenshot10 = true
+                    }
+                    libaustralis::aurora::assets::AssetType::Screenshot11 => {
+                        game_asset_types.has_screenshot11 = true
+                    }
+                    libaustralis::aurora::assets::AssetType::Screenshot12 => {
+                        game_asset_types.has_screenshot12 = true
+                    }
+                    libaustralis::aurora::assets::AssetType::Screenshot13 => {
+                        game_asset_types.has_screenshot13 = true
+                    }
+                    libaustralis::aurora::assets::AssetType::Screenshot14 => {
+                        game_asset_types.has_screenshot14 = true
+                    }
+                    libaustralis::aurora::assets::AssetType::Screenshot15 => {
+                        game_asset_types.has_screenshot15 = true
+                    }
+                    libaustralis::aurora::assets::AssetType::Screenshot16 => {
+                        game_asset_types.has_screenshot16 = true
+                    }
+                    libaustralis::aurora::assets::AssetType::Screenshot17 => {
+                        game_asset_types.has_screenshot17 = true
+                    }
+                    libaustralis::aurora::assets::AssetType::Screenshot18 => {
+                        game_asset_types.has_screenshot18 = true
+                    }
+                    libaustralis::aurora::assets::AssetType::Screenshot19 => {
+                        game_asset_types.has_screenshot19 = true
+                    }
+                    libaustralis::aurora::assets::AssetType::Screenshot20 => {
+                        game_asset_types.has_screenshot20 = true
+                    }
+                }
+            }
+        }
+        all_game_asset_types.push(game_asset_types);
+    }
+    Ok(all_game_asset_types)
+}
+
 // TODO include game type
 #[tauri::command]
 pub async fn aurora_game_entry_read_all(
     app_handle: tauri::AppHandle,
     console_configuration: GameConsoleConfiguration,
-) -> Result<Vec<AuroraGameListEntry>, String> {
-    let mut game_list_entries: Vec<AuroraGameListEntry> = Vec::new();
+) -> Result<Vec<GameListEntry>, String> {
+    let mut game_list_entries: Vec<GameListEntry> = Vec::new();
     let content_db_file = path_game_console_aurora_content_db(&app_handle, &console_configuration)?;
     if !&content_db_file.is_file() {
         return Ok(game_list_entries);
@@ -551,7 +718,7 @@ pub async fn aurora_game_entry_read_all(
             statement.read::<String, _>("TitleName"),
         ) {
             (Ok(id), Ok(title_name)) => {
-                let game_list_entry = AuroraGameListEntry {
+                let game_list_entry = GameListEntry {
                     id: id as u64,
                     title_name,
                 };
@@ -694,12 +861,14 @@ pub async fn aurora_game_read(
                 Ok(scan_path_id),
                 Ok(case_index),
             ) => {
+                let title_id_u32: u32 = (title_id as u64 & 0xFFFFFFFF) as u32;
+                let media_id_u32: u32 = (media_id as u64 & 0xFFFFFFFF) as u32;
                 game = Some(AuroraGame {
                     id: id as u64,
                     directory,
                     executable,
-                    title_id: title_id as u64,
-                    media_id: media_id as u64,
+                    title_id: title_id_u32,
+                    media_id: media_id_u32,
                     base_version: base_version as u64,
                     disc_num: disc_num as u64,
                     discs_in_set: discs_in_set as u64,
@@ -1636,7 +1805,7 @@ pub fn game_console_configuration_read(
         Ok(x) => x,
         Err(err) => {
             let msg = format!(
-                "Failed to open file at '{}' for reading. Got the following error: {}",
+                "Failed to open game console configuration file at '{}' for reading. Got the following error: {}",
                 &console_configuration_path.display(),
                 err
             );
@@ -1648,7 +1817,7 @@ pub fn game_console_configuration_read(
         Ok(x) => x,
         Err(err) => {
             let msg = format!(
-                "Failed to deserialize game console configuration from file at '{}'. Got the following error: {}",
+                "Failed to parse game console configuration from file at '{}'. Got the following error: {}",
                 &console_configuration_path.display(),
                 err
             );
@@ -1674,6 +1843,26 @@ pub fn game_console_configuration_read_all(
     let mut console_configuration_ids = Vec::new();
     let mut console_configurations = Vec::new();
     let game_console_configurations_root = path_game_console_configurations_root(&app_handle)?;
+    match std::fs::exists(&game_console_configurations_root) {
+        Ok(x) => {
+            if !x {
+                warn!(
+                    "The game console configurations root directory '{}' does not exist.",
+                    game_console_configurations_root.display(),
+                );
+                return Ok(console_configurations);
+            }
+        }
+        Err(err) => {
+            let msg = format!(
+                "Failed to determine if path '{}' exists. Got the following error: {}",
+                &game_console_configurations_root.display(),
+                err
+            );
+            error!("{}", &msg);
+            return Err(msg);
+        }
+    }
     let console_configuration_entries = match std::fs::read_dir(&game_console_configurations_root) {
         Ok(x) => x,
         Err(err) => {
@@ -1793,6 +1982,143 @@ pub fn game_console_configuration_update(
         Err(err) => {
             let msg = format!(
                 "Failed to serialize updated game console configuration. Got the following error: {}",
+                err
+            );
+            error!("{}", msg);
+            Err(msg)
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// xbox unity commands
+////////////////////////////////////////////////////////////////////////////////
+#[tauri::command]
+pub async fn xboxunity_cover_image_bytes_url(
+    cover_id: &str,
+    cover_size: &str,
+) -> Result<Option<String>, String> {
+    let cover_size = match cover_size {
+        "small" => libaustralis::xboxunity::CoverSize::Small,
+        "large" => libaustralis::xboxunity::CoverSize::Large,
+        _ => return Err(format!("Invalid cover size: {}", cover_size)),
+    };
+    match libaustralis::xboxunity::cover_image_bytes(cover_id, cover_size).await {
+        Ok(x) => Ok(Some(format!(
+            "data:image/png;base64,{}",
+            general_purpose::STANDARD.encode(&x)
+        ))),
+        Err(err) => {
+            let msg = format!(
+                "Failed to retrieve cover image bytes from XboxUnity. Got the following error: {}",
+                err
+            );
+            error!("{}", msg);
+            Err(msg)
+        }
+    }
+}
+
+#[tauri::command]
+pub fn xboxunity_cover_image_url(cover_id: &str, cover_size: &str) -> Result<String, String> {
+    let cover_size = match cover_size {
+        "small" => libaustralis::xboxunity::CoverSize::Small,
+        "large" => libaustralis::xboxunity::CoverSize::Large,
+        _ => return Err(format!("Invalid cover size: {}", cover_size)),
+    };
+    Ok(libaustralis::xboxunity::cover_image_url(
+        cover_id, cover_size,
+    ))
+}
+
+#[tauri::command]
+pub async fn xboxunity_cover_info(
+    title_id: &str,
+) -> Result<libaustralis::xboxunity::CoverInfoResult, String> {
+    match libaustralis::xboxunity::cover_info(title_id).await {
+        Ok(x) => Ok(x),
+        Err(err) => {
+            let msg = format!(
+                "Failed to retrieve cover information from XboxUnity. Got the following error: {}",
+                err
+            );
+            error!("{}", msg);
+            Err(msg)
+        }
+    }
+}
+
+#[tauri::command]
+pub fn xboxunity_icon_image_url(title_id: &str) -> Result<String, String> {
+    Ok(libaustralis::xboxunity::icon_image_url(title_id))
+}
+
+#[tauri::command]
+pub async fn xboxunity_title_list(
+    query: &str,
+    page: usize,
+    count: Option<usize>,
+) -> Result<libaustralis::xboxunity::TitleListResult, String> {
+    let count = match count {
+        Some(x) => x,
+        None => 10,
+    };
+    match libaustralis::xboxunity::title_list(
+        query,
+        page,
+        count,
+        libaustralis::xboxunity::SearchSort::Name,
+        libaustralis::xboxunity::SearchDirection::Ascending,
+        libaustralis::xboxunity::SearchCategory::All,
+        libaustralis::xboxunity::SearchFilter::All,
+    )
+    .await
+    {
+        Ok(x) => Ok(x),
+        Err(err) => {
+            let msg = format!(
+                "Failed to retrieve titles from XboxUnity. Got the following error: {}",
+                err
+            );
+            error!("{}", msg);
+            Err(msg)
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// xbox catalog commands
+////////////////////////////////////////////////////////////////////////////////
+#[tauri::command]
+pub async fn xboxcatalog_live_image_bytes_url(
+    live_image: libaustralis::xboxcatalog::LiveImage,
+) -> Result<Option<String>, String> {
+    match libaustralis::xboxcatalog::image_bytes(live_image).await {
+        Ok(x) => Ok(Some(format!(
+            "data:image/png;base64,{}",
+            general_purpose::STANDARD.encode(&x)
+        ))),
+        Err(err) => {
+            let msg = format!(
+                "Failed to retrieve image bytes from Xbox Catalog. Got the following error: {}",
+                err
+            );
+            error!("{}", msg);
+            Err(msg)
+        }
+    }
+}
+
+#[tauri::command]
+pub async fn xboxcatalog_live_images(
+    title_id: &str,
+    locale: &str,
+) -> Result<Vec<libaustralis::xboxcatalog::LiveImage>, String> {
+    match libaustralis::xboxcatalog::live_images_for_title_id(title_id, locale).await {
+        Ok(x) => Ok(x),
+        Err(err) => {
+            let msg = format!(
+                "Failed to retrieve images from XboxCatalog. Got the following error: {}",
                 err
             );
             error!("{}", msg);

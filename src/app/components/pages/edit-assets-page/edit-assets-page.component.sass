@@ -1,0 +1,46 @@
+@use '../../../../variables'
+
+app-page-toolbar
+  position: fixed
+  top: 0
+  width: 100%
+  z-index: 1000
+
+app-edit-asset-card
+  display: block
+
+app-edit-asset-card:not(:first-of-type)
+  margin-top: 16px
+
+.centered-text
+  text-align: center
+
+.content-wrapper
+  padding-top: calc(variables.$page-toolbar-height)
+
+.content-wrapper.handset
+  p
+    font: var(--mat-sys-body-small)
+  .description
+    display: block
+    margin-bottom: 16px
+  margin-bottom: 16px
+  margin-top: 16px
+
+.content-wrapper.tablet
+  p
+    font: var(--mat-sys-body-medium)
+  .description
+    display: block
+    margin-bottom: 24px
+  margin-bottom: 24px
+  margin-top: 24px
+
+.content-wrapper.web
+  p
+    font: var(--mat-sys-body-large)
+  .description
+    display: block
+    margin-bottom: 24px
+  margin-bottom: 24px
+  margin-top: 24px

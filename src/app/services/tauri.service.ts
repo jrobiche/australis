@@ -1,43 +1,47 @@
 import { Injectable } from '@angular/core';
 import { invoke } from '@tauri-apps/api/core';
 
-import { AssetImageData } from '../interfaces/asset';
-import { AuroraAssetType, AuroraGameData } from '../interfaces/aurora';
 import {
-  ConsoleAchievement,
-  ConsoleAchievementPlayer,
-  ConsoleDashlaunch,
-  ConsoleFilebrowserEntry,
-  ConsoleMemory,
-  ConsoleMultidisc,
-  ConsolePlugin,
-  ConsoleProfile,
-  ConsoleScreencaptureMeta,
-  ConsoleScreencaptureMetaListCount,
-  ConsoleSmc,
-  ConsoleSystem,
-  ConsoleSystemlink,
-  ConsoleSystemlinkBandwidth,
-  ConsoleTemperature,
-  ConsoleThread,
-  ConsoleThreadState,
-  ConsoleTitle,
-  ConsoleUpdateNotification,
-} from '../interfaces/aurora-http-schemas';
-import { GameConsoleConfiguration } from '../interfaces/game-console-configuration';
-import { GameListEntry } from '../interfaces/game-list-entry';
+  AuroraAchievement,
+  AuroraAchievementPlayer,
+  AuroraAssetType,
+  AuroraDashlaunch,
+  AuroraFilebrowserEntry,
+  AuroraGameData,
+  AuroraMemory,
+  AuroraMultidisc,
+  AuroraPlugin,
+  AuroraProfile,
+  AuroraScreencaptureMeta,
+  AuroraScreencaptureMetaListCount,
+  AuroraSmc,
+  AuroraSystem,
+  AuroraSystemlink,
+  AuroraSystemlinkBandwidth,
+  AuroraTemperature,
+  AuroraThread,
+  AuroraThreadState,
+  AuroraTitle,
+  AuroraUpdateNotification,
+} from '@app/types/aurora';
+import {
+  GameAssetTypes,
+  GameConsoleConfiguration,
+  GameListEntry,
+} from '@app/types/app';
+import { LiveImage } from '@app/types/xbox-catalog';
+import { CoverInfoResult, TitleListResult } from '@app/types/xbox-unity';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TauriService {
-  #resolvers: any;
-  #resolverCount: number;
+  /*
+   * This class should have a function for each tauri command defined
+   * in the `invoke_handler` in `src-tauri/src/lib.rs`
+   */
 
-  constructor() {
-    this.#resolvers = {};
-    this.#resolverCount = 0;
-  }
+  constructor() {}
 
   ////////////////////////////////////////////////////////////////////////////////
   // aurora ftp commands
@@ -93,20 +97,6 @@ export class TauriService {
     });
   }
 
-  auroraGameAssetImageRead(
-    consoleConfiguration: GameConsoleConfiguration,
-    game: AuroraGameData,
-    assetType: AuroraAssetType,
-  ): Promise<AssetImageData | null> {
-    return invoke('aurora_game_asset_image_read', {
-      consoleConfiguration: consoleConfiguration,
-      game: game,
-      assetTypeUsize: assetType.valueOf(),
-    }).then((response) => {
-      return response as AssetImageData | null;
-    });
-  }
-
   auroraGameAssetImageReadUrl(
     consoleConfiguration: GameConsoleConfiguration,
     game: AuroraGameData,
@@ -116,8 +106,6 @@ export class TauriService {
       consoleConfiguration: consoleConfiguration,
       game: game,
       assetTypeUsize: assetType.valueOf(),
-    }).then((response) => {
-      return response as string | null;
     });
   }
 
@@ -135,13 +123,19 @@ export class TauriService {
     });
   }
 
+  auroraGameAssetTypesReadAll(
+    consoleConfiguration: GameConsoleConfiguration,
+  ): Promise<GameAssetTypes[]> {
+    return invoke('aurora_game_asset_types_read_all', {
+      consoleConfiguration: consoleConfiguration,
+    });
+  }
+
   auroraGameEntryReadAll(
     consoleConfiguration: GameConsoleConfiguration,
   ): Promise<GameListEntry[]> {
     return invoke('aurora_game_entry_read_all', {
       consoleConfiguration: consoleConfiguration,
-    }).then((response) => {
-      return response as GameListEntry[];
     });
   }
 
@@ -164,12 +158,6 @@ export class TauriService {
     return invoke('aurora_game_read', {
       consoleConfiguration: consoleConfiguration,
       gameId: gameId,
-    }).then((response) => {
-      if (response) {
-        return response as AuroraGameData;
-      } else {
-        return null;
-      }
     });
   }
 
@@ -179,24 +167,20 @@ export class TauriService {
   auroraHttpAchievementGet(
     consoleConfiguration: GameConsoleConfiguration,
     token: string | null,
-  ): Promise<ConsoleAchievement[]> {
+  ): Promise<AuroraAchievement[]> {
     return invoke('aurora_http_achievement_get', {
       consoleConfiguration: consoleConfiguration,
       token: token,
-    }).then((response) => {
-      return Promise.resolve(response as ConsoleAchievement[]);
     });
   }
 
   auroraHttpAchievementPlayerGet(
     consoleConfiguration: GameConsoleConfiguration,
     token: string | null,
-  ): Promise<ConsoleAchievementPlayer> {
+  ): Promise<AuroraAchievementPlayer> {
     return invoke('aurora_http_achievement_player_get', {
       consoleConfiguration: consoleConfiguration,
       token: token,
-    }).then((response) => {
-      return Promise.resolve(response as ConsoleAchievementPlayer);
     });
   }
 
@@ -205,20 +189,16 @@ export class TauriService {
   ): Promise<string | null> {
     return invoke('aurora_http_authentication_token_get', {
       consoleConfiguration: consoleConfiguration,
-    }).then((response) => {
-      return Promise.resolve(response as string | null);
     });
   }
 
   auroraHttpDashlaunchGet(
     consoleConfiguration: GameConsoleConfiguration,
     token: string | null,
-  ): Promise<ConsoleDashlaunch> {
+  ): Promise<AuroraDashlaunch> {
     return invoke('aurora_http_dashlaunch_get', {
       consoleConfiguration: consoleConfiguration,
       token: token,
-    }).then((response) => {
-      return Promise.resolve(response as ConsoleDashlaunch);
     });
   }
 
@@ -227,14 +207,12 @@ export class TauriService {
     token: string | null,
     path: string | null,
     filter: string | null,
-  ): Promise<ConsoleFilebrowserEntry[]> {
+  ): Promise<AuroraFilebrowserEntry[]> {
     return invoke('aurora_http_filebrowser_get', {
       consoleConfiguration: consoleConfiguration,
       token: token,
       path: path,
       filter: filter,
-    }).then((response) => {
-      return Promise.resolve(response as ConsoleFilebrowserEntry[]);
     });
   }
 
@@ -247,8 +225,6 @@ export class TauriService {
       consoleConfiguration: consoleConfiguration,
       token: token,
       uuid: uuid,
-    }).then((response) => {
-      return Promise.resolve(response as number[]);
     });
   }
 
@@ -261,8 +237,6 @@ export class TauriService {
       consoleConfiguration: consoleConfiguration,
       token: token,
       uuid: uuid,
-    }).then((response) => {
-      return Promise.resolve(response as string);
     });
   }
 
@@ -275,8 +249,6 @@ export class TauriService {
       consoleConfiguration: consoleConfiguration,
       token: token,
       uuid: uuid,
-    }).then((response) => {
-      return Promise.resolve(response as number[]);
     });
   }
 
@@ -289,8 +261,6 @@ export class TauriService {
       consoleConfiguration: consoleConfiguration,
       token: token,
       uuid: uuid,
-    }).then((response) => {
-      return Promise.resolve(response as string);
     });
   }
 
@@ -303,8 +273,6 @@ export class TauriService {
       consoleConfiguration: consoleConfiguration,
       token: token,
       uuid: uuid,
-    }).then((response) => {
-      return Promise.resolve(response as number[]);
     });
   }
 
@@ -317,56 +285,46 @@ export class TauriService {
       consoleConfiguration: consoleConfiguration,
       token: token,
       uuid: uuid,
-    }).then((response) => {
-      return Promise.resolve(response as string);
     });
   }
 
   auroraHttpMemoryGet(
     consoleConfiguration: GameConsoleConfiguration,
     token: string | null,
-  ): Promise<ConsoleMemory> {
+  ): Promise<AuroraMemory> {
     return invoke('aurora_http_memory_get', {
       consoleConfiguration: consoleConfiguration,
       token: token,
-    }).then((response) => {
-      return Promise.resolve(response as ConsoleMemory);
     });
   }
 
   auroraHttpMultidiscGet(
     consoleConfiguration: GameConsoleConfiguration,
     token: string | null,
-  ): Promise<ConsoleMultidisc> {
+  ): Promise<AuroraMultidisc> {
     return invoke('aurora_http_multidisc_get', {
       consoleConfiguration: consoleConfiguration,
       token: token,
-    }).then((response) => {
-      return Promise.resolve(response as ConsoleMultidisc);
     });
   }
 
   auroraHttpPluginGet(
     consoleConfiguration: GameConsoleConfiguration,
     token: string | null,
-  ): Promise<ConsolePlugin> {
+  ): Promise<AuroraPlugin> {
     return invoke('aurora_http_plugin_get', {
       consoleConfiguration: consoleConfiguration,
       token: token,
-    }).then((response) => {
-      return Promise.resolve(response as ConsolePlugin);
     });
   }
 
   auroraHttpProfileGet(
     consoleConfiguration: GameConsoleConfiguration,
     token: string | null,
-  ): Promise<ConsoleProfile[]> {
+  ): Promise<AuroraProfile[]> {
     return invoke('aurora_http_profile_get', {
       consoleConfiguration: consoleConfiguration,
       token: token,
-    }).then((response) => {
-      return Promise.resolve(response as ConsoleProfile[]);
     });
   }
 
@@ -379,128 +337,106 @@ export class TauriService {
       consoleConfiguration: consoleConfiguration,
       token: token,
       uuid: uuid,
-    }).then((_) => {
-      return Promise.resolve();
     });
   }
 
   auroraHttpScreencaptureMetaGet(
     consoleConfiguration: GameConsoleConfiguration,
     token: string | null,
-  ): Promise<ConsoleScreencaptureMeta> {
+  ): Promise<AuroraScreencaptureMeta> {
     return invoke('aurora_http_screencapture_meta_get', {
       consoleConfiguration: consoleConfiguration,
       token: token,
-    }).then((response) => {
-      return Promise.resolve(response as ConsoleScreencaptureMeta);
     });
   }
 
   auroraHttpScreencaptureMetaListGet(
     consoleConfiguration: GameConsoleConfiguration,
     token: string | null,
-  ): Promise<ConsoleScreencaptureMeta[]> {
+  ): Promise<AuroraScreencaptureMeta[]> {
     return invoke('aurora_http_screencapture_meta_list_get', {
       consoleConfiguration: consoleConfiguration,
       token: token,
-    }).then((response) => {
-      return Promise.resolve(response as ConsoleScreencaptureMeta[]);
     });
   }
 
   auroraHttpScreencaptureMetaListCountGet(
     consoleConfiguration: GameConsoleConfiguration,
     token: string | null,
-  ): Promise<ConsoleScreencaptureMetaListCount> {
+  ): Promise<AuroraScreencaptureMetaListCount> {
     return invoke('aurora_http_screencapture_meta_list_count_get', {
       consoleConfiguration: consoleConfiguration,
       token: token,
-    }).then((response) => {
-      return Promise.resolve(response as ConsoleScreencaptureMetaListCount);
     });
   }
 
   auroraHttpSmcGet(
     consoleConfiguration: GameConsoleConfiguration,
     token: string | null,
-  ): Promise<ConsoleSmc> {
+  ): Promise<AuroraSmc> {
     return invoke('aurora_http_smc_get', {
       consoleConfiguration: consoleConfiguration,
       token: token,
-    }).then((response) => {
-      return Promise.resolve(response as ConsoleSmc);
     });
   }
 
   auroraHttpSystemGet(
     consoleConfiguration: GameConsoleConfiguration,
     token: string | null,
-  ): Promise<ConsoleSystem> {
+  ): Promise<AuroraSystem> {
     return invoke('aurora_http_system_get', {
       consoleConfiguration: consoleConfiguration,
       token: token,
-    }).then((response) => {
-      return Promise.resolve(response as ConsoleSystem);
     });
   }
 
   auroraHttpSystemlinkGet(
     consoleConfiguration: GameConsoleConfiguration,
     token: string | null,
-  ): Promise<ConsoleSystemlink> {
+  ): Promise<AuroraSystemlink> {
     return invoke('aurora_http_systemlink_get', {
       consoleConfiguration: consoleConfiguration,
       token: token,
-    }).then((response) => {
-      return Promise.resolve(response as ConsoleSystemlink);
     });
   }
 
   auroraHttpSystemlinkBandwidthGet(
     consoleConfiguration: GameConsoleConfiguration,
     token: string | null,
-  ): Promise<ConsoleSystemlinkBandwidth> {
+  ): Promise<AuroraSystemlinkBandwidth> {
     return invoke('aurora_http_systemlink_bandwidth_get', {
       consoleConfiguration: consoleConfiguration,
       token: token,
-    }).then((response) => {
-      return Promise.resolve(response as ConsoleSystemlinkBandwidth);
     });
   }
 
   auroraHttpTemperatureGet(
     consoleConfiguration: GameConsoleConfiguration,
     token: string | null,
-  ): Promise<ConsoleTemperature> {
+  ): Promise<AuroraTemperature> {
     return invoke('aurora_http_temperature_get', {
       consoleConfiguration: consoleConfiguration,
       token: token,
-    }).then((response) => {
-      return Promise.resolve(response as ConsoleTemperature);
     });
   }
 
   auroraHttpThreadGet(
     consoleConfiguration: GameConsoleConfiguration,
     token: string | null,
-  ): Promise<ConsoleThread[]> {
+  ): Promise<AuroraThread[]> {
     return invoke('aurora_http_thread_get', {
       consoleConfiguration: consoleConfiguration,
       token: token,
-    }).then((response) => {
-      return Promise.resolve(response as ConsoleThread[]);
     });
   }
 
   auroraHttpThreadStateGet(
     consoleConfiguration: GameConsoleConfiguration,
     token: string | null,
-  ): Promise<ConsoleThreadState> {
+  ): Promise<AuroraThreadState> {
     return invoke('aurora_http_thread_state_get', {
       consoleConfiguration: consoleConfiguration,
       token: token,
-    }).then((response) => {
-      return Promise.resolve(response as ConsoleThreadState);
     });
   }
 
@@ -513,20 +449,16 @@ export class TauriService {
       consoleConfiguration: consoleConfiguration,
       token: token,
       suspend: suspend,
-    }).then((_) => {
-      return Promise.resolve();
     });
   }
 
   auroraHttpTitleGet(
     consoleConfiguration: GameConsoleConfiguration,
     token: string | null,
-  ): Promise<ConsoleTitle> {
+  ): Promise<AuroraTitle> {
     return invoke('aurora_http_title_get', {
       consoleConfiguration: consoleConfiguration,
       token: token,
-    }).then((response) => {
-      return Promise.resolve(response as ConsoleTitle);
     });
   }
 
@@ -539,8 +471,6 @@ export class TauriService {
       consoleConfiguration: consoleConfiguration,
       token: token,
       path: path,
-    }).then((response) => {
-      return Promise.resolve(response as number[]);
     });
   }
 
@@ -557,8 +487,6 @@ export class TauriService {
       path: path,
       exec: exec,
       execType: execType,
-    }).then((_) => {
-      return Promise.resolve();
     });
   }
 
@@ -569,11 +497,10 @@ export class TauriService {
     return invoke('aurora_http_title_live_cache_get', {
       consoleConfiguration: consoleConfiguration,
       token: token,
-    }).then((response) => {
-      return Promise.resolve(response as string);
     });
   }
 
+  // TODO test
   auroraHttpTitleLiveCachePost(
     consoleConfiguration: GameConsoleConfiguration,
     token: string | null,
@@ -589,12 +516,10 @@ export class TauriService {
   auroraHttpUpdateNotificationGet(
     consoleConfiguration: GameConsoleConfiguration,
     token: string | null,
-  ): Promise<ConsoleUpdateNotification> {
+  ): Promise<AuroraUpdateNotification> {
     return invoke('aurora_http_update_notification_get', {
       consoleConfiguration: consoleConfiguration,
       token: token,
-    }).then((response) => {
-      return Promise.resolve(response as ConsoleUpdateNotification);
     });
   }
 
@@ -613,8 +538,6 @@ export class TauriService {
       auroraHttpPort: gameConsoleConfiguration.auroraHttpPort,
       auroraHttpUsername: gameConsoleConfiguration.auroraHttpUsername,
       auroraHttpPassword: gameConsoleConfiguration.auroraHttpPassword,
-    }).then((response) => {
-      return response as GameConsoleConfiguration;
     });
   }
 
@@ -627,15 +550,11 @@ export class TauriService {
   gameConsoleConfigurationRead(id: string): Promise<GameConsoleConfiguration> {
     return invoke('game_console_configuration_read', {
       consoleConfigurationId: id,
-    }).then((response) => {
-      return response as GameConsoleConfiguration;
     });
   }
 
   gameConsoleConfigurationReadAll(): Promise<GameConsoleConfiguration[]> {
-    return invoke('game_console_configuration_read_all').then((response) => {
-      return response as GameConsoleConfiguration[];
-    });
+    return invoke('game_console_configuration_read_all');
   }
 
   gameConsoleConfigurationUpdate(
@@ -652,8 +571,69 @@ export class TauriService {
       auroraHttpPort: consoleConfig.auroraHttpPort,
       auroraHttpUsername: consoleConfig.auroraHttpUsername,
       auroraHttpPassword: consoleConfig.auroraHttpPassword,
-    }).then((response) => {
-      return response as GameConsoleConfiguration;
+    });
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // xboxcatalog commands
+  ////////////////////////////////////////////////////////////////////////////////
+  xboxCatalogLiveImageBytesUrl(liveImage: LiveImage): Promise<string | null> {
+    return invoke('xboxcatalog_live_image_bytes_url', {
+      liveImage: liveImage,
+    });
+  }
+
+  xboxCatalogLiveImages(titleId: string, locale: string): Promise<LiveImage[]> {
+    return invoke('xboxcatalog_live_images', {
+      titleId: titleId,
+      locale: locale,
+    });
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // xboxunity commands
+  ////////////////////////////////////////////////////////////////////////////////
+  xboxUnityCoverImageBytesUrl(
+    coverId: string,
+    coverSize: 'small' | 'large',
+  ): Promise<string | null> {
+    return invoke('xboxunity_cover_image_bytes_url', {
+      coverId: coverId,
+      coverSize: coverSize,
+    });
+  }
+
+  xboxUnityCoverImageUrl(
+    coverId: string,
+    coverSize: 'small' | 'large',
+  ): Promise<string> {
+    return invoke('xboxunity_cover_image_url', {
+      coverId: coverId,
+      coverSize: coverSize,
+    });
+  }
+
+  xboxUnityCoverInfo(titleId: string): Promise<CoverInfoResult> {
+    return invoke('xboxunity_cover_info', {
+      titleId: titleId,
+    });
+  }
+
+  xboxUnityIconImageUrl(titleId: string): Promise<string> {
+    return invoke('xboxunity_icon_image_url', {
+      titleId: titleId,
+    });
+  }
+
+  xboxUnityTitleList(
+    query: string,
+    page: number,
+    count: number | null,
+  ): Promise<TitleListResult> {
+    return invoke('xboxunity_title_list', {
+      query: query,
+      page: page,
+      count: count,
     });
   }
 }

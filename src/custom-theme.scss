@@ -1,20 +1,177 @@
 // Custom Theming for Angular Material
 // For more information: https://material.angular.io/guide/theming
 @use '@angular/material' as mat;
+@use './variables';
 @import 'material-icons/iconfont/material-icons.css';
 
+:root {
+  touch-action: pan-x pan-y;
+}
+
+app-root {
+  @include mat.expansion-overrides((
+    container-background-color: var(--mat-sys-surface-container),
+    container-text-color:  var(--mat-sys-on-surface),
+  ));
+}
+
+app-consoles-page {
+  .mat-mdc-nav-list {
+    @include mat.list-overrides((
+      list-item-container-color: var(--mat-sys-surface-container-low),
+      list-item-label-text-color: var(--mat-sys-on-surface),
+      list-item-one-line-container-height: 80px,
+    ));
+  }
+  // list-item-container-shape override not supported for `mat-nav-list`
+  .mat-mdc-nav-list .mat-mdc-list-item {
+    border-radius: 16px;
+  }
+}
+
+app-console-page {
+  @include mat.tabs-overrides((
+    container-height: variables.$tab-container-height,
+  ));
+  @include mat.list-overrides((
+    list-item-selected-container-color: var(--mat-sys-secondary-container),
+    active-indicator-shape: 20px,
+    list-item-container-shape: 80px,
+  ));
+  .mdc-list-item--selected {
+    @include mat.list-overrides((
+      list-item-label-text-color: var(--mat-sys-on-secondary-container),
+    ));
+  }
+}
+
+app-game-card {
+  @include mat.divider-overrides((
+    color: var(--mat-sys-outline-variant),
+  ));
+}
+
+app-page-toolbar {
+  @include mat.toolbar-overrides((
+    container-background-color: var(--mat-sys-primary-container),
+    container-text-color: var(--mat-sys-on-primary-container),
+    mobile-height: variables.$page-toolbar-height,
+    standard-height: variables.$page-toolbar-height,
+  ));
+  @include mat.icon-button-overrides((
+    icon-color: var(--mat-sys-on-primary-container),
+  ));
+}
+
+app-game-library {
+  @include mat.sidenav-overrides((
+    container-divider-color: var(--mat-sys-outline-variant),
+  ));
+  @include mat.toolbar-overrides((
+    mobile-height: variables.$game-library-toolbar-height,
+    standard-height: variables.$game-library-toolbar-height,
+  ));
+  mat-drawer-container {
+    height: calc(100% - variables.$game-library-toolbar-height);
+  }
+  .web {
+    @include mat.sidenav-overrides((
+      container-shape: 0px,
+    ));
+  }
+}
+
+app-system-details {
+  @include mat.sidenav-overrides((
+    container-divider-color: var(--mat-sys-outline-variant),
+  ));
+  @include mat.toolbar-overrides((
+    mobile-height: variables.$system-details-toolbar-height,
+    standard-height: variables.$system-details-toolbar-height,
+  ));
+  mat-drawer-container {
+    height: calc(100% - variables.$system-details-toolbar-height);
+  }
+  .web {
+    @include mat.sidenav-overrides((
+      container-shape: 0px,
+    ));
+  }
+}
+
 html {
+  // available palettes:
+  //   red, green, blue, yellow, cyan, magenta
+  //   rose, violet, azure, spring-green, chartreuse, orange
   color-scheme: dark;
+  // color-scheme: light;
   @include mat.theme((
     color: (
-      primary: mat.$azure-palette,
-      tertiary: mat.$blue-palette,
+      primary: mat.$cyan-palette,
+      tertiary: mat.$orange-palette,
     ),
     typography: Roboto,
     density: 0,
   ));
 }
 
+body {
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+}
+
 body.color-scheme-light {
   color-scheme: light;
+}
+
+// This responsive-width-container is an older material design concept
+// https://material.io/design/layout/responsive-layout-grid.html#breakpoints
+// TODO use panes that follow the Material 3 specs
+// https://m3.material.io/foundations/layout/applying-layout/window-size-classes
+.responsive-width-container {
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+@media only screen and (max-width: 599px) {
+  .responsive-width-container {
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+}
+
+@media only screen and (min-width: 600px) and (max-width: 904px) {
+  .responsive-width-container {
+    margin-left: 32px;
+    margin-right: 32px;
+  }
+}
+
+@media only screen and (min-width: 905px) and (max-width: 1239px) {
+  .responsive-width-container {
+    margin: 0 auto;
+    width: 840px;
+  }
+}
+
+@media only screen and (min-width: 1240px) and (max-width: 1439px) {
+  .responsive-width-container {
+    margin-left: 200px;
+    margin-right: 200px;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  .responsive-width-container {
+    margin: 0 auto;
+    width: 1040px;
+  }
+}
+
+.leading-button {
+  margin-right: 4px;
+}
+
+.trailing-button {
+  margin-left: 4px;
 }

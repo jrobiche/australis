@@ -1,0 +1,37 @@
+@use '../../../../variables'
+
+app-page-toolbar
+  position: fixed
+  top: 0
+  width: 100%
+  z-index: 1000
+
+.content-wrapper
+  padding-top: calc(variables.$page-toolbar-height)
+
+.content-wrapper.small
+  h1
+    font: var(--mat-sys-display-small)
+  h2
+    font: var(--mat-sys-headline-small)
+  p
+    font: var(--mat-sys-body-small)
+  margin-bottom: 16px
+
+.content-wrapper.medium
+  h1
+    font: var(--mat-sys-display-medium)
+  h2
+    font: var(--mat-sys-headline-medium)
+  p
+    font: var(--mat-sys-body-medium)
+  margin-bottom: 32px
+
+.content-wrapper.large
+  h1
+    font: var(--mat-sys-display-large)
+  h2
+    font: var(--mat-sys-headline-large)
+  p
+    font: var(--mat-sys-body-large)
+  margin-bottom: 32px

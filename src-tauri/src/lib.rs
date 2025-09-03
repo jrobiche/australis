@@ -21,11 +21,13 @@ pub fn run() {
             commands::aurora_ftp_download_aurora_game_data_directory,
             commands::aurora_ftp_list_aurora_game_data_directories,
             commands::aurora_ftp_upload_game_assets,
-            // aurora game commands
+            // TODO sql commands
+            // aurora game commands (aka SQL commands)
             commands::aurora_game_asset_image_delete,
-            commands::aurora_game_asset_image_read,
+            // commands::aurora_game_asset_image_read,
             commands::aurora_game_asset_image_read_url,
             commands::aurora_game_asset_image_update,
+            commands::aurora_game_asset_types_read_all,
             commands::aurora_game_entry_read_all,
             commands::aurora_game_launch,
             commands::aurora_game_read,
@@ -69,6 +71,15 @@ pub fn run() {
             commands::game_console_configuration_read,
             commands::game_console_configuration_read_all,
             commands::game_console_configuration_update,
+            // xboxcatalog commands
+            commands::xboxcatalog_live_image_bytes_url,
+            commands::xboxcatalog_live_images,
+            // xboxunity commands
+            commands::xboxunity_cover_image_bytes_url,
+            commands::xboxunity_cover_image_url,
+            commands::xboxunity_cover_info,
+            commands::xboxunity_icon_image_url,
+            commands::xboxunity_title_list,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,0 +1,13 @@
+<div
+  class="responsive-width-container"
+  [class.handset]="uiService.isHandset$ | async"
+  [class.tablet]="uiService.isTablet$ | async"
+  [class.web]="uiService.isWeb$ | async"
+>
+  <span class="display-text">Screenshots</span>
+  <p>Manage screenshots for the currently running title.</p>
+  <app-screencaptures-card
+    [gameConsoleConfiguration]="gameConsoleConfiguration"
+    [screencaptureMetas]="screenCaptureMetas()"
+  />
+</div>

@@ -40,20 +40,42 @@ impl GameConsoleConfiguration {
     }
 }
 
-// TODO is this still used?
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct AuroraAssetImageData {
-    pub width: u32,
-    pub height: u32,
-    pub rgba8: Vec<u8>,
+pub struct GameListEntry {
+    pub id: u64,
+    pub title_name: String,
 }
 
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct AuroraGameListEntry {
+pub struct GameAssetTypes {
     pub id: u64,
-    pub title_name: String,
+    pub has_icon: bool,
+    pub has_banner: bool,
+    pub has_boxart: bool,
+    pub has_slot: bool,
+    pub has_background: bool,
+    pub has_screenshot1: bool,
+    pub has_screenshot2: bool,
+    pub has_screenshot3: bool,
+    pub has_screenshot4: bool,
+    pub has_screenshot5: bool,
+    pub has_screenshot6: bool,
+    pub has_screenshot7: bool,
+    pub has_screenshot8: bool,
+    pub has_screenshot9: bool,
+    pub has_screenshot10: bool,
+    pub has_screenshot11: bool,
+    pub has_screenshot12: bool,
+    pub has_screenshot13: bool,
+    pub has_screenshot14: bool,
+    pub has_screenshot15: bool,
+    pub has_screenshot16: bool,
+    pub has_screenshot17: bool,
+    pub has_screenshot18: bool,
+    pub has_screenshot19: bool,
+    pub has_screenshot20: bool,
 }
 
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
@@ -62,8 +84,8 @@ pub struct AuroraGame {
     pub id: u64,
     pub directory: String,
     pub executable: String,
-    pub title_id: u64,
-    pub media_id: u64,
+    pub title_id: u32,
+    pub media_id: u32,
     pub base_version: u64,
     pub disc_num: u64,
     pub discs_in_set: u64,

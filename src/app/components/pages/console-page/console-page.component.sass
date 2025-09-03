@@ -1,0 +1,11 @@
+@use '../../../../variables'
+
+mat-tab-group
+  height: calc(100vh - variables.$page-toolbar-height)
+
+// 1px for the boarder of the tab group
+.tab-content-wrapper
+  height: calc(100vh - variables.$page-toolbar-height - variables.$tab-container-height - 1px)
+
+.tab-icon
+  margin-right: 4px

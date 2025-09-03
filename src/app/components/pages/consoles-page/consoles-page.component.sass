@@ -1,0 +1,41 @@
+@use '../../../../variables'
+
+mat-nav-list a:not(:first-of-type)
+   margin-top: 8px
+
+app-page-toolbar
+  position: fixed
+  top: 0
+  width: 100%
+  z-index: 1000
+
+.add-console-fab
+  bottom: 16px
+  position: fixed
+  right: 16px
+  z-index: 2
+
+.content-wrapper.handset
+  .no-consoles-text
+    font: var(--mat-sys-headline-small)
+    margin-top: 16px
+  margin-bottom: 16px
+  margin-top: calc(variables.$page-toolbar-height + 16px)
+
+.content-wrapper.tablet
+  .no-consoles-text
+    font: var(--mat-sys-headline-medium)
+    margin-top: 24px
+  margin-bottom: 24px
+  margin-top: calc(variables.$page-toolbar-height + 24px)
+
+.content-wrapper.web
+  .no-consoles-text
+    font: var(--mat-sys-headline-large)
+    margin-top: 24px
+  margin-bottom: 24px
+  margin-top: calc(variables.$page-toolbar-height + 24px)
+
+.no-consoles-text
+  display: inline-block
+  text-align: center

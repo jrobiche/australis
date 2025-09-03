@@ -12,11 +12,12 @@ use crate::australis::structs::{AuroraGame, GameConsoleConfiguration};
 
 // game-consoles directory structure
 // <AppData>/game-consoles/
-// <AppData>/game-consoles/default.??? TODO
 // <AppData>/game-consoles/<UUID>/
 // <AppData>/game-consoles/<UUID>/configuration.json
-// <AppData>/game-consoles/<UUID>/console-data/ (file system within `console-data` should mirror remote filesystem)
 // <AppData>/game-consoles/<UUID>/aurora-data/ (file system within `aurora-data` should mirror remote aurora installation directory)
+
+// <AppData>/game-consoles/default.??? TODO?
+// <AppData>/game-consoles/<UUID>/console-data/ (file system within `console-data` should mirror remote filesystem)
 // <AppData>/game-consoles/<UUID>/asset-images/ (images extracted from asset files)
 
 // TODO rename `path_game_console_...` to `path_local_...` and create corresponding `path_remote_...` functions
@@ -138,8 +139,11 @@ pub fn path_game_console_aurora_asset(
         | libaustralis::aurora::assets::AssetType::Screenshot20 => {
             format!("SS{:0>8X}.asset", title_id)
         }
-        libaustralis::aurora::assets::AssetType::Slot => {
-            let msg = "Could not determine asset file name for AssetType::Slot.";
+        _ => {
+            let msg = format!(
+                "Could not determine file name containing asset type {}.",
+                asset_type.display()
+            );
             error!("{}", &msg);
             return Err(msg.into());
         }

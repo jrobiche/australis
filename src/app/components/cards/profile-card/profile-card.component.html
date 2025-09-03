@@ -1,0 +1,15 @@
+<mat-card appearance="outlined">
+  <mat-card-header>
+    <mat-card-title-group>
+      <mat-card-title>{{ gamertagText }}</mat-card-title>
+      @if (displayXuid) {
+        <mat-card-subtitle>XUID: {{ xuidText }}</mat-card-subtitle>
+      }
+      <mat-card-subtitle>Gamerscore: {{ gamerscoreText }}</mat-card-subtitle>
+      @if (profileImageUrl) {
+        <img mat-card-sm-image alt="Profile picture" [src]="profileImageUrl" />
+      }
+    </mat-card-title-group>
+  </mat-card-header>
+  <mat-card-content />
+</mat-card>
