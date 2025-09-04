@@ -1,0 +1,126 @@
+#!/bin/bash
+
+set -eu
+
+# TODO support android builds
+
+# configuration
+BUILDER_IMAGE_DIR='builder-image'
+BUILDER_IMAGE_TAG='localhost/australis-builder:latest'
+BUILD_TARGET='all'
+CONTAINER_BINARY='podman'
+
+print_usage() {
+  echo "
+NAME
+       $0 - build Australis executables or builder image
+
+SYNOPSIS
+       $0 [OPTION]...
+
+DESCRIPTION
+       Build Australis executables.
+
+       -b     target to build: all | builder-image | linux | windows
+              default: ${BUILD_TARGET}
+
+       -c     container binary: docker | podman
+              default: ${CONTAINER_BINARY}
+
+       -h     print usage information
+
+       -t=TAG
+              builder image tag
+              default: ${BUILDER_IMAGE_TAG}
+"
+}
+
+parse_args() {
+  while getopts ":b:c:ht:" opt; do
+      case "$opt" in
+      b)
+        BUILD_TARGET="$OPTARG"
+        ;;
+      c)
+        CONTAINER_BINARY="$OPTARG"
+        ;;
+      h)
+        print_usage
+        exit 0
+        ;;
+      t)
+        BUILDER_IMAGE_TAG="$OPTARG"
+        ;;
+      ?)
+        shift $((OPTIND-2))
+        >&2 echo "Unknown option '${1}'"
+        print_usage
+        exit 1
+        ;;
+    esac
+  done
+  shift $((OPTIND-1))
+}
+
+
+build_all() {
+  build_builder_image
+  build_linux
+  build_windows
+}
+
+build_builder_image() {
+  "$CONTAINER_BINARY" build -t "$BUILDER_IMAGE_TAG" "$BUILDER_IMAGE_DIR"
+}
+
+build_linux() {
+  "$CONTAINER_BINARY" run \
+    --interactive \
+    --tty \
+    --rm \
+    --userns=keep-id:uid=1001,gid=1001 \
+    --volume "${PWD}:/home/builder/project/:Z" \
+    "$BUILDER_IMAGE_TAG" build_linux
+}
+
+build_windows() {
+  "$CONTAINER_BINARY" run \
+    --interactive \
+    --tty \
+    --rm \
+    --userns=keep-id:uid=1001,gid=1001 \
+    --volume "${PWD}:/home/builder/project/:Z" \
+    "$BUILDER_IMAGE_TAG" build_windows
+}
+
+main() {
+  if [ ! -d "$BUILDER_IMAGE_DIR" ]; then
+    >&2 echo "
+Failed to build builder image. Could not find '${BUILDER_IMAGE_DIR}' directory.
+Make sure to run this script within the root of the repository.
+"
+    exit 1
+  fi
+  parse_args "$@"
+  case "$BUILD_TARGET" in
+  "all")
+    build_all
+    ;;
+  "builder-image")
+    build_builder_image
+    ;;
+  "linux")
+    build_linux
+    ;;
+  "windows")
+    build_windows
+    ;;
+  ?)
+    >&2 echo "Invalid value for build target: ${BUILD_TARGET}"
+    print_usage
+    exit 1
+    ;;
+esac
+}
+
+main "$@"
