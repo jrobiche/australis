@@ -1,7 +1,7 @@
 [package]
 name = "australis"
 version = "0.1.0"
-description = "A desktop client for the Aurora Xbox 360 Dashboard"
+description = "A client for the Aurora Xbox 360 Dashboard"
 authors = ["jrobiche"]
 license = "GPL-3.0-or-later"
 repository = "https://github.com/jrobiche/australis"
@@ -26,7 +26,9 @@ log = "0.4"
 tauri = { version = "2.1.0", features = [] }
 tauri-plugin-log = "2.0.0-rc"
 uuid = { version = "1.11.0", features = ["v4", "fast-rng"] }
+# TODO set to latest tag
 # libaustralis = { git = "https://github.com/jrobiche/libaustralis.git", tag = "0.1.0" }
-libaustralis = { git = "https://github.com/jrobiche/libaustralis.git", branch = "next" }
+# libaustralis = { git = "https://github.com/jrobiche/libaustralis.git", branch = "next" }
+libaustralis = { git = "https://github.com/jrobiche/libaustralis.git", branch = "fix/improve-modules" }
 base64 = "0.22.1"
 env_logger = "0.11.6"

@@ -1,0 +1,56 @@
+<app-page-toolbar heading="Home" [backButton]="false">
+  @if (breakpoint.isHandset$ | async) {
+    <button mat-icon-button aria-label="About" [routerLink]="['/', 'about']">
+      <mat-icon fontSet="material-icons-outlined">info</mat-icon>
+    </button>
+  } @else {
+    <a mat-stroked-button aria-label="About" [routerLink]="['/', 'about']">
+      <mat-icon fontSet="material-icons-outlined">info</mat-icon>
+      About
+    </a>
+  }
+</app-page-toolbar>
+<div class="content-wrapper responsive-width-container">
+  <app-page-title-toolbar heading="Consoles">
+    @if (breakpoint.isWeb$ | async) {
+      <button
+        mat-flat-button
+        aria-label="Add console"
+        class="trailing-button"
+        (click)="onAddConsoleClick()"
+      >
+        <mat-icon fontSet="material-icons-round">add</mat-icon>
+        Add Console
+      </button>
+    }
+  </app-page-title-toolbar>
+  @if (breakpoint.isHandset$ | async) {
+    <button
+      aria-label="Add console"
+      class="add-console-fab"
+      mat-fab
+      (click)="onAddConsoleClick()"
+    >
+      <mat-icon fontSet="material-icons-round">add</mat-icon>
+    </button>
+  } @else if (breakpoint.isTablet$ | async) {
+    <button
+      aria-label="Add console"
+      class="add-console-fab"
+      mat-fab
+      extended
+      (click)="onAddConsoleClick()"
+    >
+      <mat-icon fontSet="material-icons-round">add</mat-icon>
+      Add Console
+    </button>
+  }
+  @if (gameConsoleConfigurations.length == 0) {
+    <p>Add a console and it will show up here.</p>
+  } @else {
+    <app-console-navigation-list
+      class="navigation-list"
+      [configurations]="gameConsoleConfigurations"
+    />
+  }
+</div>

@@ -1,0 +1,11 @@
+@use '../../../../../variables'
+
+app-game-console-toolbar
+  position: fixed
+  top: 0
+  width: 100%
+  z-index: 1000
+
+.app-content
+  height: calc(100vh - variables.$page-toolbar-height)
+  padding-top: calc(variables.$page-toolbar-height)

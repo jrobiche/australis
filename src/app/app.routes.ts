@@ -1,20 +1,29 @@
 import { Routes } from '@angular/router';
 
-import { AboutPageComponent } from '@app/components/pages/about-page/about-page.component';
-import { ConsolePageComponent } from '@app/components/pages/console-page/console-page.component';
-import { ConsolesPageComponent } from '@app/components/pages/consoles-page/consoles-page.component';
-import { EditAssetsPageComponent } from '@app/components/pages/edit-assets-page/edit-assets-page.component';
-import { NotFoundPageComponent } from '@app/components/pages/not-found-page/not-found-page.component';
-
 export const routes: Routes = [
-  { path: 'about', component: AboutPageComponent },
-  { path: 'consoles', component: ConsolesPageComponent },
-  // TODO support gameId and systemDetailView via query params
-  { path: 'consoles/:consoleId', component: ConsolePageComponent },
   {
-    path: 'consoles/:consoleId/edit-assets/:gameId',
-    component: EditAssetsPageComponent,
+    path: 'about',
+    loadChildren: () =>
+      import('@app/modules/about/about.module').then((mod) => mod.AboutModule),
   },
-  { path: '', redirectTo: '/consoles', pathMatch: 'full' },
-  { path: '**', component: NotFoundPageComponent },
+  {
+    path: 'consoles',
+    loadChildren: () =>
+      import('@app/modules/game-console/game-console.module').then(
+        (mod) => mod.GameConsoleModule,
+      ),
+  },
+  {
+    path: 'home',
+    loadChildren: () =>
+      import('@app/modules/home/home.module').then((mod) => mod.HomeModule),
+  },
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
+  {
+    path: '**',
+    loadChildren: () =>
+      import('@app/modules/not-found/not-found.module').then(
+        (mod) => mod.NotFoundModule,
+      ),
+  },
 ];

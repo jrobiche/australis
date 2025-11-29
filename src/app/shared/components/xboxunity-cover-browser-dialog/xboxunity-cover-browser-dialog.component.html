@@ -1,0 +1,19 @@
+<h2 mat-dialog-title>Browse XboxUnity Covers</h2>
+<mat-dialog-content>
+  @if (titleListResult) {
+    @if (titleListResult.Items.length == 0) {
+      <span>No titles found.</span>
+    }
+    @for (item of titleListResult.Items; track $index) {
+      <app-title-card
+        [titleListItem]="item"
+        (coverSelected)="onCoverSelected($event)"
+      />
+    }
+  } @else {
+    <span>No results found.</span>
+  }
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="onCancelClick()">Cancel</button>
+</mat-dialog-actions>

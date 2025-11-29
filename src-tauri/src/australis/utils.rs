@@ -142,7 +142,7 @@ pub fn path_game_console_aurora_asset(
         _ => {
             let msg = format!(
                 "Could not determine file name containing asset type {}.",
-                asset_type.display()
+                asset_type
             );
             error!("{}", &msg);
             return Err(msg.into());

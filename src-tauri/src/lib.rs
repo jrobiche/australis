@@ -76,9 +76,8 @@ pub fn run() {
             commands::xboxcatalog_live_images,
             // xboxunity commands
             commands::xboxunity_cover_image_bytes_url,
-            commands::xboxunity_cover_image_url,
             commands::xboxunity_cover_info,
-            commands::xboxunity_icon_image_url,
+            commands::xboxunity_title_icon_image_bytes_url,
             commands::xboxunity_title_list,
         ])
         .run(tauri::generate_context!())

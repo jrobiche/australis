@@ -6,48 +6,9 @@
 
 :root {
   touch-action: pan-x pan-y;
-}
-
-app-root {
   @include mat.expansion-overrides((
     container-background-color: var(--mat-sys-surface-container),
     container-text-color:  var(--mat-sys-on-surface),
-  ));
-}
-
-app-consoles-page {
-  .mat-mdc-nav-list {
-    @include mat.list-overrides((
-      list-item-container-color: var(--mat-sys-surface-container-low),
-      list-item-label-text-color: var(--mat-sys-on-surface),
-      list-item-one-line-container-height: 80px,
-    ));
-  }
-  // list-item-container-shape override not supported for `mat-nav-list`
-  .mat-mdc-nav-list .mat-mdc-list-item {
-    border-radius: 16px;
-  }
-}
-
-app-console-page {
-  @include mat.tabs-overrides((
-    container-height: variables.$tab-container-height,
-  ));
-  @include mat.list-overrides((
-    list-item-selected-container-color: var(--mat-sys-secondary-container),
-    active-indicator-shape: 20px,
-    list-item-container-shape: 80px,
-  ));
-  .mdc-list-item--selected {
-    @include mat.list-overrides((
-      list-item-label-text-color: var(--mat-sys-on-secondary-container),
-    ));
-  }
-}
-
-app-game-card {
-  @include mat.divider-overrides((
-    color: var(--mat-sys-outline-variant),
   ));
 }
 
@@ -63,39 +24,55 @@ app-page-toolbar {
   ));
 }
 
-app-game-library {
-  @include mat.sidenav-overrides((
-    container-divider-color: var(--mat-sys-outline-variant),
-  ));
+app-page-title-toolbar {
   @include mat.toolbar-overrides((
-    mobile-height: variables.$game-library-toolbar-height,
-    standard-height: variables.$game-library-toolbar-height,
+    mobile-height: variables.$page-title-toolbar-height,
+    standard-height: variables.$page-title-toolbar-height,
   ));
-  mat-drawer-container {
-    height: calc(100% - variables.$game-library-toolbar-height);
-  }
-  .web {
-    @include mat.sidenav-overrides((
-      container-shape: 0px,
+}
+
+.divider-variant {
+  @include mat.divider-overrides((
+    color: var(--mat-sys-outline-variant),
+  ));
+}
+
+.game-console-app-toolbar {
+  @include mat.toolbar-overrides((
+    mobile-height: variables.$game-console-app-toolbar-height,
+    standard-height: variables.$game-console-app-toolbar-height,
+  ));
+}
+
+.navigation-drawer {
+  @include mat.list-overrides((
+    active-indicator-shape: 20px,
+    list-item-container-shape: 80px,
+    list-item-selected-container-color: var(--mat-sys-secondary-container),
+  ));
+  .mdc-list-item--selected {
+    @include mat.list-overrides((
+      list-item-label-text-color: var(--mat-sys-on-secondary-container),
     ));
   }
 }
 
-app-system-details {
+.navigation-drawer.layout-web {
   @include mat.sidenav-overrides((
     container-divider-color: var(--mat-sys-outline-variant),
+    container-shape: 0px,
   ));
-  @include mat.toolbar-overrides((
-    mobile-height: variables.$system-details-toolbar-height,
-    standard-height: variables.$system-details-toolbar-height,
+}
+
+.navigation-list {
+  @include mat.list-overrides((
+    list-item-container-color: var(--mat-sys-surface-container-high),
+    list-item-label-text-color: var(--mat-sys-on-surface),
+    list-item-one-line-container-height: variables.$console-nav-list-card-height,
   ));
-  mat-drawer-container {
-    height: calc(100% - variables.$system-details-toolbar-height);
-  }
-  .web {
-    @include mat.sidenav-overrides((
-      container-shape: 0px,
-    ));
+  // list-item-container-shape override not supported for `mat-nav-list`
+  .mat-mdc-nav-list .mat-mdc-list-item {
+    border-radius: variables.$console-nav-list-card-border-radius;
   }
 }
 
@@ -168,10 +145,12 @@ body.color-scheme-light {
   }
 }
 
+// TODO is this used?
 .leading-button {
   margin-right: 4px;
 }
 
+// TODO is this used?
 .trailing-button {
   margin-left: 4px;
 }

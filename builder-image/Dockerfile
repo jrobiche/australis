@@ -8,8 +8,8 @@ FROM docker.io/ubuntu:24.04
 # - https://github.com/audioling/audioling/issues/40#issuecomment-2908048836
 # - https://github.com/OmniKee/OmniKee/blob/main/.github/workflows/release.yml#L108C1-L113C42
 RUN set -eux; \
-  apt update; \
-  apt install -y \
+  apt-get update; \
+  apt-get install -y \
     libwebkit2gtk-4.1-0=2.44.0-2 \
     libwebkit2gtk-4.1-dev=2.44.0-2 \
     libjavascriptcoregtk-4.1-0=2.44.0-2 \
@@ -30,11 +30,11 @@ RUN set -eux; \
   curl -fsSL -o nodesource_setup.sh https://deb.nodesource.com/setup_20.x; \
   bash nodesource_setup.sh; \
   rm nodesource_setup.sh; \
-  apt install -y nodejs
+  apt-get install -y nodejs
 
 # install llvm (required for building windows executable)
 RUN set -eux; \
-  apt install -y nsis lld llvm lsb-release wget software-properties-common gnupg; \
+  apt-get install -y nsis lld llvm lsb-release wget software-properties-common gnupg; \
   curl -o llvm.sh https://apt.llvm.org/llvm.sh; \
   bash llvm.sh 20 all; \
   rm llvm.sh

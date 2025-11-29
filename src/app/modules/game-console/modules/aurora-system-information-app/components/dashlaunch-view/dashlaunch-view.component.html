@@ -1,0 +1,138 @@
+<div
+  class="responsive-width-container"
+  [class.layout-handset]="breakpointService.isHandset$ | async"
+  [class.layout-tablet]="breakpointService.isTablet$ | async"
+  [class.layout-web]="breakpointService.isWeb$ | async"
+>
+  <app-page-title-toolbar heading="DashLaunch" />
+  <mat-chip-set aria-label="Dashlaunch attributes">
+    <mat-chip>Version: {{ versionText }}</mat-chip>
+    <mat-chip>Kernel: {{ kernelText }}</mat-chip>
+  </mat-chip-set>
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>Configuration</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-accordion>
+        <!-- Paths Options -->
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>Paths</mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-list role="list">
+            @if (pathOptions.length == 0) {
+              <p>No options available.</p>
+            }
+            @for (pathOption of pathOptions; track pathOption.id) {
+              <mat-list-item role="listitem">
+                <span matListItemTitle>{{ pathOption.name }}</span>
+                <span class="path-property" matListItemLine>
+                  <code>{{ pathOption.value }}</code>
+                </span>
+              </mat-list-item>
+            }
+          </mat-list>
+        </mat-expansion-panel>
+        <!-- Behavior Options -->
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>Behavior</mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-list role="list">
+            @if (behaviorOptions.length == 0) {
+              <p>No options available.</p>
+            }
+            @for (behaviorOption of behaviorOptions; track behaviorOption.id) {
+              <mat-list-item role="listitem">
+                <span class="key-value-columns">
+                  <span>{{ behaviorOption.name }}</span>
+                  <span>{{ behaviorOption.value }}</span>
+                </span>
+              </mat-list-item>
+            }
+          </mat-list>
+        </mat-expansion-panel>
+        <!-- Network Options -->
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>Network</mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-list role="list">
+            @if (networkOptions.length == 0) {
+              <p>No options available.</p>
+            }
+            @for (networkOption of networkOptions; track networkOption.id) {
+              <mat-list-item role="listitem">
+                <span class="key-value-columns">
+                  <span>{{ networkOption.name }}</span>
+                  <span>{{ networkOption.value }}</span>
+                </span>
+              </mat-list-item>
+            }
+          </mat-list>
+        </mat-expansion-panel>
+        <!-- Timer Options -->
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>Timers</mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-list role="list">
+            @if (timerOptions.length == 0) {
+              <p>No options available.</p>
+            }
+            @for (timerOption of timerOptions; track timerOption.id) {
+              <mat-list-item role="listitem">
+                <span class="key-value-columns">
+                  <span>{{ timerOption.name }}</span>
+                  <span>{{ timerOption.value }}</span>
+                </span>
+              </mat-list-item>
+            }
+          </mat-list>
+        </mat-expansion-panel>
+        <!-- Plugin Options -->
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>Plugins</mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-list role="list">
+            @if (pluginOptions.length == 0) {
+              <p>No options available.</p>
+            }
+            @for (pluginOption of pluginOptions; track pluginOption.id) {
+              <mat-list-item role="listitem">
+                <span class="key-value-columns">
+                  <span>{{ pluginOption.name }}</span>
+                  <span>{{ pluginOption.value }}</span>
+                </span>
+              </mat-list-item>
+            }
+          </mat-list>
+        </mat-expansion-panel>
+        <!-- Configurator Options -->
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>Configurator</mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-list role="list">
+            @if (configuratorOptions.length == 0) {
+              <p>No options available.</p>
+            }
+            @for (
+              configuratorOption of configuratorOptions;
+              track configuratorOption.id
+            ) {
+              <mat-list-item role="listitem">
+                <span class="key-value-columns">
+                  <span>{{ configuratorOption.name }}</span>
+                  <span>{{ configuratorOption.value }}</span>
+                </span>
+              </mat-list-item>
+            }
+          </mat-list>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </mat-card-content>
+  </mat-card>
+</div>

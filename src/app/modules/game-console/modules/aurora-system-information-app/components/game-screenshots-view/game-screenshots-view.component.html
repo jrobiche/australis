@@ -1,0 +1,13 @@
+<div
+  class="responsive-width-container"
+  [class.layout-handset]="breakpointService.isHandset$ | async"
+  [class.layout-tablet]="breakpointService.isTablet$ | async"
+  [class.layout-web]="breakpointService.isWeb$ | async"
+>
+  <app-page-title-toolbar heading="Screenshots" />
+  <p class="description">Manage screenshots for the currently running title.</p>
+  <app-screencaptures-card
+    [gameConsoleConfiguration]="gameConsoleConfiguration"
+    [screencaptureMetas]="screenCaptureMetas()"
+  />
+</div>

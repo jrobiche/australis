@@ -1,0 +1,25 @@
+@use '../../../../../variables'
+
+app-page-toolbar
+  position: fixed
+  top: 0
+  width: 100%
+  z-index: 1000
+
+.content-wrapper
+  margin-top: calc(variables.$page-toolbar-height)
+  margin-bottom: 32px
+  p:first-of-type
+    margin-top: 0px
+
+.content-wrapper.font-small
+  p
+    font: var(--mat-sys-body-small)
+
+.content-wrapper.font-medium
+  p
+    font: var(--mat-sys-body-medium)
+
+.content-wrapper.font-large
+  p
+    font: var(--mat-sys-body-large)

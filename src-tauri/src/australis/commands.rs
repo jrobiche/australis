@@ -306,7 +306,7 @@ pub async fn aurora_game_asset_image_delete(
 //         (Some(w), Some(h), None) => (w, h),
 //         _ => {
 //             let msg = format!("Failed to read '{}' image in asset at '{}'. Could not determine image width and height.",
-//                 &asset_type.display(),
+//                 &asset_type,
 //                 &asset_path.display()
 //             );
 //             error!("{}", &msg);
@@ -321,7 +321,7 @@ pub async fn aurora_game_asset_image_delete(
 //         Err(err) => {
 //             let msg = format!(
 //                 "Failed to read '{}' image in asset at '{}'. Failed to get image RGBA8. Got the following error: {}",
-//                 &asset_type.display(),
+//                 &asset_type,
 //                 &asset_path.display(),
 //                 err
 //             );
@@ -377,7 +377,7 @@ pub async fn aurora_game_asset_image_read_url(
             return Err(msg);
         }
     };
-    if !asset.is_image_set(asset_type) {
+    if !asset.has_image(asset_type) {
         return Ok(None);
     }
     let image = match asset.image(asset_type) {
@@ -388,7 +388,7 @@ pub async fn aurora_game_asset_image_read_url(
         Err(err) => {
             let msg = format!(
                 "Failed to read '{}' image in asset at '{}'. Got the following error: {}",
-                &asset_type.display(),
+                &asset_type,
                 &asset_path.display(),
                 err
             );
@@ -406,7 +406,7 @@ pub async fn aurora_game_asset_image_read_url(
             Err(err) => {
                 let msg = format!(
                     "Failed to write '{}' image in asset at '{}' to buffer. Got the following error: {}",
-                    &asset_type.display(),
+                    &asset_type,
                     &asset_path.display(),
                     err
                 );
@@ -466,12 +466,29 @@ pub async fn aurora_game_asset_image_update(
         // TODO should this warn? should this error?
         asset = libaustralis::aurora::assets::Asset::new();
     }
-    let image = match libaustralis::utils::image_from_be_bytes(file_data) {
-        Ok(x) => x,
+    // TODO do not use utils
+    // pub fn image_from_be_bytes(bytes: Vec<u8>) -> GenericResult<image::DynamicImage> {
+    //     Ok(image::ImageReader::new(std::io::Cursor::new(bytes))
+    //         .with_guessed_format()?
+    //         .decode()?)
+    // }
+    let image = match libaustralis::aurora::assets::image::ImageReader::new(std::io::Cursor::new(
+        file_data,
+    ))
+    .with_guessed_format()
+    {
+        Ok(img) => match img.decode() {
+            Ok(x) => x,
+            Err(err) => {
+                let msg = format!("TODO: {}", err);
+                error!("{}", &msg);
+                return Err(msg);
+            }
+        },
         Err(err) => {
             let msg = format!(
                 "Failed to update '{}' image in asset at '{}'. Failed to create image from file data. Got the following error: {}",
-                &asset_type.display(),
+                &asset_type,
                 &asset_path.display(),
                 err
             );
@@ -479,12 +496,30 @@ pub async fn aurora_game_asset_image_update(
             return Err(msg);
         }
     };
-    match asset.set_image(image, asset_type, libaustralis::utils::TextureFormat::RGBA8) {
+    // let image = match libaustralis::utils::image_from_be_bytes(file_data) {
+    //     Ok(x) => x,
+    //     Err(err) => {
+    //         let msg = format!(
+    //             "Failed to update '{}' image in asset at '{}'. Failed to create image from file data. Got the following error: {}",
+    //             &asset_type,
+    //             &asset_path.display(),
+    //             err
+    //         );
+    //         error!("{}", &msg);
+    //         return Err(msg);
+    //     }
+    // };
+    // TODO do not use utils
+    match asset.set_image(
+        image,
+        asset_type,
+        libaustralis::aurora::assets::TextureFormat::RGBA8,
+    ) {
         Ok(_) => (),
         Err(err) => {
             let msg = format!(
                 "Failed to update '{}' image in asset at '{}'. Got the following error: {}",
-                &asset_type.display(),
+                &asset_type,
                 &asset_path.display(),
                 err
             );
@@ -497,7 +532,7 @@ pub async fn aurora_game_asset_image_update(
         Err(err) => {
             let msg = format!(
                 "Failed to update '{}' image in asset at '{}'. Failed to save asset to '{}'. Got the following error: {}",
-                &asset_type.display(),
+                &asset_type,
                 &asset_path.display(),
                 &asset_path.display(),
                 err
@@ -509,6 +544,7 @@ pub async fn aurora_game_asset_image_update(
     Ok(())
 }
 
+// TODO is this used?
 #[tauri::command(async)]
 pub async fn aurora_game_asset_types_read_all(
     app_handle: tauri::AppHandle,
@@ -591,7 +627,7 @@ pub async fn aurora_game_asset_types_read_all(
                     // return Err(msg);
                 }
             };
-            if asset.is_image_set(asset_type) {
+            if asset.has_image(asset_type) {
                 match asset_type {
                     libaustralis::aurora::assets::AssetType::Icon => {
                         game_asset_types.has_icon = true
@@ -1997,17 +2033,28 @@ pub fn game_console_configuration_update(
 pub async fn xboxunity_cover_image_bytes_url(
     cover_id: &str,
     cover_size: &str,
-) -> Result<Option<String>, String> {
+) -> Result<String, String> {
+    let cover_id_usize = match cover_id.parse::<usize>() {
+        Ok(x) => x,
+        Err(err) => {
+            let msg = format!(
+                "Failed to convert string to usize. Got the following error: {}",
+                err
+            );
+            error!("{}", msg);
+            return Err(msg);
+        }
+    };
     let cover_size = match cover_size {
         "small" => libaustralis::xboxunity::CoverSize::Small,
         "large" => libaustralis::xboxunity::CoverSize::Large,
         _ => return Err(format!("Invalid cover size: {}", cover_size)),
     };
-    match libaustralis::xboxunity::cover_image_bytes(cover_id, cover_size).await {
-        Ok(x) => Ok(Some(format!(
+    match libaustralis::xboxunity::cover_image_bytes(cover_id_usize, cover_size).await {
+        Ok(x) => Ok(format!(
             "data:image/png;base64,{}",
             general_purpose::STANDARD.encode(&x)
-        ))),
+        )),
         Err(err) => {
             let msg = format!(
                 "Failed to retrieve cover image bytes from XboxUnity. Got the following error: {}",
@@ -2020,22 +2067,21 @@ pub async fn xboxunity_cover_image_bytes_url(
 }
 
 #[tauri::command]
-pub fn xboxunity_cover_image_url(cover_id: &str, cover_size: &str) -> Result<String, String> {
-    let cover_size = match cover_size {
-        "small" => libaustralis::xboxunity::CoverSize::Small,
-        "large" => libaustralis::xboxunity::CoverSize::Large,
-        _ => return Err(format!("Invalid cover size: {}", cover_size)),
-    };
-    Ok(libaustralis::xboxunity::cover_image_url(
-        cover_id, cover_size,
-    ))
-}
-
-#[tauri::command]
 pub async fn xboxunity_cover_info(
     title_id: &str,
 ) -> Result<libaustralis::xboxunity::CoverInfoResult, String> {
-    match libaustralis::xboxunity::cover_info(title_id).await {
+    let title_id_usize = match usize::from_str_radix(title_id, 16) {
+        Ok(x) => x,
+        Err(err) => {
+            let msg = format!(
+                "Failed to convert string to usize. Got the following error: {}",
+                err
+            );
+            error!("{}", msg);
+            return Err(msg);
+        }
+    };
+    match libaustralis::xboxunity::cover_info(title_id_usize).await {
         Ok(x) => Ok(x),
         Err(err) => {
             let msg = format!(
@@ -2049,20 +2095,31 @@ pub async fn xboxunity_cover_info(
 }
 
 #[tauri::command]
-pub fn xboxunity_icon_image_url(title_id: &str) -> Result<String, String> {
-    Ok(libaustralis::xboxunity::icon_image_url(title_id))
+pub async fn xboxunity_title_icon_image_bytes_url(
+    title_list_item: libaustralis::xboxunity::TitleListItem,
+) -> Result<String, String> {
+    match libaustralis::xboxunity::icon_image_bytes(title_list_item.title_id).await {
+        Ok(x) => Ok(format!(
+            "data:image/png;base64,{}",
+            general_purpose::STANDARD.encode(&x)
+        )),
+        Err(err) => {
+            let msg = format!(
+                "Failed to retrieve icon image bytes from XboxUnity. Got the following error: {}",
+                err
+            );
+            error!("{}", msg);
+            Err(msg)
+        }
+    }
 }
 
 #[tauri::command]
 pub async fn xboxunity_title_list(
     query: &str,
     page: usize,
-    count: Option<usize>,
+    count: usize,
 ) -> Result<libaustralis::xboxunity::TitleListResult, String> {
-    let count = match count {
-        Some(x) => x,
-        None => 10,
-    };
     match libaustralis::xboxunity::title_list(
         query,
         page,
@@ -2074,7 +2131,10 @@ pub async fn xboxunity_title_list(
     )
     .await
     {
-        Ok(x) => Ok(x),
+        Ok(x) => {
+            println!("RESULT: {:?}", &x);
+            Ok(x)
+        }
         Err(err) => {
             let msg = format!(
                 "Failed to retrieve titles from XboxUnity. Got the following error: {}",
@@ -2093,9 +2153,15 @@ pub async fn xboxunity_title_list(
 pub async fn xboxcatalog_live_image_bytes_url(
     live_image: libaustralis::xboxcatalog::LiveImage,
 ) -> Result<Option<String>, String> {
-    match libaustralis::xboxcatalog::image_bytes(live_image).await {
+    let media_type = match live_image.format {
+        4 => "image/jpeg",
+        5 => "image/png",
+        _ => "image/png", // TODO error?
+    };
+    match live_image.file_bytes().await {
         Ok(x) => Ok(Some(format!(
-            "data:image/png;base64,{}",
+            "data:{};base64,{}",
+            media_type,
             general_purpose::STANDARD.encode(&x)
         ))),
         Err(err) => {
@@ -2111,14 +2177,25 @@ pub async fn xboxcatalog_live_image_bytes_url(
 
 #[tauri::command]
 pub async fn xboxcatalog_live_images(
-    title_id: &str,
-    locale: &str,
+    title_id: usize,
+    locale_code: &str,
 ) -> Result<Vec<libaustralis::xboxcatalog::LiveImage>, String> {
+    let locale = match libaustralis::xboxcatalog::Locale::from_code_str(locale_code) {
+        Ok(x) => x,
+        Err(err) => {
+            let msg = format!(
+                "Failed to convert locale code to Locale. Got the following error: {}",
+                err
+            );
+            error!("{}", msg);
+            return Err(msg);
+        }
+    };
     match libaustralis::xboxcatalog::live_images_for_title_id(title_id, locale).await {
         Ok(x) => Ok(x),
         Err(err) => {
             let msg = format!(
-                "Failed to retrieve images from XboxCatalog. Got the following error: {}",
+                "Failed to retrieve live image information from XboxCatalog. Got the following error: {}",
                 err
             );
             error!("{}", msg);
