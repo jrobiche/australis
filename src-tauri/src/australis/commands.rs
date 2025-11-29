@@ -1707,126 +1707,6 @@ pub fn game_console_configuration_update(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// xbox unity commands
-////////////////////////////////////////////////////////////////////////////////
-#[tauri::command]
-pub async fn xboxunity_cover_image_bytes_url(
-    cover_id: &str,
-    cover_size: &str,
-) -> Result<String, String> {
-    let cover_id_usize = match cover_id.parse::<usize>() {
-        Ok(x) => x,
-        Err(err) => {
-            let msg = format!(
-                "Failed to convert string to usize. Got the following error: {}",
-                err
-            );
-            error!("{}", msg);
-            return Err(msg);
-        }
-    };
-    let cover_size = match cover_size {
-        "small" => libaustralis::xboxunity::CoverSize::Small,
-        "large" => libaustralis::xboxunity::CoverSize::Large,
-        _ => return Err(format!("Invalid cover size: {}", cover_size)),
-    };
-    match libaustralis::xboxunity::cover_image_bytes(cover_id_usize, cover_size).await {
-        Ok(x) => Ok(format!(
-            "data:image/png;base64,{}",
-            general_purpose::STANDARD.encode(&x)
-        )),
-        Err(err) => {
-            let msg = format!(
-                "Failed to retrieve cover image bytes from XboxUnity. Got the following error: {}",
-                err
-            );
-            error!("{}", msg);
-            Err(msg)
-        }
-    }
-}
-
-#[tauri::command]
-pub async fn xboxunity_cover_info(
-    title_id: &str,
-) -> Result<libaustralis::xboxunity::CoverInfoResult, String> {
-    let title_id_usize = match usize::from_str_radix(title_id, 16) {
-        Ok(x) => x,
-        Err(err) => {
-            let msg = format!(
-                "Failed to convert string to usize. Got the following error: {}",
-                err
-            );
-            error!("{}", msg);
-            return Err(msg);
-        }
-    };
-    match libaustralis::xboxunity::cover_info(title_id_usize).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
-            let msg = format!(
-                "Failed to retrieve cover information from XboxUnity. Got the following error: {}",
-                err
-            );
-            error!("{}", msg);
-            Err(msg)
-        }
-    }
-}
-
-#[tauri::command]
-pub async fn xboxunity_title_icon_image_bytes_url(
-    title_list_item: libaustralis::xboxunity::TitleListItem,
-) -> Result<String, String> {
-    match libaustralis::xboxunity::icon_image_bytes(title_list_item.title_id).await {
-        Ok(x) => Ok(format!(
-            "data:image/png;base64,{}",
-            general_purpose::STANDARD.encode(&x)
-        )),
-        Err(err) => {
-            let msg = format!(
-                "Failed to retrieve icon image bytes from XboxUnity. Got the following error: {}",
-                err
-            );
-            error!("{}", msg);
-            Err(msg)
-        }
-    }
-}
-
-#[tauri::command]
-pub async fn xboxunity_title_list(
-    query: &str,
-    page: usize,
-    count: usize,
-) -> Result<libaustralis::xboxunity::TitleListResult, String> {
-    match libaustralis::xboxunity::title_list(
-        query,
-        page,
-        count,
-        libaustralis::xboxunity::SearchSort::Name,
-        libaustralis::xboxunity::SearchDirection::Ascending,
-        libaustralis::xboxunity::SearchCategory::All,
-        libaustralis::xboxunity::SearchFilter::All,
-    )
-    .await
-    {
-        Ok(x) => {
-            println!("RESULT: {:?}", &x);
-            Ok(x)
-        }
-        Err(err) => {
-            let msg = format!(
-                "Failed to retrieve titles from XboxUnity. Got the following error: {}",
-                err
-            );
-            error!("{}", msg);
-            Err(msg)
-        }
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // xbox catalog commands
 ////////////////////////////////////////////////////////////////////////////////
 #[tauri::command]
@@ -1838,21 +1718,22 @@ pub async fn xboxcatalog_live_image_bytes_url(
         5 => "image/png",
         _ => "image/png", // TODO error?
     };
-    match live_image.file_bytes().await {
-        Ok(x) => Ok(Some(format!(
-            "data:{};base64,{}",
-            media_type,
-            general_purpose::STANDARD.encode(&x)
-        ))),
-        Err(err) => {
-            let msg = format!(
-                "Failed to retrieve image bytes from Xbox Catalog. Got the following error: {}",
-                err
-            );
-            error!("{}", msg);
-            Err(msg)
-        }
+    let image_bytes: Vec<u8> = live_image.file_bytes().await.map_err(|err| {
+        let msg = format!(
+            "Failed to retrieve image bytes from Xbox Catalog. Got the following error: {}",
+            err
+        );
+        error!("{}", msg);
+        msg
+    })?;
+    if image_bytes.len() == 0 {
+        return Ok(None);
     }
+    Ok(Some(format!(
+        "data:{};base64,{}",
+        media_type,
+        general_purpose::STANDARD.encode(&image_bytes)
+    )))
 }
 
 #[tauri::command]
@@ -1860,26 +1741,131 @@ pub async fn xboxcatalog_live_images(
     title_id: usize,
     locale_code: &str,
 ) -> Result<Vec<libaustralis::xboxcatalog::LiveImage>, String> {
-    let locale = match libaustralis::xboxcatalog::Locale::from_code_str(locale_code) {
-        Ok(x) => x,
-        Err(err) => {
-            let msg = format!(
-                "Failed to convert locale code to Locale. Got the following error: {}",
-                err
-            );
-            error!("{}", msg);
-            return Err(msg);
-        }
-    };
-    match libaustralis::xboxcatalog::live_images_for_title_id(title_id, locale).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    let locale = libaustralis::xboxcatalog::Locale::from_code_str(locale_code).map_err(|err| {
+        let msg = format!(
+            "Failed to convert locale code to Locale. Got the following error: {}",
+            err
+        );
+        error!("{}", msg);
+        msg
+    })?;
+    libaustralis::xboxcatalog::live_images_for_title_id(title_id, locale).await.map_err(|err| {
             let msg = format!(
                 "Failed to retrieve live image information from XboxCatalog. Got the following error: {}",
                 err
             );
             error!("{}", msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// xbox unity commands
+////////////////////////////////////////////////////////////////////////////////
+#[tauri::command]
+pub async fn xboxunity_cover_image_bytes_url(
+    cover_id: &str,
+    cover_size: &str,
+) -> Result<String, String> {
+    let cover_id_usize = cover_id.parse::<usize>().map_err(|err| {
+        let msg = format!(
+            "Failed to convert string to usize. Got the following error: {}",
+            err
+        );
+        error!("{}", msg);
+        msg
+    })?;
+    let cover_size_enum =
+        libaustralis::xboxunity::CoverSize::from_str(cover_size).map_err(|err| {
+            let msg = format!(
+                "Failed to convert string '{}' to CoverSize. Got the following error: {}",
+                cover_size, err,
+            );
+            error!("{}", msg);
+            msg
+        })?;
+    let image_bytes = libaustralis::xboxunity::cover_image_bytes(cover_id_usize, cover_size_enum).await.map_err(|err| {
+            let msg = format!(
+                "Failed to retrieve cover image bytes for cover with id '{}' and size '{}' from XboxUnity. Got the following error: {}",
+                cover_id, cover_size,
+                err
+            );
+            error!("{}", msg);
+            msg
+    })?;
+    Ok(format!(
+        "data:image/png;base64,{}",
+        general_purpose::STANDARD.encode(&image_bytes)
+    ))
+}
+
+#[tauri::command]
+pub async fn xboxunity_cover_info(
+    title_id: &str,
+) -> Result<libaustralis::xboxunity::CoverInfoResult, String> {
+    let title_id_usize = usize::from_str_radix(title_id, 16).map_err(|err| {
+        let msg = format!(
+            "Failed to convert title id string '{}' to usize. Got the following error: {}",
+            title_id, err
+        );
+        error!("{}", msg);
+        msg
+    })?;
+    libaustralis::xboxunity::cover_info(title_id_usize)
+        .await
+        .map_err(|err| {
+            let msg = format!(
+                "Failed to retrieve cover information for title id usize '{}' from XboxUnity. Got the following error: {}",
+                title_id_usize,
+                err
+            );
+            error!("{}", msg);
+            msg
+        })
+}
+
+#[tauri::command]
+pub async fn xboxunity_title_icon_image_bytes_url(
+    title_list_item: libaustralis::xboxunity::TitleListItem,
+) -> Result<String, String> {
+    let image_bytes: Vec<u8> = libaustralis::xboxunity::icon_image_bytes(title_list_item.title_id)
+        .await
+        .map_err(|err| {
+            let msg = format!(
+                "Failed to retrieve icon image bytes from XboxUnity. Got the following error: {}",
+                err
+            );
+            error!("{}", msg);
+            msg
+        })?;
+    Ok(format!(
+        "data:image/png;base64,{}",
+        general_purpose::STANDARD.encode(&image_bytes)
+    ))
+}
+
+#[tauri::command]
+pub async fn xboxunity_title_list(
+    query: &str,
+    page: usize,
+    count: usize,
+) -> Result<libaustralis::xboxunity::TitleListResult, String> {
+    libaustralis::xboxunity::title_list(
+        query,
+        page,
+        count,
+        libaustralis::xboxunity::SearchSort::Name,
+        libaustralis::xboxunity::SearchDirection::Ascending,
+        libaustralis::xboxunity::SearchCategory::All,
+        libaustralis::xboxunity::SearchFilter::All,
+    )
+    .await
+    .map_err(|err| {
+        let msg = format!(
+            "Failed to retrieve titles from XboxUnity. Got the following error: {}",
+            err
+        );
+        error!("{}", msg);
+        msg
+    })
 }
