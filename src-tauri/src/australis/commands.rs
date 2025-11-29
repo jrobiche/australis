@@ -258,84 +258,6 @@ pub async fn aurora_game_asset_image_delete(
     Ok(())
 }
 
-// #[tauri::command(async)]
-// pub async fn aurora_game_asset_image_read(
-//     app_handle: tauri::AppHandle,
-//     console_configuration: GameConsoleConfiguration,
-//     game: AuroraGame,
-//     asset_type_usize: usize,
-// ) -> Result<Option<AuroraAssetImageData>, String> {
-//     let asset_type = match libaustralis::aurora::assets::AssetType::from_usize(asset_type_usize) {
-//         Ok(x) => x,
-//         Err(err) => {
-//             let msg = format!(
-//                 "Failed to create AssetType from '{}'. Got the following error: {}",
-//                 asset_type_usize, err
-//             );
-//             error!("{}", &msg);
-//             return Err(msg);
-//         }
-//     };
-//     let asset_path = path_game_console_aurora_asset(
-//         &app_handle,
-//         &console_configuration,
-//         (game.title_id & 0xFFFFFFFF) as u32,
-//         (game.id & 0xFFFFFFFF) as u32,
-//         asset_type,
-//     )?;
-//     // TODO warn?
-//     if !asset_path.is_file() {
-//         return Ok(None);
-//     }
-//     let asset = match libaustralis::aurora::assets::Asset::load(&asset_path) {
-//         Ok(x) => x,
-//         Err(err) => {
-//             let msg = format!(
-//                 "Failed to read asset at '{}'. Got the following error: {}",
-//                 &asset_path.display(),
-//                 err
-//             );
-//             error!("{}", &msg);
-//             return Err(msg);
-//         }
-//     };
-//     if !asset.is_image_set(asset_type) {
-//         return Ok(None);
-//     }
-//     let (width, height) = match asset.image_dimensions(asset_type) {
-//         (Some(w), Some(h), None) => (w, h),
-//         _ => {
-//             let msg = format!("Failed to read '{}' image in asset at '{}'. Could not determine image width and height.",
-//                 &asset_type,
-//                 &asset_path.display()
-//             );
-//             error!("{}", &msg);
-//             return Err(msg);
-//         }
-//     };
-//     let rgba8 = match asset.image_rgba8(asset_type) {
-//         Ok(x) => match x {
-//             Some(y) => y,
-//             None => Vec::new(),
-//         },
-//         Err(err) => {
-//             let msg = format!(
-//                 "Failed to read '{}' image in asset at '{}'. Failed to get image RGBA8. Got the following error: {}",
-//                 &asset_type,
-//                 &asset_path.display(),
-//                 err
-//             );
-//             error!("{}", &msg);
-//             return Err(msg);
-//         }
-//     };
-//     Ok(Some(AuroraAssetImageData {
-//         width,
-//         height,
-//         rgba8,
-//     }))
-// }
-
 #[tauri::command(async)]
 pub async fn aurora_game_asset_image_read_url(
     app_handle: tauri::AppHandle,
@@ -948,28 +870,33 @@ pub async fn aurora_game_read(
 ////////////////////////////////////////////////////////////////////////////////
 // aurora http commands
 ////////////////////////////////////////////////////////////////////////////////
+fn http_client(
+    game_console_configuration: GameConsoleConfiguration,
+) -> libaustralis::aurora::http::HttpClient {
+    libaustralis::aurora::http::HttpClient::new(
+        game_console_configuration.ip_address,
+        game_console_configuration.aurora_http_port,
+        game_console_configuration.aurora_http_username,
+        game_console_configuration.aurora_http_password,
+    )
+}
+
 #[tauri::command]
 pub async fn aurora_http_achievement_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<Vec<libaustralis::aurora::http_schemas::Achievement>, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_achievement(token).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .get_achievement(token)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get achievements. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -977,46 +904,34 @@ pub async fn aurora_http_achievement_player_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<Vec<libaustralis::aurora::http_schemas::AchievementPlayer>, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_achievement_player(token).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .get_achievement_player(token)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get players achievements. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
 pub async fn aurora_http_authentication_token_get(
     console_configuration: GameConsoleConfiguration,
 ) -> Result<Option<String>, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.new_token().await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .new_token()
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get console authentication token. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1024,23 +939,17 @@ pub async fn aurora_http_dashlaunch_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::Dashlaunch, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_dashlaunch(token).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .get_dashlaunch(token)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get console dashlaunch. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1050,23 +959,17 @@ pub async fn aurora_http_filebrowser_get(
     path: Option<&str>,
     filter: Option<&str>,
 ) -> Result<Vec<libaustralis::aurora::http_schemas::FilebrowserEntry>, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_filebrowser(token, path, filter).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .get_filebrowser(token, path, filter)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get console filebrowser entries. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1075,23 +978,17 @@ pub async fn aurora_http_image_achievement_get(
     token: Option<&str>,
     uuid: &str,
 ) -> Result<Vec<u8>, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_image_achievement(token, uuid).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .get_image_achievement(token, uuid)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get console achievement image. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1100,26 +997,12 @@ pub async fn aurora_http_image_achievement_get_url(
     token: Option<&str>,
     uuid: &str,
 ) -> Result<String, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_image_achievement(token, uuid).await {
-        Ok(x) => Ok(format!(
-            "data:image/png;base64,{}",
-            general_purpose::STANDARD.encode(&x)
-        )),
-        Err(err) => {
-            let msg = format!(
-                "Failed to get console achievement image. Got the following error: {}",
-                err
-            );
-            error!("{}", &msg);
-            Err(msg)
-        }
-    }
+    let image_bytes: Vec<u8> =
+        aurora_http_image_achievement_get(console_configuration, token, uuid).await?;
+    Ok(format!(
+        "data:image/png;base64,{}",
+        general_purpose::STANDARD.encode(&image_bytes)
+    ))
 }
 
 #[tauri::command]
@@ -1128,26 +1011,17 @@ pub async fn aurora_http_image_profile_get(
     token: Option<&str>,
     uuid: u32,
 ) -> Result<Vec<u8>, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client
+    http_client(console_configuration)
         .get_image_profile(token, &format!("{}", uuid))
         .await
-    {
-        Ok(x) => Ok(x),
-        Err(err) => {
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get console profile image. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1156,29 +1030,12 @@ pub async fn aurora_http_image_profile_get_url(
     token: Option<&str>,
     uuid: u32,
 ) -> Result<String, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client
-        .get_image_profile(token, &format!("{}", uuid))
-        .await
-    {
-        Ok(x) => Ok(format!(
-            "data:image/png;base64,{}",
-            general_purpose::STANDARD.encode(&x)
-        )),
-        Err(err) => {
-            let msg = format!(
-                "Failed to get console profile image. Got the following error: {}",
-                err
-            );
-            error!("{}", &msg);
-            Err(msg)
-        }
-    }
+    let image_bytes: Vec<u8> =
+        aurora_http_image_profile_get(console_configuration, token, uuid).await?;
+    Ok(format!(
+        "data:image/png;base64,{}",
+        general_purpose::STANDARD.encode(&image_bytes)
+    ))
 }
 
 #[tauri::command]
@@ -1187,23 +1044,17 @@ pub async fn aurora_http_image_screencapture_get(
     token: Option<&str>,
     uuid: &str,
 ) -> Result<Vec<u8>, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_image_screencapture(token, uuid).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .get_image_screencapture(token, uuid)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get console screenshot image. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1212,26 +1063,12 @@ pub async fn aurora_http_image_screencapture_get_url(
     token: Option<&str>,
     uuid: &str,
 ) -> Result<String, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_image_screencapture(token, uuid).await {
-        Ok(x) => Ok(format!(
-            "data:image/png;base64,{}",
-            general_purpose::STANDARD.encode(&x)
-        )),
-        Err(err) => {
-            let msg = format!(
-                "Failed to get console screenshot image. Got the following error: {}",
-                err
-            );
-            error!("{}", &msg);
-            Err(msg)
-        }
-    }
+    let image_bytes: Vec<u8> =
+        aurora_http_image_screencapture_get(console_configuration, token, uuid).await?;
+    Ok(format!(
+        "data:image/png;base64,{}",
+        general_purpose::STANDARD.encode(&image_bytes)
+    ))
 }
 
 #[tauri::command]
@@ -1239,23 +1076,17 @@ pub async fn aurora_http_memory_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::Memory, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_memory(token).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .get_memory(token)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get console memory. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1263,23 +1094,17 @@ pub async fn aurora_http_multidisc_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::Multidisc, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_multidisc(token).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .get_multidisc(token)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get console multidisc. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1287,23 +1112,17 @@ pub async fn aurora_http_plugin_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::Plugin, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_plugin(token).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .get_plugin(token)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get console plugin. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1311,23 +1130,17 @@ pub async fn aurora_http_profile_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<Vec<libaustralis::aurora::http_schemas::Profile>, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_profile(token).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .get_profile(token)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get console profile. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1336,23 +1149,17 @@ pub async fn aurora_http_screencapture_delete(
     token: Option<&str>,
     uuid: &str,
 ) -> Result<(), String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.delete_screencapture(token, uuid).await {
-        Ok(_) => Ok(()),
-        Err(err) => {
+    http_client(console_configuration)
+        .delete_screencapture(token, uuid)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to delete console screencapture. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1360,23 +1167,17 @@ pub async fn aurora_http_screencapture_meta_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::ScreencaptureMeta, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_screencapture_meta(token).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .get_screencapture_meta(token)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get console screencapture meta. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1384,23 +1185,17 @@ pub async fn aurora_http_screencapture_meta_list_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<Vec<libaustralis::aurora::http_schemas::ScreencaptureMeta>, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_screencapture_meta_list(token).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .get_screencapture_meta_list(token)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get console screencapture meta list. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1408,23 +1203,17 @@ pub async fn aurora_http_screencapture_meta_list_count_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::ScreencaptureMetaListCount, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_screencapture_meta_list_count(token).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .get_screencapture_meta_list_count(token)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get console screencapture meta list count. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1432,23 +1221,17 @@ pub async fn aurora_http_smc_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::Smc, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_smc(token).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .get_smc(token)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get console smc. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1456,23 +1239,17 @@ pub async fn aurora_http_system_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::System, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_system(token).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .get_system(token)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get console system. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1480,23 +1257,17 @@ pub async fn aurora_http_systemlink_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::Systemlink, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_systemlink(token).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .get_systemlink(token)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get console systemlink. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1504,23 +1275,17 @@ pub async fn aurora_http_systemlink_bandwidth_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::SystemlinkBandwidth, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_systemlink_bandwidth(token).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .get_systemlink_bandwidth(token)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get console systemlink bandwidth. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1528,23 +1293,17 @@ pub async fn aurora_http_temperature_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::Temperature, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_temperature(token).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .get_temperature(token)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get console temperature. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1552,23 +1311,17 @@ pub async fn aurora_http_thread_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<Vec<libaustralis::aurora::http_schemas::Thread>, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_thread(token).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .get_thread(token)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get console threads. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1576,23 +1329,17 @@ pub async fn aurora_http_thread_state_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::ThreadState, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_thread_state(token).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .get_thread_state(token)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get console thread state. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1601,23 +1348,17 @@ pub async fn aurora_http_thread_state_post(
     token: Option<&str>,
     suspend: bool,
 ) -> Result<(), String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.post_thread_state(token, suspend).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .post_thread_state(token, suspend)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to post console thread state. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1625,23 +1366,17 @@ pub async fn aurora_http_title_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::Title, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_title(token).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .get_title(token)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get console title. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1650,23 +1385,17 @@ pub async fn aurora_http_title_file_get(
     token: Option<&str>,
     path: &str,
 ) -> Result<Vec<u8>, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_title_file(token, path).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .get_title_file(token, path)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get console title file. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1677,26 +1406,17 @@ pub async fn aurora_http_title_launch_post(
     exec: &str,
     exec_type: u32,
 ) -> Result<(), String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client
+    http_client(console_configuration)
         .post_title_launch(token, &path, &exec, exec_type)
         .await
-    {
-        Ok(_) => Ok(()),
-        Err(err) => {
+        .map_err(|err| {
             let msg = format!(
                 "Failed to post console title launch. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1704,23 +1424,17 @@ pub async fn aurora_http_title_live_cache_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<String, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_title_live_cache(token).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .get_title_live_cache(token)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get console title live cache. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1729,23 +1443,17 @@ pub async fn aurora_http_title_live_cache_post(
     token: Option<&str>,
     liveinfo: &str,
 ) -> Result<(), String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.post_title_live_cache(token, liveinfo).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .post_title_live_cache(token, liveinfo)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to post console title live cache. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 #[tauri::command]
@@ -1753,28 +1461,65 @@ pub async fn aurora_http_update_notification_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::UpdateNotification, String> {
-    let http_client = libaustralis::aurora::http::HttpClient::new(
-        console_configuration.ip_address,
-        console_configuration.aurora_http_port,
-        console_configuration.aurora_http_username,
-        console_configuration.aurora_http_password,
-    );
-    match http_client.get_update_notification(token).await {
-        Ok(x) => Ok(x),
-        Err(err) => {
+    http_client(console_configuration)
+        .get_update_notification(token)
+        .await
+        .map_err(|err| {
             let msg = format!(
                 "Failed to get console update notification. Got the following error: {}",
                 err
             );
             error!("{}", &msg);
-            Err(msg)
-        }
-    }
+            msg
+        })
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // game console configuration commands
 ////////////////////////////////////////////////////////////////////////////////
+fn load_game_console_configuration(
+    file_path: &std::path::PathBuf,
+) -> Result<GameConsoleConfiguration, String> {
+    let file = std::fs::OpenOptions::new().read(true).open(&file_path).map_err(|err| {
+            let msg = format!(
+                "Failed to open game console configuration file at '{}' for reading. Got the following error: {}",
+                &file_path.display(),
+                err
+            );
+            error!("{}", &msg);
+            msg
+        })?;
+    serde_json::from_reader(file).map_err(|err| {
+            let msg = format!(
+                "Failed to parse game console configuration from file at '{}'. Got the following error: {}",
+                &file_path.display(),
+                err
+            );
+            error!("{}", &msg);
+            msg
+        })
+}
+
+fn save_game_console_configuration(
+    console_configuration: GameConsoleConfiguration,
+    file_path: &std::path::PathBuf,
+) -> Result<GameConsoleConfiguration, String> {
+    match serde_json::to_string(&console_configuration) {
+        Ok(console_configuration_string) => {
+            write_str_to_path(file_path, &console_configuration_string)?;
+            Ok(console_configuration)
+        }
+        Err(err) => {
+            let msg = format!(
+                "Failed to serialize game console configuration. Got the following error: {}",
+                err
+            );
+            error!("{}", msg);
+            Err(msg)
+        }
+    }
+}
+
 #[tauri::command]
 pub fn game_console_configuration_create(
     app_handle: tauri::AppHandle,
@@ -1796,24 +1541,9 @@ pub fn game_console_configuration_create(
     console_configuration.aurora_http_port = aurora_http_port;
     console_configuration.aurora_http_username = aurora_http_username;
     console_configuration.aurora_http_password = aurora_http_password;
-    // serialize `console_configuration` and save to disk
-    match serde_json::to_string(&console_configuration) {
-        Ok(console_configuration_string) => {
-            write_str_to_path(
-                &path_game_console_configuration(&app_handle, &console_configuration)?,
-                &console_configuration_string,
-            )?;
-            Ok(console_configuration)
-        }
-        Err(err) => {
-            let msg = format!(
-                "Failed to serialize game console configuration. Got the following error: {}",
-                err
-            );
-            error!("{}", msg);
-            Err(msg)
-        }
-    }
+    let console_configuration_path =
+        path_game_console_configuration(&app_handle, &console_configuration)?;
+    save_game_console_configuration(console_configuration, &console_configuration_path)
 }
 
 #[tauri::command]
@@ -1834,36 +1564,10 @@ pub fn game_console_configuration_read(
 ) -> Result<GameConsoleConfiguration, String> {
     let console_configuration_path =
         path_game_console_configuration_from_id(&app_handle, &console_configuration_id)?;
-    let file = match std::fs::OpenOptions::new()
-        .read(true)
-        .open(&console_configuration_path)
-    {
-        Ok(x) => x,
-        Err(err) => {
-            let msg = format!(
-                "Failed to open game console configuration file at '{}' for reading. Got the following error: {}",
-                &console_configuration_path.display(),
-                err
-            );
-            error!("{}", &msg);
-            return Err(msg);
-        }
-    };
-    let console_configuration: GameConsoleConfiguration = match serde_json::from_reader(file) {
-        Ok(x) => x,
-        Err(err) => {
-            let msg = format!(
-                "Failed to parse game console configuration from file at '{}'. Got the following error: {}",
-                &console_configuration_path.display(),
-                err
-            );
-            error!("{}", &msg);
-            return Err(msg);
-        }
-    };
+    let console_configuration = load_game_console_configuration(&console_configuration_path)?;
     if console_configuration.id() != console_configuration_id {
         let msg = format!(
-            "The console configuration id in '{}' does not match parent directory name. Expected '{}' but got '{}'.",
+            "The game console configuration id in '{}' does not match parent directory name. Expected '{}' but got '{}'.",
             &console_configuration_path.display(), &console_configuration_id, &console_configuration.id()
         );
         error!("{}", &msg);
@@ -1876,17 +1580,17 @@ pub fn game_console_configuration_read(
 pub fn game_console_configuration_read_all(
     app_handle: tauri::AppHandle,
 ) -> Result<Vec<GameConsoleConfiguration>, String> {
-    let mut console_configuration_ids = Vec::new();
-    let mut console_configurations = Vec::new();
     let game_console_configurations_root = path_game_console_configurations_root(&app_handle)?;
     match std::fs::exists(&game_console_configurations_root) {
-        Ok(x) => {
-            if !x {
+        Ok(exists) => {
+            if !exists {
+                // if the game console configurations root directory does not exist, assume this is the first run and that
+                // the directory will be created when a game console configuration is created
                 warn!(
                     "The game console configurations root directory '{}' does not exist.",
                     game_console_configurations_root.display(),
                 );
-                return Ok(console_configurations);
+                return Ok(Vec::new());
             }
         }
         Err(err) => {
@@ -1899,18 +1603,18 @@ pub fn game_console_configuration_read_all(
             return Err(msg);
         }
     }
-    let console_configuration_entries = match std::fs::read_dir(&game_console_configurations_root) {
-        Ok(x) => x,
-        Err(err) => {
+    let console_configuration_entries = std::fs::read_dir(&game_console_configurations_root)
+        .map_err(|err| {
             let msg = format!(
-                "Failed to read contents of directory '{}'. Got the following error: {}",
+                "Failed to read contents of game console configurations root directory '{}'. Got the following error: {}",
                 &game_console_configurations_root.display(),
                 err
             );
             error!("{}", &msg);
-            return Err(msg);
-        }
-    };
+            msg
+        })?;
+    // create list of all directories in the game console configurations root directory whose directory name is a valid uuid
+    let mut console_configuration_ids = Vec::new();
     for entry in console_configuration_entries {
         let entry_path = match entry {
             Ok(x) => x.path(),
@@ -1954,6 +1658,8 @@ pub fn game_console_configuration_read_all(
             }
         }
     }
+    // create list of console configurations for valid entries in the game console configurations root directory
+    let mut console_configurations = Vec::new();
     for console_configuration_id in console_configuration_ids {
         match game_console_configuration_read(app_handle.clone(), console_configuration_id.clone())
         {
@@ -1962,7 +1668,7 @@ pub fn game_console_configuration_read_all(
             }
             Err(err) => {
                 warn!(
-                    "Ignoring console configuration for id '{}'. Failed to read console configuration. Got the following error: {}",
+                    "Ignoring game console configuration for id '{}'. Failed to read game console configuration. Got the following error: {}",
                     &console_configuration_id, err
                 );
                 continue;
@@ -1985,19 +1691,8 @@ pub fn game_console_configuration_update(
     aurora_http_username: Option<String>,
     aurora_http_password: Option<String>,
 ) -> Result<GameConsoleConfiguration, String> {
-    let mut console_configuration =
-        match game_console_configuration_read(app_handle.clone(), id.clone()) {
-            Ok(x) => x,
-            Err(err) => {
-                let msg = format!(
-                "Failed to load console configuration with id '{}'. Got the following error: {}",
-                &id,
-                err
-            );
-                error!("{}", &msg);
-                return Err(msg);
-            }
-        };
+    let console_configuration_path = path_game_console_configuration_from_id(&app_handle, &id)?;
+    let mut console_configuration = load_game_console_configuration(&console_configuration_path)?;
     console_configuration.name = name;
     console_configuration.ip_address = ip_address;
     console_configuration.aurora_ftp_port = aurora_ftp_port;
@@ -2006,24 +1701,9 @@ pub fn game_console_configuration_update(
     console_configuration.aurora_http_port = aurora_http_port;
     console_configuration.aurora_http_username = aurora_http_username;
     console_configuration.aurora_http_password = aurora_http_password;
-    // serialize `console_configuration` and save to disk
-    match serde_json::to_string(&console_configuration) {
-        Ok(console_configuration_string) => {
-            write_str_to_path(
-                &path_game_console_configuration(&app_handle, &console_configuration)?,
-                &console_configuration_string,
-            )?;
-            Ok(console_configuration)
-        }
-        Err(err) => {
-            let msg = format!(
-                "Failed to serialize updated game console configuration. Got the following error: {}",
-                err
-            );
-            error!("{}", msg);
-            Err(msg)
-        }
-    }
+    let console_configuration_path =
+        path_game_console_configuration(&app_handle, &console_configuration)?;
+    save_game_console_configuration(console_configuration, &console_configuration_path)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
