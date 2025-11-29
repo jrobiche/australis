@@ -19,18 +19,22 @@ use libaustralis;
 ////////////////////////////////////////////////////////////////////////////////
 // aurora ftp commands
 ////////////////////////////////////////////////////////////////////////////////
+fn ftp_client(
+    console_configuration: &GameConsoleConfiguration,
+) -> libaustralis::aurora::ftp::FtpClient {
+    libaustralis::aurora::ftp::FtpClient::new(
+        console_configuration.ip_address.clone(),
+        console_configuration.aurora_ftp_port,
+        console_configuration.aurora_ftp_username.clone(),
+        console_configuration.aurora_ftp_password.clone(),
+    )
+}
+
 #[tauri::command]
 pub async fn aurora_ftp_download_aurora_databases(
     app_handle: tauri::AppHandle,
     console_configuration: GameConsoleConfiguration,
 ) -> Result<(), String> {
-    // TODO if `FtpClient::new()` accepted `str` instead of `String` would the clones be required?
-    let ftp_client = libaustralis::aurora::ftp::FtpClient::new(
-        console_configuration.ip_address.clone(),
-        console_configuration.aurora_ftp_port.clone(),
-        console_configuration.aurora_ftp_username.clone(),
-        console_configuration.aurora_ftp_password.clone(),
-    );
     let files = vec![
         // source and destination of content.db
         (
@@ -44,9 +48,7 @@ pub async fn aurora_ftp_download_aurora_databases(
         ),
     ];
     for (file_src, file_dest) in files {
-        match ftp_client.download_file(None, &file_src, &file_dest) {
-            Ok(_) => (),
-            Err(err) => {
+        ftp_client(&console_configuration).download_file(None, &file_src, &file_dest).map_err(|err| {
                 let msg = format!(
                     "Failed to download file over FTP from '{}' to '{}'. Got the following error: {}",
                     &file_src,
@@ -54,9 +56,8 @@ pub async fn aurora_ftp_download_aurora_databases(
                     err
                 );
                 error!("{}", &msg);
-                return Err(msg);
-            }
-        }
+                msg
+            })?;
     }
     Ok(())
 }
@@ -67,61 +68,40 @@ pub async fn aurora_ftp_download_aurora_game_data_directory(
     console_configuration: GameConsoleConfiguration,
     directory_name: String,
 ) -> Result<(), String> {
-    // TODO if `FtpClient::new()` accepted `str` instead of `String` would the clones be required?
-    let ftp_client = libaustralis::aurora::ftp::FtpClient::new(
-        console_configuration.ip_address.clone(),
-        console_configuration.aurora_ftp_port.clone(),
-        console_configuration.aurora_ftp_username.clone(),
-        console_configuration.aurora_ftp_password.clone(),
-    );
-    let game_data_path_src = format!("/Game/Data/GameData/{}", &directory_name);
-    let game_data_path_dest =
-        path_game_console_aurora_game_data(&app_handle, &console_configuration)?
-            .join(directory_name);
-    match ftp_client.download_directory(None, &game_data_path_src, &game_data_path_dest) {
-        Ok(_) => (),
-        Err(err) => {
+    let directory_src = format!("/Game/Data/GameData/{}", &directory_name);
+    let directory_dest = path_game_console_aurora_game_data(&app_handle, &console_configuration)?
+        .join(directory_name);
+    ftp_client(&console_configuration).download_directory(None, &directory_src, &directory_dest).map_err(|err| {
             let msg = format!(
                     "Failed to download directory over FTP from '{}' to '{}'. Got the following error: {}",
-                    &game_data_path_src,
-                    &game_data_path_dest.display(),
+                    &directory_src,
+                    &directory_dest.display(),
                     err
                 );
             error!("{}", &msg);
-            return Err(msg);
-        }
-    }
-    Ok(())
+            msg
+        })
 }
 
 #[tauri::command]
 pub async fn aurora_ftp_list_aurora_game_data_directories(
     console_configuration: GameConsoleConfiguration,
 ) -> Result<Vec<String>, String> {
-    // TODO if `FtpClient::new()` accepted `str` instead of `String` would the clones be required?
-    let ftp_client = libaustralis::aurora::ftp::FtpClient::new(
-        console_configuration.ip_address.clone(),
-        console_configuration.aurora_ftp_port.clone(),
-        console_configuration.aurora_ftp_username.clone(),
-        console_configuration.aurora_ftp_password.clone(),
-    );
-    let game_data_path_remote = "/Game/Data/GameData";
-    let mut dirs: Vec<String> = Vec::new();
-    match ftp_client.list_directory_contents(None, &game_data_path_remote) {
-        Ok(entries) => {
-            for entry in entries {
-                if entry.is_directory() {
-                    dirs.push(entry.name().to_string());
-                }
-            }
-        }
-        Err(err) => {
+    let directory_path = "/Game/Data/GameData";
+    let entries = ftp_client(&console_configuration)
+        .list_directory_contents(None, &directory_path)
+        .map_err(|err| {
             let msg = format!(
                 "Failed to list directory contents of '{}' over FTP. Got the following error: {}",
-                &game_data_path_remote, err
+                &directory_path, err
             );
             error!("{}", &msg);
-            return Err(msg);
+            msg
+        })?;
+    let mut dirs: Vec<String> = Vec::new();
+    for entry in entries {
+        if entry.is_directory() {
+            dirs.push(entry.name().to_string());
         }
     }
     Ok(dirs)
@@ -133,13 +113,6 @@ pub async fn aurora_ftp_upload_game_assets(
     console_configuration: GameConsoleConfiguration,
     game: AuroraGame,
 ) -> Result<(), String> {
-    // TODO if `FtpClient::new()` accepted `str` instead of `String` would the clones be required?
-    let ftp_client = libaustralis::aurora::ftp::FtpClient::new(
-        console_configuration.ip_address.clone(),
-        console_configuration.aurora_ftp_port.clone(),
-        console_configuration.aurora_ftp_username.clone(),
-        console_configuration.aurora_ftp_password.clone(),
-    );
     let mut files = vec![];
     for asset_type in libaustralis::aurora::assets::AssetType::into_iter() {
         if asset_type == libaustralis::aurora::assets::AssetType::Slot {
@@ -155,10 +128,15 @@ pub async fn aurora_ftp_upload_game_assets(
         if !file_src.is_file() {
             continue;
         }
-        // TODO print warning?
         let asset_path_name = match file_src.as_path().file_name() {
             Some(x) => x.to_string_lossy(),
-            None => continue,
+            None => {
+                warn!(
+                    "Ignoring entry at '{}'. Failed to get file name of path. The path does not have a file name.",
+                    &file_src.display()
+                );
+                continue;
+            }
         };
         let file_dest = format!(
             "/Game/Data/GameData/{:0>8X}_{:0>8X}/{}",
@@ -169,9 +147,9 @@ pub async fn aurora_ftp_upload_game_assets(
         files.push((file_src, file_dest));
     }
     for (file_src, file_dest) in files {
-        match ftp_client.upload_file(None, &file_src, &file_dest) {
-            Ok(_) => (),
-            Err(err) => {
+        ftp_client(&console_configuration)
+            .upload_file(None, &file_src, &file_dest)
+            .map_err(|err| {
                 let msg = format!(
                     "Failed to upload file over FTP from '{}' to '{}'. Got the following error: {}",
                     &file_src.display(),
@@ -179,9 +157,8 @@ pub async fn aurora_ftp_upload_game_assets(
                     err
                 );
                 error!("{}", &msg);
-                return Err(msg);
-            }
-        }
+                msg
+            })?;
     }
     Ok(())
 }
@@ -871,13 +848,13 @@ pub async fn aurora_game_read(
 // aurora http commands
 ////////////////////////////////////////////////////////////////////////////////
 fn http_client(
-    game_console_configuration: GameConsoleConfiguration,
+    game_console_configuration: &GameConsoleConfiguration,
 ) -> libaustralis::aurora::http::HttpClient {
     libaustralis::aurora::http::HttpClient::new(
-        game_console_configuration.ip_address,
+        game_console_configuration.ip_address.clone(),
         game_console_configuration.aurora_http_port,
-        game_console_configuration.aurora_http_username,
-        game_console_configuration.aurora_http_password,
+        game_console_configuration.aurora_http_username.clone(),
+        game_console_configuration.aurora_http_password.clone(),
     )
 }
 
@@ -886,7 +863,7 @@ pub async fn aurora_http_achievement_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<Vec<libaustralis::aurora::http_schemas::Achievement>, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .get_achievement(token)
         .await
         .map_err(|err| {
@@ -904,7 +881,7 @@ pub async fn aurora_http_achievement_player_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<Vec<libaustralis::aurora::http_schemas::AchievementPlayer>, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .get_achievement_player(token)
         .await
         .map_err(|err| {
@@ -921,7 +898,7 @@ pub async fn aurora_http_achievement_player_get(
 pub async fn aurora_http_authentication_token_get(
     console_configuration: GameConsoleConfiguration,
 ) -> Result<Option<String>, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .new_token()
         .await
         .map_err(|err| {
@@ -939,7 +916,7 @@ pub async fn aurora_http_dashlaunch_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::Dashlaunch, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .get_dashlaunch(token)
         .await
         .map_err(|err| {
@@ -959,7 +936,7 @@ pub async fn aurora_http_filebrowser_get(
     path: Option<&str>,
     filter: Option<&str>,
 ) -> Result<Vec<libaustralis::aurora::http_schemas::FilebrowserEntry>, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .get_filebrowser(token, path, filter)
         .await
         .map_err(|err| {
@@ -978,7 +955,7 @@ pub async fn aurora_http_image_achievement_get(
     token: Option<&str>,
     uuid: &str,
 ) -> Result<Vec<u8>, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .get_image_achievement(token, uuid)
         .await
         .map_err(|err| {
@@ -1011,7 +988,7 @@ pub async fn aurora_http_image_profile_get(
     token: Option<&str>,
     uuid: u32,
 ) -> Result<Vec<u8>, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .get_image_profile(token, &format!("{}", uuid))
         .await
         .map_err(|err| {
@@ -1044,7 +1021,7 @@ pub async fn aurora_http_image_screencapture_get(
     token: Option<&str>,
     uuid: &str,
 ) -> Result<Vec<u8>, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .get_image_screencapture(token, uuid)
         .await
         .map_err(|err| {
@@ -1076,7 +1053,7 @@ pub async fn aurora_http_memory_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::Memory, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .get_memory(token)
         .await
         .map_err(|err| {
@@ -1094,7 +1071,7 @@ pub async fn aurora_http_multidisc_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::Multidisc, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .get_multidisc(token)
         .await
         .map_err(|err| {
@@ -1112,7 +1089,7 @@ pub async fn aurora_http_plugin_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::Plugin, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .get_plugin(token)
         .await
         .map_err(|err| {
@@ -1130,7 +1107,7 @@ pub async fn aurora_http_profile_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<Vec<libaustralis::aurora::http_schemas::Profile>, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .get_profile(token)
         .await
         .map_err(|err| {
@@ -1149,7 +1126,7 @@ pub async fn aurora_http_screencapture_delete(
     token: Option<&str>,
     uuid: &str,
 ) -> Result<(), String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .delete_screencapture(token, uuid)
         .await
         .map_err(|err| {
@@ -1167,7 +1144,7 @@ pub async fn aurora_http_screencapture_meta_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::ScreencaptureMeta, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .get_screencapture_meta(token)
         .await
         .map_err(|err| {
@@ -1185,7 +1162,7 @@ pub async fn aurora_http_screencapture_meta_list_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<Vec<libaustralis::aurora::http_schemas::ScreencaptureMeta>, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .get_screencapture_meta_list(token)
         .await
         .map_err(|err| {
@@ -1203,7 +1180,7 @@ pub async fn aurora_http_screencapture_meta_list_count_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::ScreencaptureMetaListCount, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .get_screencapture_meta_list_count(token)
         .await
         .map_err(|err| {
@@ -1221,7 +1198,7 @@ pub async fn aurora_http_smc_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::Smc, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .get_smc(token)
         .await
         .map_err(|err| {
@@ -1239,7 +1216,7 @@ pub async fn aurora_http_system_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::System, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .get_system(token)
         .await
         .map_err(|err| {
@@ -1257,7 +1234,7 @@ pub async fn aurora_http_systemlink_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::Systemlink, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .get_systemlink(token)
         .await
         .map_err(|err| {
@@ -1275,7 +1252,7 @@ pub async fn aurora_http_systemlink_bandwidth_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::SystemlinkBandwidth, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .get_systemlink_bandwidth(token)
         .await
         .map_err(|err| {
@@ -1293,7 +1270,7 @@ pub async fn aurora_http_temperature_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::Temperature, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .get_temperature(token)
         .await
         .map_err(|err| {
@@ -1311,7 +1288,7 @@ pub async fn aurora_http_thread_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<Vec<libaustralis::aurora::http_schemas::Thread>, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .get_thread(token)
         .await
         .map_err(|err| {
@@ -1329,7 +1306,7 @@ pub async fn aurora_http_thread_state_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::ThreadState, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .get_thread_state(token)
         .await
         .map_err(|err| {
@@ -1348,7 +1325,7 @@ pub async fn aurora_http_thread_state_post(
     token: Option<&str>,
     suspend: bool,
 ) -> Result<(), String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .post_thread_state(token, suspend)
         .await
         .map_err(|err| {
@@ -1366,7 +1343,7 @@ pub async fn aurora_http_title_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::Title, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .get_title(token)
         .await
         .map_err(|err| {
@@ -1385,7 +1362,7 @@ pub async fn aurora_http_title_file_get(
     token: Option<&str>,
     path: &str,
 ) -> Result<Vec<u8>, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .get_title_file(token, path)
         .await
         .map_err(|err| {
@@ -1406,7 +1383,7 @@ pub async fn aurora_http_title_launch_post(
     exec: &str,
     exec_type: u32,
 ) -> Result<(), String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .post_title_launch(token, &path, &exec, exec_type)
         .await
         .map_err(|err| {
@@ -1424,7 +1401,7 @@ pub async fn aurora_http_title_live_cache_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<String, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .get_title_live_cache(token)
         .await
         .map_err(|err| {
@@ -1443,7 +1420,7 @@ pub async fn aurora_http_title_live_cache_post(
     token: Option<&str>,
     liveinfo: &str,
 ) -> Result<(), String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .post_title_live_cache(token, liveinfo)
         .await
         .map_err(|err| {
@@ -1461,7 +1438,7 @@ pub async fn aurora_http_update_notification_get(
     console_configuration: GameConsoleConfiguration,
     token: Option<&str>,
 ) -> Result<libaustralis::aurora::http_schemas::UpdateNotification, String> {
-    http_client(console_configuration)
+    http_client(&console_configuration)
         .get_update_notification(token)
         .await
         .map_err(|err| {
