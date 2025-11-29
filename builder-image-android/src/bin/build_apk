@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# KEYSTORE_PATH is the path to the keystore within the container
+KEYSTORE_PATH='/config/keystore.jks'
+KEYSTORE_PROPS_PATH='src-tauri/gen/android/keystore.properties'
+
+if [ -z "$ANDROID_KEY_ALIAS" ]; then
+  >&2 echo 'Environment variable ANDROID_KEY_ALIAS is required.'
+  exit 1
+fi
+
+if [ -z "$ANDROID_KEY_PASSWORD" ]; then
+  >&2 echo 'Environment variable ANDROID_KEY_PASSWORD is required.'
+  exit 1
+fi
+
+if [ ! -f "$KEYSTORE_PATH" ]; then
+  >&2 echo 'The file /config/keystore.jks does not exist.'
+  exit 1
+fi
+
+. "$HOME/.cargo/env"
+npm ci
+npx tauri android init
+
+# generate keystore.properties
+echo "keyAlias=${ANDROID_KEY_ALIAS}" > "$KEYSTORE_PROPS_PATH"
+echo "password=${ANDROID_KEY_PASSWORD}" >> "$KEYSTORE_PROPS_PATH"
+echo "storeFile=${KEYSTORE_PATH}" >> "$KEYSTORE_PROPS_PATH"
+
+# use pre-configured `build.gradle.kts` so that gradle will sign with key in keystore
+# for information on how this file was created see: https://v2.tauri.app/distribute/sign/android/#configure-gradle-to-use-the-signing-key
+rm src-tauri/gen/android/app/build.gradle.kts
+cp "${HOME}/.local/etc/com.github.jrobiche.australis/build.gradle.kts" src-tauri/gen/android/app/build.gradle.kts
+
+npx tauri icon app-icon.png
+npm run tauri android build -- --apk

@@ -2,13 +2,19 @@
 
 set -eu
 
-# TODO support android builds
-
 # configuration
-BUILDER_IMAGE_DIR='builder-image'
-BUILDER_IMAGE_TAG='localhost/australis-builder:latest'
-BUILD_TARGET='all'
-CONTAINER_BINARY='podman'
+DEFAULT_BUILDER_IMAGE_DIR='builder-image'
+DEFAULT_BUILDER_IMAGE_TAG='localhost/australis-builder:latest'
+DEFAULT_BUILDER_IMAGE_ANDROID_DIR='builder-image-android'
+DEFAULT_BUILDER_IMAGE_ANDROID_TAG='localhost/australis-builder-android:latest'
+DEFAULT_BUILD_TARGET='all'
+DEFAULT_CONTAINER_BINARY='podman'
+BUILDER_IMAGE_DIR="$DEFAULT_BUILDER_IMAGE_DIR"
+BUILDER_IMAGE_TAG="$DEFAULT_BUILDER_IMAGE_TAG"
+BUILDER_IMAGE_ANDROID_DIR="$DEFAULT_BUILDER_IMAGE_ANDROID_DIR"
+BUILDER_IMAGE_ANDROID_TAG="$DEFAULT_BUILDER_IMAGE_ANDROID_TAG"
+BUILD_TARGET="$DEFAULT_BUILD_TARGET"
+CONTAINER_BINARY="$DEFAULT_CONTAINER_BINARY"
 
 print_usage() {
   echo "
@@ -21,32 +27,52 @@ SYNOPSIS
 DESCRIPTION
        Build Australis executables.
 
-       -b     target to build: all | builder-image | linux | windows
-              default: ${BUILD_TARGET}
+       -a=ALIAS
+              keystore alias (required when building apk)
 
-       -c     container binary: docker | podman
-              default: ${CONTAINER_BINARY}
+       -b=BUILD_TARGET
+              target to build: all | apk | builder-image | builder-image-android | linux | windows
+              default: ${DEFAULT_BUILD_TARGET}
+
+       -c=CONTAINER_BIN
+              container binary: docker | podman
+              default: ${DEFAULT_CONTAINER_BINARY}
+
+       -k=KEYSTORE
+              keystore path (required when building apk)
 
        -h     print usage information
 
+       -p=PASSWORD
+              keystore password (required when building apk)
+
        -t=TAG
               builder image tag
-              default: ${BUILDER_IMAGE_TAG}
+              default: ${DEFAULT_BUILDER_IMAGE_TAG}
 "
 }
 
 parse_args() {
-  while getopts ":b:c:ht:" opt; do
+  while getopts ":a:b:c:k:p:ht:" opt; do
       case "$opt" in
+      a)
+        ANDROID_KEY_ALIAS="$OPTARG"
+        ;;
       b)
         BUILD_TARGET="$OPTARG"
         ;;
       c)
         CONTAINER_BINARY="$OPTARG"
         ;;
+      k)
+        ANDROID_KEYSTORE_PATH="$OPTARG"
+        ;;
       h)
         print_usage
         exit 0
+        ;;
+      p)
+        ANDROID_KEY_PASSWORD="$OPTARG"
         ;;
       t)
         BUILDER_IMAGE_TAG="$OPTARG"
@@ -65,12 +91,31 @@ parse_args() {
 
 build_all() {
   build_builder_image
+  build_builder_image_android
+  build_apk
   build_linux
   build_windows
 }
 
 build_builder_image() {
   "$CONTAINER_BINARY" build -t "$BUILDER_IMAGE_TAG" "$BUILDER_IMAGE_DIR"
+}
+
+build_builder_image_android() {
+  "$CONTAINER_BINARY" build -t "$BUILDER_IMAGE_ANDROID_TAG" "$BUILDER_IMAGE_ANDROID_DIR"
+}
+
+build_apk() {
+  "$CONTAINER_BINARY" run \
+    --env "ANDROID_KEY_ALIAS=${ANDROID_KEY_ALIAS}" \
+    --env "ANDROID_KEY_PASSWORD=${ANDROID_KEY_PASSWORD}" \
+    --interactive \
+    --tty \
+    --rm \
+    --userns=keep-id:uid=1001,gid=1002 \
+    --volume "${PWD}:/home/circleci/project/:Z" \
+    --volume "${ANDROID_KEYSTORE_PATH}:/config/keystore.jks" \
+    "$BUILDER_IMAGE_ANDROID_TAG" build_apk
 }
 
 build_linux() {
@@ -108,6 +153,12 @@ Make sure to run this script within the root of the repository.
     ;;
   "builder-image")
     build_builder_image
+    ;;
+  "builder-image-android")
+    build_builder_image_android
+    ;;
+  "apk")
+    build_apk
     ;;
   "linux")
     build_linux
