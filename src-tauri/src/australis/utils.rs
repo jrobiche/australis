@@ -1,204 +1,12 @@
 use std::io::Write;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use log::{error, warn};
-use tauri::Manager;
 use uuid::Uuid;
 
-use crate::australis::structs::{AuroraGame, GameConsoleConfiguration};
+use crate::australis::structs::{AuroraGame, GameConsoleConfiguration, PathResolver};
 
-// TODO move path functions to their own module
 // TODO move sql functions to their own module
-
-// game-consoles directory structure
-// <AppData>/game-consoles/
-// <AppData>/game-consoles/<UUID>/
-// <AppData>/game-consoles/<UUID>/configuration.json
-// <AppData>/game-consoles/<UUID>/aurora-data/ (file system within `aurora-data` should mirror remote aurora installation directory)
-
-// <AppData>/game-consoles/default.??? TODO?
-// <AppData>/game-consoles/<UUID>/console-data/ (file system within `console-data` should mirror remote filesystem)
-// <AppData>/game-consoles/<UUID>/asset-images/ (images extracted from asset files)
-
-// TODO rename `path_game_console_...` to `path_local_...` and create corresponding `path_remote_...` functions
-////////////////////////////////////////////////////////////////////////////////
-// path resolving functions
-////////////////////////////////////////////////////////////////////////////////
-pub fn path_game_consoles_root(app_handle: &tauri::AppHandle) -> Result<PathBuf, String> {
-    match app_handle
-        .path()
-        .resolve("game-consoles", tauri::path::BaseDirectory::AppData)
-    {
-        Ok(x) => Ok(x),
-        Err(err) => {
-            let msg = format!(
-                "Failed to resolve game consoles root directory. Got the following error: {}",
-                err
-            );
-            error!("{}", msg);
-            Err(msg)
-        }
-    }
-}
-
-pub fn path_game_console_aurora_data(
-    app_handle: &tauri::AppHandle,
-    console_configuration: &GameConsoleConfiguration,
-) -> Result<PathBuf, String> {
-    Ok(path_game_consoles_root(app_handle)?
-        .join(console_configuration.id_string())
-        .join("aurora-data"))
-}
-
-pub fn path_game_console_aurora_content_db(
-    app_handle: &tauri::AppHandle,
-    console_configuration: &GameConsoleConfiguration,
-) -> Result<PathBuf, String> {
-    Ok(
-        path_game_console_aurora_data(&app_handle, console_configuration)?
-            .join("Data")
-            .join("Databases")
-            .join("content.db"),
-    )
-}
-
-pub fn path_game_console_aurora_game_data(
-    app_handle: &tauri::AppHandle,
-    console_configuration: &GameConsoleConfiguration,
-) -> Result<PathBuf, String> {
-    Ok(
-        path_game_console_aurora_data(&app_handle, console_configuration)?
-            .join("Data")
-            .join("GameData"),
-    )
-}
-
-pub fn path_game_console_aurora_settings_db(
-    app_handle: &tauri::AppHandle,
-    console_configuration: &GameConsoleConfiguration,
-) -> Result<PathBuf, String> {
-    Ok(
-        path_game_console_aurora_data(&app_handle, console_configuration)?
-            .join("Data")
-            .join("Databases")
-            .join("settings.db"),
-    )
-}
-
-pub fn path_game_console_aurora_assets_root(
-    app_handle: &tauri::AppHandle,
-    console_configuration: &GameConsoleConfiguration,
-    title_id: u32,
-    game_id: u32,
-) -> Result<PathBuf, String> {
-    Ok(
-        path_game_console_aurora_data(app_handle, console_configuration)?
-            .join("Data")
-            .join("GameData")
-            .join(format!("{:0>8X}_{:0>8X}", title_id, game_id)),
-    )
-}
-
-pub fn path_game_console_aurora_asset(
-    app_handle: &tauri::AppHandle,
-    console_configuration: &GameConsoleConfiguration,
-    title_id: u32,
-    game_id: u32,
-    asset_type: libaustralis::aurora::assets::AssetType,
-) -> Result<PathBuf, String> {
-    let asset_file_name = match asset_type {
-        libaustralis::aurora::assets::AssetType::Background => {
-            format!("BK{:0>8X}.asset", title_id)
-        }
-        libaustralis::aurora::assets::AssetType::Boxart => {
-            format!("GC{:0>8X}.asset", title_id)
-        }
-        libaustralis::aurora::assets::AssetType::Icon
-        | libaustralis::aurora::assets::AssetType::Banner => {
-            format!("GL{:0>8X}.asset", title_id)
-        }
-        libaustralis::aurora::assets::AssetType::Screenshot1
-        | libaustralis::aurora::assets::AssetType::Screenshot2
-        | libaustralis::aurora::assets::AssetType::Screenshot3
-        | libaustralis::aurora::assets::AssetType::Screenshot4
-        | libaustralis::aurora::assets::AssetType::Screenshot5
-        | libaustralis::aurora::assets::AssetType::Screenshot6
-        | libaustralis::aurora::assets::AssetType::Screenshot7
-        | libaustralis::aurora::assets::AssetType::Screenshot8
-        | libaustralis::aurora::assets::AssetType::Screenshot9
-        | libaustralis::aurora::assets::AssetType::Screenshot10
-        | libaustralis::aurora::assets::AssetType::Screenshot11
-        | libaustralis::aurora::assets::AssetType::Screenshot12
-        | libaustralis::aurora::assets::AssetType::Screenshot13
-        | libaustralis::aurora::assets::AssetType::Screenshot14
-        | libaustralis::aurora::assets::AssetType::Screenshot15
-        | libaustralis::aurora::assets::AssetType::Screenshot16
-        | libaustralis::aurora::assets::AssetType::Screenshot17
-        | libaustralis::aurora::assets::AssetType::Screenshot18
-        | libaustralis::aurora::assets::AssetType::Screenshot19
-        | libaustralis::aurora::assets::AssetType::Screenshot20 => {
-            format!("SS{:0>8X}.asset", title_id)
-        }
-        _ => {
-            let msg = format!(
-                "Could not determine file name containing asset type {}.",
-                asset_type
-            );
-            error!("{}", &msg);
-            return Err(msg.into());
-        }
-    };
-    Ok(
-        path_game_console_aurora_assets_root(app_handle, console_configuration, title_id, game_id)?
-            .join(asset_file_name),
-    )
-}
-
-pub fn path_game_console_configurations_root(
-    app_handle: &tauri::AppHandle,
-) -> Result<PathBuf, String> {
-    match app_handle
-        .path()
-        .resolve("game-consoles", tauri::path::BaseDirectory::AppData)
-    {
-        Ok(x) => Ok(x),
-        Err(err) => {
-            let msg = format!(
-                "Failed to resolve consoles root directory. Got the following error: {}",
-                err
-            );
-            error!("{}", msg);
-            Err(msg)
-        }
-    }
-}
-
-pub fn path_game_console_configuration_root(
-    app_handle: &tauri::AppHandle,
-    console_configuration_id: &Uuid,
-) -> Result<PathBuf, String> {
-    Ok(path_game_console_configurations_root(app_handle)?
-        .join(uuid_to_string(console_configuration_id)))
-}
-
-pub fn path_game_console_configuration(
-    app_handle: &tauri::AppHandle,
-    console_configuration: &GameConsoleConfiguration,
-) -> Result<PathBuf, String> {
-    Ok(path_game_console_configuration_from_id(
-        app_handle,
-        &console_configuration.id(),
-    )?)
-}
-
-pub fn path_game_console_configuration_from_id(
-    app_handle: &tauri::AppHandle,
-    console_configuration_id: &Uuid,
-) -> Result<PathBuf, String> {
-    Ok(path_game_console_configurations_root(app_handle)?
-        .join(uuid_to_string(console_configuration_id))
-        .join("configuration.json"))
-}
 
 ////////////////////////////////////////////////////////////////////////////////
 // misc
@@ -347,9 +155,9 @@ pub fn determine_title_launch_data(
     console_configuration: &GameConsoleConfiguration,
     game: &AuroraGame,
 ) -> Result<(String, String, u32), String> {
-    let content_db_file = path_game_console_aurora_content_db(&app_handle, &console_configuration)?;
-    let settings_db_file =
-        path_game_console_aurora_settings_db(&app_handle, &console_configuration)?;
+    let path_resolver = PathResolver::new(&app_handle);
+    let content_db_file = path_resolver.game_console_aurora_content_db(&console_configuration)?;
+    let settings_db_file = path_resolver.game_console_aurora_settings_db(&console_configuration)?;
     if !content_db_file.is_file() {
         let msg = format!("No database exists at '{}'.", content_db_file.display());
         error!("{}", &msg);

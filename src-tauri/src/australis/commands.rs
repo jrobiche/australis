@@ -3,17 +3,12 @@ use log::{error, warn};
 use sqlite;
 use uuid::Uuid;
 
-use crate::australis::structs::{AuroraGame, GameConsoleConfiguration, GameListEntry};
-use crate::australis::utils::{
-    delete_directory, determine_title_launch_data, path_game_console_aurora_asset,
-    path_game_console_aurora_content_db, path_game_console_aurora_game_data,
-    path_game_console_aurora_settings_db, path_game_console_configuration,
-    path_game_console_configuration_from_id, path_game_console_configuration_root,
-    path_game_console_configurations_root, write_str_to_path,
+use crate::australis::structs::{
+    AuroraGame, GameConsoleConfiguration, GameListEntry, PathResolver,
 };
+use crate::australis::utils::{delete_directory, determine_title_launch_data, write_str_to_path};
 use libaustralis;
 
-// TODO make path_... commands for remote aurora file/dir locations
 ////////////////////////////////////////////////////////////////////////////////
 // aurora ftp commands
 ////////////////////////////////////////////////////////////////////////////////
@@ -33,16 +28,17 @@ pub async fn aurora_ftp_download_aurora_databases(
     app_handle: tauri::AppHandle,
     console_configuration: GameConsoleConfiguration,
 ) -> Result<(), String> {
+    let path_resolver = PathResolver::new(&app_handle);
     let files = vec![
         // source and destination of content.db
         (
             "/Game/Data/Databases/content.db",
-            path_game_console_aurora_content_db(&app_handle, &console_configuration)?,
+            path_resolver.game_console_aurora_content_db(&console_configuration)?,
         ),
         // source and destination of settings.db
         (
             "/Game/Data/Databases/settings.db",
-            path_game_console_aurora_settings_db(&app_handle, &console_configuration)?,
+            path_resolver.game_console_aurora_settings_db(&console_configuration)?,
         ),
     ];
     for (file_src, file_dest) in files {
@@ -66,8 +62,10 @@ pub async fn aurora_ftp_download_aurora_game_data_directory(
     console_configuration: GameConsoleConfiguration,
     directory_name: String,
 ) -> Result<(), String> {
+    let path_resolver = PathResolver::new(&app_handle);
     let directory_src = format!("/Game/Data/GameData/{}", &directory_name);
-    let directory_dest = path_game_console_aurora_game_data(&app_handle, &console_configuration)?
+    let directory_dest = path_resolver
+        .game_console_aurora_game_data(&console_configuration)?
         .join(directory_name);
     ftp_client(&console_configuration).download_directory(None, &directory_src, &directory_dest).map_err(|err| {
             let msg = format!(
@@ -111,13 +109,13 @@ pub async fn aurora_ftp_upload_game_assets(
     console_configuration: GameConsoleConfiguration,
     game: AuroraGame,
 ) -> Result<(), String> {
+    let path_resolver = PathResolver::new(&app_handle);
     let mut files = vec![];
     for asset_type in libaustralis::aurora::assets::AssetType::into_iter() {
         if asset_type == libaustralis::aurora::assets::AssetType::Slot {
             continue;
         }
-        let file_src = path_game_console_aurora_asset(
-            &app_handle,
+        let file_src = path_resolver.game_console_aurora_asset(
             &console_configuration,
             (game.title_id & 0xFFFFFFFF) as u32,
             (game.id & 0xFFFFFFFF) as u32,
@@ -171,6 +169,7 @@ pub async fn aurora_game_asset_image_delete(
     game: AuroraGame,
     asset_type_usize: usize,
 ) -> Result<(), String> {
+    let path_resolver = PathResolver::new(&app_handle);
     let asset_type = libaustralis::aurora::assets::AssetType::from_usize(asset_type_usize)
         .map_err(|err| {
             let msg = format!(
@@ -180,8 +179,7 @@ pub async fn aurora_game_asset_image_delete(
             error!("{}", &msg);
             msg
         })?;
-    let asset_path = path_game_console_aurora_asset(
-        &app_handle,
+    let asset_path = path_resolver.game_console_aurora_asset(
         &console_configuration,
         (game.title_id & 0xFFFFFFFF) as u32,
         (game.id & 0xFFFFFFFF) as u32,
@@ -228,6 +226,7 @@ pub async fn aurora_game_asset_image_read_url(
     game: AuroraGame,
     asset_type_usize: usize,
 ) -> Result<Option<String>, String> {
+    let path_resolver = PathResolver::new(&app_handle);
     let asset_type = libaustralis::aurora::assets::AssetType::from_usize(asset_type_usize)
         .map_err(|err| {
             let msg = format!(
@@ -237,8 +236,7 @@ pub async fn aurora_game_asset_image_read_url(
             error!("{}", &msg);
             msg
         })?;
-    let asset_path = path_game_console_aurora_asset(
-        &app_handle,
+    let asset_path = path_resolver.game_console_aurora_asset(
         &console_configuration,
         (game.title_id & 0xFFFFFFFF) as u32,
         (game.id & 0xFFFFFFFF) as u32,
@@ -300,6 +298,7 @@ pub async fn aurora_game_asset_image_update(
     asset_type_usize: usize,
     file_data: Vec<u8>,
 ) -> Result<(), String> {
+    let path_resolver = PathResolver::new(&app_handle);
     let asset_type = libaustralis::aurora::assets::AssetType::from_usize(asset_type_usize)
         .map_err(|err| {
             let msg = format!(
@@ -309,8 +308,7 @@ pub async fn aurora_game_asset_image_update(
             error!("{}", &msg);
             msg
         })?;
-    let asset_path = path_game_console_aurora_asset(
-        &app_handle,
+    let asset_path = path_resolver.game_console_aurora_asset(
         &console_configuration,
         (game.title_id & 0xFFFFFFFF) as u32,
         (game.id & 0xFFFFFFFF) as u32,
@@ -382,7 +380,8 @@ pub async fn aurora_game_entry_read_all(
     app_handle: tauri::AppHandle,
     console_configuration: GameConsoleConfiguration,
 ) -> Result<Vec<GameListEntry>, String> {
-    let content_db_file = path_game_console_aurora_content_db(&app_handle, &console_configuration)?;
+    let path_resolver = PathResolver::new(&app_handle);
+    let content_db_file = path_resolver.game_console_aurora_content_db(&console_configuration)?;
     if !&content_db_file.is_file() {
         return Ok(Vec::new());
     }
@@ -449,7 +448,8 @@ pub async fn aurora_game_read(
     console_configuration: GameConsoleConfiguration,
     game_id: u32,
 ) -> Result<Option<AuroraGame>, String> {
-    let content_db_file = path_game_console_aurora_content_db(&app_handle, &console_configuration)?;
+    let path_resolver = PathResolver::new(&app_handle);
+    let content_db_file = path_resolver.game_console_aurora_content_db(&console_configuration)?;
     if !&content_db_file.is_file() {
         return Ok(None);
     }
@@ -1259,6 +1259,7 @@ pub fn game_console_configuration_create(
     aurora_http_username: Option<String>,
     aurora_http_password: Option<String>,
 ) -> Result<GameConsoleConfiguration, String> {
+    let path_resolver = PathResolver::new(&app_handle);
     let mut console_configuration = GameConsoleConfiguration::new();
     console_configuration.name = name;
     console_configuration.ip_address = ip_address;
@@ -1269,7 +1270,7 @@ pub fn game_console_configuration_create(
     console_configuration.aurora_http_username = aurora_http_username;
     console_configuration.aurora_http_password = aurora_http_password;
     let console_configuration_path =
-        path_game_console_configuration(&app_handle, &console_configuration)?;
+        path_resolver.game_console_configuration_file(&console_configuration.id())?;
     save_game_console_configuration(console_configuration, &console_configuration_path)
 }
 
@@ -1278,10 +1279,10 @@ pub fn game_console_configuration_delete(
     app_handle: tauri::AppHandle,
     console_configuration_id: Uuid,
 ) -> Result<(), String> {
-    Ok(delete_directory(&path_game_console_configuration_root(
-        &app_handle,
-        &console_configuration_id,
-    )?)?)
+    let path_resolver = PathResolver::new(&app_handle);
+    Ok(delete_directory(
+        &path_resolver.game_console_configuration_directory(&console_configuration_id)?,
+    )?)
 }
 
 #[tauri::command]
@@ -1289,8 +1290,9 @@ pub fn game_console_configuration_read(
     app_handle: tauri::AppHandle,
     console_configuration_id: Uuid,
 ) -> Result<GameConsoleConfiguration, String> {
+    let path_resolver = PathResolver::new(&app_handle);
     let console_configuration_path =
-        path_game_console_configuration_from_id(&app_handle, &console_configuration_id)?;
+        path_resolver.game_console_configuration_file(&console_configuration_id)?;
     let console_configuration = load_game_console_configuration(&console_configuration_path)?;
     if console_configuration.id() != console_configuration_id {
         let msg = format!(
@@ -1307,7 +1309,8 @@ pub fn game_console_configuration_read(
 pub fn game_console_configuration_read_all(
     app_handle: tauri::AppHandle,
 ) -> Result<Vec<GameConsoleConfiguration>, String> {
-    let game_console_configurations_root = path_game_console_configurations_root(&app_handle)?;
+    let path_resolver = PathResolver::new(&app_handle);
+    let game_console_configurations_root = path_resolver.game_console_configurations_root()?;
     match std::fs::exists(&game_console_configurations_root) {
         Ok(exists) => {
             if !exists {
@@ -1418,7 +1421,8 @@ pub fn game_console_configuration_update(
     aurora_http_username: Option<String>,
     aurora_http_password: Option<String>,
 ) -> Result<GameConsoleConfiguration, String> {
-    let console_configuration_path = path_game_console_configuration_from_id(&app_handle, &id)?;
+    let path_resolver = PathResolver::new(&app_handle);
+    let console_configuration_path = path_resolver.game_console_configuration_file(&id)?;
     let mut console_configuration = load_game_console_configuration(&console_configuration_path)?;
     console_configuration.name = name;
     console_configuration.ip_address = ip_address;
@@ -1429,7 +1433,7 @@ pub fn game_console_configuration_update(
     console_configuration.aurora_http_username = aurora_http_username;
     console_configuration.aurora_http_password = aurora_http_password;
     let console_configuration_path =
-        path_game_console_configuration(&app_handle, &console_configuration)?;
+        path_resolver.game_console_configuration_file(&console_configuration.id())?;
     save_game_console_configuration(console_configuration, &console_configuration_path)
 }
 
