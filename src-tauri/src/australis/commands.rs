@@ -3,9 +3,7 @@ use log::{error, warn};
 use sqlite;
 use uuid::Uuid;
 
-use crate::australis::structs::{
-    AuroraGame, GameAssetTypes, GameConsoleConfiguration, GameListEntry,
-};
+use crate::australis::structs::{AuroraGame, GameConsoleConfiguration, GameListEntry};
 use crate::australis::utils::{
     delete_directory, determine_title_launch_data, path_game_console_aurora_asset,
     path_game_console_aurora_content_db, path_game_console_aurora_game_data,
@@ -173,17 +171,15 @@ pub async fn aurora_game_asset_image_delete(
     game: AuroraGame,
     asset_type_usize: usize,
 ) -> Result<(), String> {
-    let asset_type = match libaustralis::aurora::assets::AssetType::from_usize(asset_type_usize) {
-        Ok(x) => x,
-        Err(err) => {
+    let asset_type = libaustralis::aurora::assets::AssetType::from_usize(asset_type_usize)
+        .map_err(|err| {
             let msg = format!(
                 "Failed to create AssetType from '{}'. Got the following error: {}",
                 asset_type_usize, err
             );
             error!("{}", &msg);
-            return Err(msg);
-        }
-    };
+            msg
+        })?;
     let asset_path = path_game_console_aurora_asset(
         &app_handle,
         &console_configuration,
@@ -193,46 +189,36 @@ pub async fn aurora_game_asset_image_delete(
     )?;
     let mut asset: libaustralis::aurora::assets::Asset;
     if asset_path.is_file() {
-        asset = match libaustralis::aurora::assets::Asset::load(&asset_path) {
-            Ok(x) => x,
-            Err(err) => {
-                let msg = format!(
-                    "Failed to read asset file at '{}'. Got the following error: {}",
-                    &asset_path.display(),
-                    err
-                );
-                error!("{}", &msg);
-                return Err(msg);
-            }
-        };
+        asset = libaustralis::aurora::assets::Asset::load(&asset_path).map_err(|err| {
+            let msg = format!(
+                "Failed to read asset file at '{}'. Got the following error: {}",
+                &asset_path.display(),
+                err
+            );
+            error!("{}", &msg);
+            msg
+        })?;
     } else {
         asset = libaustralis::aurora::assets::Asset::new();
     }
-    match asset.delete_image(asset_type) {
-        Ok(_) => (),
-        Err(err) => {
-            let msg = format!(
-                "Failed to delete image in asset at '{}'. Got the following error: {}",
-                &asset_path.display(),
-                err
-            );
-            error!("{}", &msg);
-            return Err(msg);
-        }
-    }
-    match asset.save(&asset_path) {
-        Ok(_) => (),
-        Err(err) => {
-            let msg = format!(
-                "Failed to write asset to '{}'. Got the following error: {}",
-                &asset_path.display(),
-                err
-            );
-            error!("{}", &msg);
-            return Err(msg);
-        }
-    }
-    Ok(())
+    asset.delete_image(asset_type).map_err(|err| {
+        let msg = format!(
+            "Failed to delete image in asset at '{}'. Got the following error: {}",
+            &asset_path.display(),
+            err
+        );
+        error!("{}", &msg);
+        msg
+    })?;
+    asset.save(&asset_path).map_err(|err| {
+        let msg = format!(
+            "Failed to write asset to '{}'. Got the following error: {}",
+            &asset_path.display(),
+            err
+        );
+        error!("{}", &msg);
+        msg
+    })
 }
 
 #[tauri::command(async)]
@@ -242,17 +228,15 @@ pub async fn aurora_game_asset_image_read_url(
     game: AuroraGame,
     asset_type_usize: usize,
 ) -> Result<Option<String>, String> {
-    let asset_type = match libaustralis::aurora::assets::AssetType::from_usize(asset_type_usize) {
-        Ok(x) => x,
-        Err(err) => {
+    let asset_type = libaustralis::aurora::assets::AssetType::from_usize(asset_type_usize)
+        .map_err(|err| {
             let msg = format!(
                 "Failed to create AssetType from '{}'. Got the following error: {}",
                 asset_type_usize, err
             );
             error!("{}", &msg);
-            return Err(msg);
-        }
-    };
+            msg
+        })?;
     let asset_path = path_game_console_aurora_asset(
         &app_handle,
         &console_configuration,
@@ -260,49 +244,38 @@ pub async fn aurora_game_asset_image_read_url(
         (game.id & 0xFFFFFFFF) as u32,
         asset_type,
     )?;
-    // TODO warn?
     if !asset_path.is_file() {
         return Ok(None);
     }
-    let asset = match libaustralis::aurora::assets::Asset::load(&asset_path) {
-        Ok(x) => x,
-        Err(err) => {
-            let msg = format!(
-                "Failed to read asset file at '{}'. Got the following error: {}",
-                &asset_path.display(),
-                err
-            );
-            error!("{}", &msg);
-            return Err(msg);
-        }
-    };
-    if !asset.has_image(asset_type) {
-        return Ok(None);
-    }
-    let image = match asset.image(asset_type) {
-        Ok(x) => match x {
-            Some(y) => y,
-            None => return Ok(None),
-        },
-        Err(err) => {
-            let msg = format!(
-                "Failed to read '{}' image in asset at '{}'. Got the following error: {}",
-                &asset_type,
-                &asset_path.display(),
-                err
-            );
-            error!("{}", &msg);
-            return Err(msg);
-        }
+    let asset = libaustralis::aurora::assets::Asset::load(&asset_path).map_err(|err| {
+        let msg = format!(
+            "Failed to read asset file at '{}'. Got the following error: {}",
+            &asset_path.display(),
+            err
+        );
+        error!("{}", &msg);
+        msg
+    })?;
+    let image = match asset.image(asset_type).map_err(|err| {
+        let msg = format!(
+            "Failed to read '{}' image in asset at '{}'. Got the following error: {}",
+            &asset_type,
+            &asset_path.display(),
+            err
+        );
+        error!("{}", &msg);
+        msg
+    })? {
+        Some(y) => y,
+        None => return Ok(None),
     };
     let mut buff = std::io::Cursor::new(Vec::new());
     match image.as_rgba8() {
-        Some(x) => match x.write_to(
+        None => (),
+        Some(x) => x.write_to(
             &mut buff,
             libaustralis::aurora::assets::image::ImageFormat::Png,
-        ) {
-            Ok(_) => (),
-            Err(err) => {
+        ).map_err(|err| {
                 let msg = format!(
                     "Failed to write '{}' image in asset at '{}' to buffer. Got the following error: {}",
                     &asset_type,
@@ -310,15 +283,13 @@ pub async fn aurora_game_asset_image_read_url(
                     err
                 );
                 error!("{}", &msg);
-                return Err(msg);
-            }
-        },
-        None => (),
+                msg
+            })?,
     }
-    return Ok(Some(format!(
+    Ok(Some(format!(
         "data:image/png;base64,{}",
         general_purpose::STANDARD.encode(&buff.get_ref())
-    )));
+    )))
 }
 
 #[tauri::command(async)]
@@ -329,17 +300,15 @@ pub async fn aurora_game_asset_image_update(
     asset_type_usize: usize,
     file_data: Vec<u8>,
 ) -> Result<(), String> {
-    let asset_type = match libaustralis::aurora::assets::AssetType::from_usize(asset_type_usize) {
-        Ok(x) => x,
-        Err(err) => {
+    let asset_type = libaustralis::aurora::assets::AssetType::from_usize(asset_type_usize)
+        .map_err(|err| {
             let msg = format!(
                 "Failed to create AssetType from '{}'. Got the following error: {}",
                 asset_type_usize, err
             );
             error!("{}", &msg);
-            return Err(msg);
-        }
-    };
+            msg
+        })?;
     let asset_path = path_game_console_aurora_asset(
         &app_handle,
         &console_configuration,
@@ -349,42 +318,22 @@ pub async fn aurora_game_asset_image_update(
     )?;
     let mut asset: libaustralis::aurora::assets::Asset;
     if asset_path.is_file() {
-        asset = match libaustralis::aurora::assets::Asset::load(&asset_path) {
-            Ok(x) => x,
-            Err(err) => {
-                let msg = format!(
-                    "Failed to read asset file at '{}'. Got the following error: {}",
-                    &asset_path.display(),
-                    err
-                );
-                error!("{}", &msg);
-                return Err(msg);
-            }
-        };
+        asset = libaustralis::aurora::assets::Asset::load(&asset_path).map_err(|err| {
+            let msg = format!(
+                "Failed to read asset file at '{}'. Got the following error: {}",
+                &asset_path.display(),
+                err
+            );
+            error!("{}", &msg);
+            msg
+        })?;
     } else {
-        // TODO should this warn? should this error?
         asset = libaustralis::aurora::assets::Asset::new();
     }
-    // TODO do not use utils
-    // pub fn image_from_be_bytes(bytes: Vec<u8>) -> GenericResult<image::DynamicImage> {
-    //     Ok(image::ImageReader::new(std::io::Cursor::new(bytes))
-    //         .with_guessed_format()?
-    //         .decode()?)
-    // }
-    let image = match libaustralis::aurora::assets::image::ImageReader::new(std::io::Cursor::new(
+    let image = libaustralis::aurora::assets::image::ImageReader::new(std::io::Cursor::new(
         file_data,
     ))
-    .with_guessed_format()
-    {
-        Ok(img) => match img.decode() {
-            Ok(x) => x,
-            Err(err) => {
-                let msg = format!("TODO: {}", err);
-                error!("{}", &msg);
-                return Err(msg);
-            }
-        },
-        Err(err) => {
+    .with_guessed_format().map_err(|err| {
             let msg = format!(
                 "Failed to update '{}' image in asset at '{}'. Failed to create image from file data. Got the following error: {}",
                 &asset_type,
@@ -392,30 +341,20 @@ pub async fn aurora_game_asset_image_update(
                 err
             );
             error!("{}", &msg);
-            return Err(msg);
-        }
-    };
-    // let image = match libaustralis::utils::image_from_be_bytes(file_data) {
-    //     Ok(x) => x,
-    //     Err(err) => {
-    //         let msg = format!(
-    //             "Failed to update '{}' image in asset at '{}'. Failed to create image from file data. Got the following error: {}",
-    //             &asset_type,
-    //             &asset_path.display(),
-    //             err
-    //         );
-    //         error!("{}", &msg);
-    //         return Err(msg);
-    //     }
-    // };
-    // TODO do not use utils
-    match asset.set_image(
-        image,
-        asset_type,
-        libaustralis::aurora::assets::TextureFormat::RGBA8,
-    ) {
-        Ok(_) => (),
-        Err(err) => {
+            msg
+        })?;
+    let image = image.decode().map_err(|err| {
+        let msg = format!("Failed to decode image. Got the following error: {}", err);
+        error!("{}", &msg);
+        msg
+    })?;
+    asset
+        .set_image(
+            image,
+            asset_type,
+            libaustralis::aurora::assets::TextureFormat::RGBA8,
+        )
+        .map_err(|err| {
             let msg = format!(
                 "Failed to update '{}' image in asset at '{}'. Got the following error: {}",
                 &asset_type,
@@ -423,12 +362,9 @@ pub async fn aurora_game_asset_image_update(
                 err
             );
             error!("{}", &msg);
-            return Err(msg);
-        }
-    }
-    match asset.save(&asset_path) {
-        Ok(_) => (),
-        Err(err) => {
+            msg
+        })?;
+    Ok(asset.save(&asset_path).map_err(|err| {
             let msg = format!(
                 "Failed to update '{}' image in asset at '{}'. Failed to save asset to '{}'. Got the following error: {}",
                 &asset_type,
@@ -437,216 +373,39 @@ pub async fn aurora_game_asset_image_update(
                 err
             );
             error!("{}", &msg);
-            return Err(msg);
-        }
-    }
-    Ok(())
+            msg
+        })?)
 }
 
-// TODO is this used?
-#[tauri::command(async)]
-pub async fn aurora_game_asset_types_read_all(
-    app_handle: tauri::AppHandle,
-    console_configuration: GameConsoleConfiguration,
-) -> Result<Vec<GameAssetTypes>, String> {
-    // TODO move some db logic into libaustralis
-    // TODO this logic can be simplified
-    let mut all_game_asset_types: Vec<GameAssetTypes> = Vec::new();
-    let game_list_entries =
-        aurora_game_entry_read_all(app_handle.clone(), console_configuration.clone()).await?;
-    for game_list_entry in game_list_entries {
-        let game = match aurora_game_read(
-            app_handle.clone(),
-            console_configuration.clone(),
-            (game_list_entry.id & 0xFFFFFFFF) as u32,
-        )
-        .await?
-        {
-            Some(x) => x,
-            None => continue,
-        };
-        let mut game_asset_types = GameAssetTypes {
-            id: game.id,
-            has_icon: false,
-            has_banner: false,
-            has_boxart: false,
-            has_slot: false,
-            has_background: false,
-            has_screenshot1: false,
-            has_screenshot2: false,
-            has_screenshot3: false,
-            has_screenshot4: false,
-            has_screenshot5: false,
-            has_screenshot6: false,
-            has_screenshot7: false,
-            has_screenshot8: false,
-            has_screenshot9: false,
-            has_screenshot10: false,
-            has_screenshot11: false,
-            has_screenshot12: false,
-            has_screenshot13: false,
-            has_screenshot14: false,
-            has_screenshot15: false,
-            has_screenshot16: false,
-            has_screenshot17: false,
-            has_screenshot18: false,
-            has_screenshot19: false,
-            has_screenshot20: false,
-        };
-        for asset_type in libaustralis::aurora::assets::AssetType::into_iter() {
-            let asset_path = match path_game_console_aurora_asset(
-                &app_handle,
-                &console_configuration,
-                (game.title_id & 0xFFFFFFFF) as u32,
-                (game.id & 0xFFFFFFFF) as u32,
-                asset_type,
-            ) {
-                Ok(x) => x,
-                Err(_) => {
-                    // TODO message
-                    continue;
-                }
-            };
-            // TODO warn?
-            if !asset_path.is_file() {
-                // return Ok(None);
-                continue;
-            }
-            let asset = match libaustralis::aurora::assets::Asset::load(&asset_path) {
-                Ok(x) => x,
-                Err(_) => {
-                    // TODO
-                    // let msg = format!(
-                    //     "Failed to read asset file at '{}'. Got the following error: {}",
-                    //     &asset_path.display(),
-                    //     err
-                    // );
-                    continue;
-                    // error!("{}", &msg);
-                    // return Err(msg);
-                }
-            };
-            if asset.has_image(asset_type) {
-                match asset_type {
-                    libaustralis::aurora::assets::AssetType::Icon => {
-                        game_asset_types.has_icon = true
-                    }
-                    libaustralis::aurora::assets::AssetType::Banner => {
-                        game_asset_types.has_banner = true
-                    }
-                    libaustralis::aurora::assets::AssetType::Boxart => {
-                        game_asset_types.has_boxart = true
-                    }
-                    libaustralis::aurora::assets::AssetType::Slot => {
-                        game_asset_types.has_slot = true
-                    }
-                    libaustralis::aurora::assets::AssetType::Background => {
-                        game_asset_types.has_background = true
-                    }
-                    libaustralis::aurora::assets::AssetType::Screenshot1 => {
-                        game_asset_types.has_screenshot1 = true
-                    }
-                    libaustralis::aurora::assets::AssetType::Screenshot2 => {
-                        game_asset_types.has_screenshot2 = true
-                    }
-                    libaustralis::aurora::assets::AssetType::Screenshot3 => {
-                        game_asset_types.has_screenshot3 = true
-                    }
-                    libaustralis::aurora::assets::AssetType::Screenshot4 => {
-                        game_asset_types.has_screenshot4 = true
-                    }
-                    libaustralis::aurora::assets::AssetType::Screenshot5 => {
-                        game_asset_types.has_screenshot5 = true
-                    }
-                    libaustralis::aurora::assets::AssetType::Screenshot6 => {
-                        game_asset_types.has_screenshot6 = true
-                    }
-                    libaustralis::aurora::assets::AssetType::Screenshot7 => {
-                        game_asset_types.has_screenshot7 = true
-                    }
-                    libaustralis::aurora::assets::AssetType::Screenshot8 => {
-                        game_asset_types.has_screenshot8 = true
-                    }
-                    libaustralis::aurora::assets::AssetType::Screenshot9 => {
-                        game_asset_types.has_screenshot9 = true
-                    }
-                    libaustralis::aurora::assets::AssetType::Screenshot10 => {
-                        game_asset_types.has_screenshot10 = true
-                    }
-                    libaustralis::aurora::assets::AssetType::Screenshot11 => {
-                        game_asset_types.has_screenshot11 = true
-                    }
-                    libaustralis::aurora::assets::AssetType::Screenshot12 => {
-                        game_asset_types.has_screenshot12 = true
-                    }
-                    libaustralis::aurora::assets::AssetType::Screenshot13 => {
-                        game_asset_types.has_screenshot13 = true
-                    }
-                    libaustralis::aurora::assets::AssetType::Screenshot14 => {
-                        game_asset_types.has_screenshot14 = true
-                    }
-                    libaustralis::aurora::assets::AssetType::Screenshot15 => {
-                        game_asset_types.has_screenshot15 = true
-                    }
-                    libaustralis::aurora::assets::AssetType::Screenshot16 => {
-                        game_asset_types.has_screenshot16 = true
-                    }
-                    libaustralis::aurora::assets::AssetType::Screenshot17 => {
-                        game_asset_types.has_screenshot17 = true
-                    }
-                    libaustralis::aurora::assets::AssetType::Screenshot18 => {
-                        game_asset_types.has_screenshot18 = true
-                    }
-                    libaustralis::aurora::assets::AssetType::Screenshot19 => {
-                        game_asset_types.has_screenshot19 = true
-                    }
-                    libaustralis::aurora::assets::AssetType::Screenshot20 => {
-                        game_asset_types.has_screenshot20 = true
-                    }
-                }
-            }
-        }
-        all_game_asset_types.push(game_asset_types);
-    }
-    Ok(all_game_asset_types)
-}
-
-// TODO include game type
 #[tauri::command]
 pub async fn aurora_game_entry_read_all(
     app_handle: tauri::AppHandle,
     console_configuration: GameConsoleConfiguration,
 ) -> Result<Vec<GameListEntry>, String> {
-    let mut game_list_entries: Vec<GameListEntry> = Vec::new();
     let content_db_file = path_game_console_aurora_content_db(&app_handle, &console_configuration)?;
     if !&content_db_file.is_file() {
-        return Ok(game_list_entries);
+        return Ok(Vec::new());
     }
-    let connection = match sqlite::open(&content_db_file) {
-        Ok(x) => x,
-        Err(err) => {
-            let msg = format!(
-                "Failed to open connection to database at '{}'. Got the following error: {}",
-                &content_db_file.display(),
-                err
-            );
-            error!("{}", &msg);
-            return Err(msg);
-        }
-    };
+    let connection = sqlite::open(&content_db_file).map_err(|err| {
+        let msg = format!(
+            "Failed to open connection to database at '{}'. Got the following error: {}",
+            &content_db_file.display(),
+            err
+        );
+        error!("{}", &msg);
+        msg
+    })?;
     let query = "SELECT Id, TitleName FROM ContentItems";
-    let mut statement = match connection.prepare(query) {
-        Ok(x) => x,
-        Err(err) => {
+    let mut statement = connection.prepare(query).map_err(|err| {
             let msg = format!(
                 "Failed to prepare query to select game entries from database at '{}'. Got the following error: {}",
                 &content_db_file.display(),
                 err
             );
             error!("{}", &msg);
-            return Err(msg);
-        }
-    };
+            msg
+        })?;
+    let mut game_list_entries: Vec<GameListEntry> = Vec::new();
     while let Ok(sqlite::State::Row) = statement.next() {
         match (
             statement.read::<i64, _>("Id"),
@@ -669,7 +428,7 @@ pub async fn aurora_game_entry_read_all(
             }
         }
     }
-    return Ok(game_list_entries);
+    Ok(game_list_entries)
 }
 
 #[tauri::command]
@@ -690,39 +449,30 @@ pub async fn aurora_game_read(
     console_configuration: GameConsoleConfiguration,
     game_id: u32,
 ) -> Result<Option<AuroraGame>, String> {
-    let mut game: Option<AuroraGame> = None;
     let content_db_file = path_game_console_aurora_content_db(&app_handle, &console_configuration)?;
     if !&content_db_file.is_file() {
-        return Ok(game);
+        return Ok(None);
     }
-    let connection = match sqlite::open(&content_db_file) {
-        Ok(x) => x,
-        Err(err) => {
-            let msg = format!(
-                "Failed to open connection to database at '{}'. Got the following error: {}",
-                &content_db_file.display(),
-                err
-            );
-            error!("{}", &msg);
-            return Err(msg);
-        }
-    };
+    let connection = sqlite::open(&content_db_file).map_err(|err| {
+        let msg = format!(
+            "Failed to open connection to database at '{}'. Got the following error: {}",
+            &content_db_file.display(),
+            err
+        );
+        error!("{}", &msg);
+        msg
+    })?;
     let query = "SELECT * FROM ContentItems WHERE Id = ?";
-    let mut statement = match connection.prepare(query) {
-        Ok(x) => x,
-        Err(err) => {
+    let mut statement = connection.prepare(query).map_err(|err| {
             let msg = format!(
                 "Failed to prepare query to select game from database at '{}'. Got the following error: {}",
                 &content_db_file.display(),
                 err
             );
             error!("{}", &msg);
-            return Err(msg);
-        }
-    };
-    match statement.bind((1, i64::from(game_id))) {
-        Ok(_) => (),
-        Err(err) => {
+            msg
+        })?;
+    statement.bind((1, i64::from(game_id))).map_err(|err| {
             let msg = format!(
                 "Failed to bind game id '{}' to SQL query to select game from database at '{}'. Got the following error: {}",
                 &content_db_file.display(),
@@ -730,9 +480,9 @@ pub async fn aurora_game_read(
                 err
             );
             error!("{}", &msg);
-            return Err(msg);
-        }
-    }
+            msg
+        })?;
+    let mut game: Option<AuroraGame> = None;
     while let Ok(sqlite::State::Row) = statement.next() {
         match (
             statement.read::<i64, _>("Id"),
@@ -828,7 +578,7 @@ pub async fn aurora_game_read(
                     system_link: system_link as u64,
                     scan_path_id: scan_path_id as u64,
                     case_index: case_index as u64,
-                })
+                });
             }
             _ => {
                 let msg = format!(

@@ -21,13 +21,10 @@ pub fn run() {
             commands::aurora_ftp_download_aurora_game_data_directory,
             commands::aurora_ftp_list_aurora_game_data_directories,
             commands::aurora_ftp_upload_game_assets,
-            // TODO sql commands
-            // aurora game commands (aka SQL commands)
+            // aurora game commands
             commands::aurora_game_asset_image_delete,
-            // commands::aurora_game_asset_image_read,
             commands::aurora_game_asset_image_read_url,
             commands::aurora_game_asset_image_update,
-            commands::aurora_game_asset_types_read_all,
             commands::aurora_game_entry_read_all,
             commands::aurora_game_launch,
             commands::aurora_game_read,
