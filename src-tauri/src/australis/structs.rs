@@ -206,38 +206,6 @@ pub struct GameListEntry {
     pub title_name: String,
 }
 
-// TODO remove
-// #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
-// #[serde(rename_all = "camelCase")]
-// pub struct GameAssetTypes {
-//     pub id: u64,
-//     pub has_icon: bool,
-//     pub has_banner: bool,
-//     pub has_boxart: bool,
-//     pub has_slot: bool,
-//     pub has_background: bool,
-//     pub has_screenshot1: bool,
-//     pub has_screenshot2: bool,
-//     pub has_screenshot3: bool,
-//     pub has_screenshot4: bool,
-//     pub has_screenshot5: bool,
-//     pub has_screenshot6: bool,
-//     pub has_screenshot7: bool,
-//     pub has_screenshot8: bool,
-//     pub has_screenshot9: bool,
-//     pub has_screenshot10: bool,
-//     pub has_screenshot11: bool,
-//     pub has_screenshot12: bool,
-//     pub has_screenshot13: bool,
-//     pub has_screenshot14: bool,
-//     pub has_screenshot15: bool,
-//     pub has_screenshot16: bool,
-//     pub has_screenshot17: bool,
-//     pub has_screenshot18: bool,
-//     pub has_screenshot19: bool,
-//     pub has_screenshot20: bool,
-// }
-
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AuroraGame {
@@ -270,4 +238,29 @@ pub struct AuroraGame {
     pub system_link: u64,
     pub scan_path_id: u64,
     pub case_index: u64,
+}
+
+impl AuroraGame {
+    // TODO create enum
+    pub fn executable_type(&self) -> u32 {
+        // 0: Xbox 360 Executable (xex)
+        // 1: Classic Xbox Executable (xbe)
+        // 2: Xbox 360 Container
+        // 3: Classic Xbox Container
+        // 4: XNA Container
+        if self.executable.to_lowercase().ends_with(".xex") {
+            return 0;
+        }
+        if self.executable.to_lowercase().ends_with(".xbe") {
+            return 1;
+        }
+        // assume game is in container format
+        if self.default_group == 3 {
+            return 4;
+        }
+        if self.default_group == 4 {
+            return 3;
+        }
+        return 2;
+    }
 }

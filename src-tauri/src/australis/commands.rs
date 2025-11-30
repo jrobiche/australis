@@ -6,7 +6,7 @@ use uuid::Uuid;
 use crate::australis::structs::{
     AuroraGame, GameConsoleConfiguration, GameListEntry, PathResolver,
 };
-use crate::australis::utils::{delete_directory, determine_title_launch_data, write_str_to_path};
+use crate::australis::utils::{determine_title_launch_data, write_str_to_path};
 use libaustralis;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1280,9 +1280,16 @@ pub fn game_console_configuration_delete(
     console_configuration_id: Uuid,
 ) -> Result<(), String> {
     let path_resolver = PathResolver::new(&app_handle);
-    Ok(delete_directory(
-        &path_resolver.game_console_configuration_directory(&console_configuration_id)?,
-    )?)
+    let dir_path = path_resolver.game_console_configuration_directory(&console_configuration_id)?;
+    std::fs::remove_dir_all(&dir_path).map_err(|err| {
+        let msg = format!(
+            "Failed to delete directory '{}'. Got the following error: {}",
+            dir_path.display(),
+            err
+        );
+        error!("{}", &msg);
+        msg
+    })
 }
 
 #[tauri::command]
