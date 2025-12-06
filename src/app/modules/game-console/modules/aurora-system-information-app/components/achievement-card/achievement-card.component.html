@@ -1,0 +1,15 @@
+<mat-card appearance="outlined">
+  <mat-card-header>
+    <mat-card-title-group>
+      <mat-card-title>{{ titleText }}</mat-card-title>
+      <mat-card-subtitle>{{ gamerscoreText }} Gamerscore</mat-card-subtitle>
+      <mat-card-subtitle>Type: {{ typeText }}</mat-card-subtitle>
+      @if (iconImageUrl && isDisplayed) {
+        <img mat-card-sm-image alt="Achievement icon" [src]="iconImageUrl" />
+      }
+    </mat-card-title-group>
+  </mat-card-header>
+  <mat-card-content>
+    {{ descriptionText }}
+  </mat-card-content>
+</mat-card>

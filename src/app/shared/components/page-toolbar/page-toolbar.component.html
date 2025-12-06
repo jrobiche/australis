@@ -1,0 +1,25 @@
+<mat-toolbar
+  [class.font-small]="appSettings.isFontSizeSmall"
+  [class.font-medium]="appSettings.isFontSizeMedium"
+  [class.font-large]="appSettings.isFontSizeLarge"
+>
+  @if (backButton) {
+    <button
+      aria-label="Back"
+      class="leading-button"
+      type="button"
+      mat-icon-button
+      (click)="onBackClick()"
+    >
+      <mat-icon
+        aria-label="Return to previous page"
+        fontSet="material-icons-outlined"
+      >
+        arrow_back
+      </mat-icon>
+    </button>
+  }
+  <span class="heading">{{ heading }}</span>
+  <span class="spacer"></span>
+  <ng-content></ng-content>
+</mat-toolbar>

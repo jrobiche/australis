@@ -1,0 +1,37 @@
+@use '../../../../../variables'
+
+mat-drawer-container
+  height: calc(100% - variables.$game-console-app-toolbar-height)
+
+mat-selection-list
+  margin-bottom: 8px
+  margin-left: 8px
+  margin-right: 8px
+  margin-top: 8px
+
+mat-toolbar
+  border-bottom: 1px solid var(--mat-sys-outline-variant)
+
+app-edit-asset-card
+  display: block
+
+app-edit-asset-card:not(:first-of-type)
+  margin-top: 16px
+
+.centered-text
+  text-align: center
+
+.content-wrapper.layout-handset
+  margin-bottom: 16px
+
+.content-wrapper.layout-tablet
+  margin-bottom: 24px
+
+.content-wrapper.layout-web
+  margin-bottom: 32px
+
+.description
+  margin-top: 0px
+
+.toolbar-spacer
+  flex: 1 1 auto

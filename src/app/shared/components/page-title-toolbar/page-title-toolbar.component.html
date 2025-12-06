@@ -1,0 +1,9 @@
+<mat-toolbar
+  [class.font-small]="appSettings.isFontSizeSmall"
+  [class.font-medium]="appSettings.isFontSizeMedium"
+  [class.font-large]="appSettings.isFontSizeLarge"
+>
+  <h1>{{ heading }}</h1>
+  <span class="spacer"></span>
+  <ng-content></ng-content>
+</mat-toolbar>

@@ -1,0 +1,6 @@
+<app-game-console-toolbar
+  [(gameConsoleConfiguration)]="gameConsoleConfiguration"
+/>
+<div class="app-content">
+  <router-outlet [routerOutletData]="gameConsoleConfiguration" />
+</div>
