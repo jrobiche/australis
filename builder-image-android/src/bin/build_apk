@@ -34,4 +34,4 @@ rm src-tauri/gen/android/app/build.gradle.kts
 cp "${HOME}/.local/etc/com.github.jrobiche.australis/build.gradle.kts" src-tauri/gen/android/app/build.gradle.kts
 
 npx tauri icon app-icon.png
-npm run tauri android build -- --apk
+npm run tauri android build -- --apk true
