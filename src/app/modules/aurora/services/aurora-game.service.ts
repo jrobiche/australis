@@ -2,16 +2,12 @@ import { Injectable, inject } from '@angular/core';
 import { invoke } from '@tauri-apps/api/core';
 
 import { GameConsoleConfiguration, GameListEntry } from '@app/shared/types/app';
-// import { AuroraHttpTauriService } from '../services/aurora-http-tauri.service';
 import { AuroraAssetType, AuroraGameData } from '../types/aurora';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuroraGameService {
-  // TODO remove this dependency
-  // readonly #auroraHttpService = inject(AuroraHttpTauriService);
-
   constructor() {}
 
   assetImageUrl(
@@ -55,6 +51,14 @@ export class AuroraGameService {
   list(configuration: GameConsoleConfiguration): Promise<GameListEntry[]> {
     return invoke('aurora_game_entry_read_all', {
       consoleConfiguration: configuration,
+    });
+  }
+
+  listSorted(
+    configuration: GameConsoleConfiguration,
+  ): Promise<GameListEntry[]> {
+    return this.list(configuration).then((gameList) => {
+      return gameList.sort(this.compareGameListEntries);
     });
   }
 
@@ -155,5 +159,27 @@ export class AuroraGameService {
       assetTypeUsize: assetType.valueOf(),
       fileData: assetImageBytes,
     });
+  }
+
+  compareGameListEntries(a: GameListEntry, b: GameListEntry) {
+    // compare title names
+    const nameA = a.titleName.toUpperCase();
+    const nameB = b.titleName.toUpperCase();
+    if (nameA < nameB) {
+      return -1;
+    }
+    if (nameA > nameB) {
+      return 1;
+    }
+    // names are the same, compare ids
+    const idA = a.id;
+    const idB = b.id;
+    if (idA < idB) {
+      return -1;
+    }
+    if (idA > idB) {
+      return 1;
+    }
+    return 0;
   }
 }

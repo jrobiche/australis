@@ -44,7 +44,7 @@ export class TitleCardComponent implements OnInit {
   ngOnInit() {
     if (this.titleListItem) {
       this.#xboxunityService
-        .titleIconImageBytesUrl(this.titleListItem)
+        .titleIconImageDataUrl(this.titleListItem)
         .then((imageUrl) => {
           this.iconUrl = imageUrl;
         })

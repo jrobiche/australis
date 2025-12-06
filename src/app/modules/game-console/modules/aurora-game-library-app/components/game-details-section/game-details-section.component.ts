@@ -39,7 +39,7 @@ import { GameCardComponent } from '../game-card/game-card.component';
 export class GameDetailsSectionComponent implements OnChanges, OnInit {
   readonly #auroraState = inject(AuroraStateService);
   readonly #snackBar = inject(MatSnackBar);
-  readonly breakpointService = inject(BreakpointService);
+  readonly breakpoint = inject(BreakpointService);
   @Input({ required: true })
   gameConsoleConfiguration!: GameConsoleConfiguration;
   @Input({ required: true })

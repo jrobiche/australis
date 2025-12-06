@@ -40,7 +40,7 @@ export class ListAndDetailsLayoutComponent implements OnInit {
   readonly #auroraState = inject(AuroraStateService);
   readonly #dialogService = inject(DialogService);
   readonly #snackBar = inject(MatSnackBar);
-  readonly breakpointService = inject(BreakpointService);
+  readonly breakpoint = inject(BreakpointService);
   @Input({ required: true })
   gameConsoleConfiguration!: GameConsoleConfiguration;
   @ViewChild('drawer')
@@ -57,31 +57,16 @@ export class ListAndDetailsLayoutComponent implements OnInit {
     this.gameList = [];
   }
 
-  ngOnInit() {
-    this.#auroraState.game
-      .list(this.gameConsoleConfiguration)
-      .then((gameList) => {
-        this.gameList = gameList.sort(this.#compareGameListEntries);
-        if (this.gameList.length > 0) {
-          this.#updateSelectedGame(this.gameList[0].id);
-        }
-      })
-      .catch((error) => {
-        console.error(
-          'Failed to load game list. Got the following error:',
-          error,
-        );
-        this.#snackBar.open('Failed to load game list', '', {
-          duration: 3000,
-        });
-      })
-      .finally(() => {
-        if (this.breakpointService.isWeb) {
-          setTimeout(() => {
-            this.drawer?.open();
-          }, 250);
-        }
-      });
+  async ngOnInit() {
+    this.gameList = await this.#loadGameList();
+    if (this.gameList.length > 0) {
+      this.#updateSelectedGame(this.gameList[0].id);
+    }
+    if (this.breakpoint.isWeb) {
+      setTimeout(() => {
+        this.drawer?.open();
+      }, 250);
+    }
   }
 
   gameListCompareWith(o1: GameListEntry, o2: GameListEntry): boolean {
@@ -97,55 +82,36 @@ export class ListAndDetailsLayoutComponent implements OnInit {
       .openDownloadGameDataDialog(this.gameConsoleConfiguration)
       .subscribe((result) => {
         if (result) {
-          this.#auroraState.game
-            .list(this.gameConsoleConfiguration)
-            .then((gameList) => {
-              this.gameList = gameList.sort(this.#compareGameListEntries);
-              if (this.selectedGameData == null && this.gameList.length > 0) {
-                this.#updateSelectedGame(this.gameList[0].id);
-              }
-            })
-            .catch((error) => {
-              console.error(
-                'Failed to load game list. Got the following error:',
-                error,
-              );
-              this.#snackBar.open('Failed to load game list', '', {
-                duration: 3000,
-              });
-            });
+          this.#loadGameList().then((gameList) => {
+            this.gameList = gameList;
+            if (this.selectedGameData == null && this.gameList.length > 0) {
+              this.#updateSelectedGame(this.gameList[0].id);
+            }
+          });
         }
       });
   }
 
   onGameSelectionChange(event: any) {
     this.#updateSelectedGame(event.options[0].value.id);
-    if (this.drawer && !this.breakpointService.isWeb) {
+    if (this.drawer && !this.breakpoint.isWeb) {
       this.drawer.close();
     }
   }
 
-  // TODO move somewhere else
-  #compareGameListEntries(a: GameListEntry, b: GameListEntry) {
-    // compare title names
-    const nameA = a.titleName.toUpperCase();
-    const nameB = b.titleName.toUpperCase();
-    if (nameA < nameB) {
-      return -1;
-    }
-    if (nameA > nameB) {
-      return 1;
-    }
-    // names are the same, compare ids
-    const idA = a.id;
-    const idB = b.id;
-    if (idA < idB) {
-      return -1;
-    }
-    if (idA > idB) {
-      return 1;
-    }
-    return 0;
+  #loadGameList(): Promise<GameListEntry[]> {
+    return this.#auroraState.game
+      .listSorted(this.gameConsoleConfiguration)
+      .catch((error) => {
+        console.error(
+          'Failed to load game list. Got the following error:',
+          error,
+        );
+        this.#snackBar.open('Failed to load game list', '', {
+          duration: 3000,
+        });
+        return Promise.resolve([]);
+      });
   }
 
   #updateSelectedGame(gameId: number | null) {

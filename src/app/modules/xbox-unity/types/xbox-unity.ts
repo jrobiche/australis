@@ -35,7 +35,6 @@ export type TitleListResult = {
   Count: number;
   Pages: number;
   Page: number;
-  // TODO verify these values
   Filter: string;
   Category: string;
   Sort: string;

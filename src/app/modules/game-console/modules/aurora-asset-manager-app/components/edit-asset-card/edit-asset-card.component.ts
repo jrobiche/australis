@@ -192,7 +192,7 @@ export class EditAssetCardComponent implements OnChanges, OnInit {
         if (result) {
           this.isLoadingImage = true;
           this.#xboxcatalogService
-            .liveImageBytesUrl(result)
+            .liveImageDataUrl(result)
             .then((url: string | null) => {
               this.assetImageUrlNew = url;
               if (url) {
@@ -224,7 +224,7 @@ export class EditAssetCardComponent implements OnChanges, OnInit {
         if (result) {
           this.isLoadingImage = true;
           this.#xboxunityService
-            .coverImageBytesUrl(result.CoverID, 'large')
+            .coverImageDataUrl(result.CoverID, 'large')
             .then((url: string | null) => {
               this.assetImageUrlNew = url;
               if (url) {

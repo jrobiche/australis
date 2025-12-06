@@ -13,8 +13,7 @@ import {
 export class XboxunityService {
   constructor() {}
 
-  // TODO rename to `...DataUrl`
-  coverImageBytesUrl(
+  coverImageDataUrl(
     coverId: string,
     coverSize: 'small' | 'large',
   ): Promise<string> {
@@ -45,7 +44,7 @@ export class XboxunityService {
   //   return this.#tauriService.xboxunityTitleIconImageUrl(titleListItem);
   // }
 
-  titleIconImageBytesUrl(titleListItem: TitleListItem): Promise<string> {
+  titleIconImageDataUrl(titleListItem: TitleListItem): Promise<string> {
     return invoke('xboxunity_title_icon_image_bytes_url', {
       titleListItem: titleListItem,
     });

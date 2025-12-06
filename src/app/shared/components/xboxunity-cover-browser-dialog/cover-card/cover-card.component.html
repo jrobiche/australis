@@ -6,8 +6,7 @@
   </mat-card-header>
   <mat-card-content>
     @if (imageUrl) {
-      <!-- TODO alt text -->
-      <img class="cover-image" [src]="imageUrl" />
+      <img class="cover-image" alt="Cover image" [src]="imageUrl" />
     } @else {
       <p class="centered-text">No image available.</p>
     }

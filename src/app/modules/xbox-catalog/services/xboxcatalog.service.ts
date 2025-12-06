@@ -19,7 +19,7 @@ export class XboxcatalogService {
     });
   }
 
-  liveImageBytesUrl(liveImage: LiveImage): Promise<string | null> {
+  liveImageDataUrl(liveImage: LiveImage): Promise<string | null> {
     return invoke('xboxcatalog_live_image_bytes_url', {
       liveImage: liveImage,
     });

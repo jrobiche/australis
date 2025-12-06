@@ -36,7 +36,7 @@ export class CoverCardComponent implements OnInit {
   ngOnInit(): void {
     if (this.coverInfoItem) {
       this.#xboxunityService
-        .coverImageBytesUrl(this.coverInfoItem.CoverID, 'small')
+        .coverImageDataUrl(this.coverInfoItem.CoverID, 'small')
         .then((url: string) => {
           this.imageUrl = url;
         })
@@ -68,7 +68,7 @@ export class CoverCardComponent implements OnInit {
   onViewLargeCoverClick() {
     if (this.coverInfoItem) {
       this.#xboxunityService
-        .coverImageBytesUrl(this.coverInfoItem.CoverID, 'large')
+        .coverImageDataUrl(this.coverInfoItem.CoverID, 'large')
         .then((url: string) => {
           this.imageUrl = url;
         })

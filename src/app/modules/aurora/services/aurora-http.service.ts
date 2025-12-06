@@ -31,7 +31,6 @@ import {
 export class AuroraHttpService {
   constructor() {}
 
-  // TODO fix failed to parse when game does not have achievements
   getAchievement(
     consoleConfiguration: GameConsoleConfiguration,
     token: string | null,

@@ -155,29 +155,6 @@ export class AuroraAssetManagerAppComponent implements OnInit {
     });
   }
 
-  // TODO move somewhere else
-  #compareGameListEntries(a: GameListEntry, b: GameListEntry) {
-    // compare title names
-    const nameA = a.titleName.toUpperCase();
-    const nameB = b.titleName.toUpperCase();
-    if (nameA < nameB) {
-      return -1;
-    }
-    if (nameA > nameB) {
-      return 1;
-    }
-    // names are the same, compare ids
-    const idA = a.id;
-    const idB = b.id;
-    if (idA < idB) {
-      return -1;
-    }
-    if (idA > idB) {
-      return 1;
-    }
-    return 0;
-  }
-
   #loadGameData(gameId: number | null): Promise<AuroraGameData | null> {
     if (gameId === null) {
       return Promise.resolve(null);
@@ -199,10 +176,7 @@ export class AuroraAssetManagerAppComponent implements OnInit {
 
   #loadGameList(): Promise<GameListEntry[]> {
     return this.#auroraState.game
-      .list(this.gameConsoleConfiguration())
-      .then((gameList) => {
-        return gameList.sort(this.#compareGameListEntries);
-      })
+      .listSorted(this.gameConsoleConfiguration())
       .catch((error) => {
         console.error(
           'Failed to load game list. Got the following error:',
@@ -211,7 +185,7 @@ export class AuroraAssetManagerAppComponent implements OnInit {
         this.#snackBar.open('Failed to load game list', '', {
           duration: 3000,
         });
-        return Promise.reject(error);
+        return Promise.resolve([]);
       });
   }
 

@@ -36,7 +36,7 @@ import { GameConsoleConfiguration } from '@app/shared/types/app';
 })
 export class DashlaunchViewComponent implements OnInit {
   readonly #auroraState = inject(AuroraStateService);
-  readonly breakpointService = inject(BreakpointService);
+  readonly breakpoint = inject(BreakpointService);
   @Input({ required: true })
   gameConsoleConfiguration!: GameConsoleConfiguration;
   dashlaunch: Signal<AuroraDashlaunch | null>;

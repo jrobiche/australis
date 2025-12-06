@@ -3,6 +3,7 @@
  * you would get back from Aurora. This includes
  * things such as HTTP responses and DB schemas.
  */
+import { WritableSignal } from '@angular/core';
 
 export enum AuroraAssetType {
   Icon = 0,
@@ -31,6 +32,24 @@ export enum AuroraAssetType {
   Screenshot19 = 23,
   Screenshot20 = 24,
 }
+
+export type AuroraState = {
+  activeTitle: WritableSignal<AuroraTitle | null>;
+  // TODO activeTitleAchievementImageUrls: WritableSignal<(string | null)[]>;
+  activeTitleAchievements: WritableSignal<AuroraAchievement[]>;
+  activeTitleScreencaptureMetas: WritableSignal<AuroraScreencaptureMeta[]>;
+  dashlaunch: WritableSignal<AuroraDashlaunch | null>;
+  memory: WritableSignal<AuroraMemory | null>;
+  plugin: WritableSignal<AuroraPlugin | null>;
+  profileImageUrls: WritableSignal<[string, string, string, string]>;
+  // TODO make [AuroraProfile | null, AuroraProfile | null, AuroraProfile | null, AuroraProfile | null]?
+  profiles: WritableSignal<(AuroraProfile | null)[]>;
+  smc: WritableSignal<AuroraSmc | null>;
+  system: WritableSignal<AuroraSystem | null>;
+  temperature: WritableSignal<AuroraTemperature | null>;
+  threadState: WritableSignal<AuroraThreadState | null>;
+  threads: WritableSignal<AuroraThread[]>;
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 // HTTP Response Schemas

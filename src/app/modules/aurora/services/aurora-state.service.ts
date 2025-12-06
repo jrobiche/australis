@@ -8,10 +8,7 @@ import {
 } from '@angular/core';
 import { invoke } from '@tauri-apps/api/core';
 
-import {
-  GameConsoleConfiguration,
-  GameConsoleData,
-} from '@app/shared/types/app';
+import { GameConsoleConfiguration } from '@app/shared/types/app';
 import { AuroraFtpService } from './aurora-ftp.service';
 import { AuroraGameService } from './aurora-game.service';
 import { AuroraHttpService } from './aurora-http.service';
@@ -36,6 +33,7 @@ import {
   AuroraThreadState,
   AuroraTitle,
   AuroraUpdateNotification,
+  AuroraState,
 } from '../types/aurora';
 
 @Injectable({
@@ -46,14 +44,14 @@ export class AuroraStateService {
   readonly game = inject(AuroraGameService);
   readonly http = inject(AuroraHttpService);
   #authenticationTokens: Map<string, WritableSignal<string | null>>;
-  #gameConsoleDatas: Map<string, GameConsoleData>;
+  #states: Map<string, AuroraState>;
 
   constructor() {
     this.#authenticationTokens = new Map<
       string,
       WritableSignal<string | null>
     >();
-    this.#gameConsoleDatas = new Map<string, GameConsoleData>();
+    this.#states = new Map<string, AuroraState>();
   }
 
   ////////////////////////////////////////////////////////////////////////////////
@@ -188,7 +186,6 @@ export class AuroraStateService {
         return Promise.resolve(activeTitleAchievements);
       })
       .catch((error) => {
-        // TODO handle at Tauri level
         this.#gameConsoleData(configuration).activeTitleAchievements.update(
           (value) => [],
         );
@@ -205,7 +202,6 @@ export class AuroraStateService {
         this.#authenticationToken(configuration)(),
       )
       .then((activeTitleScreencaptureMetas) => {
-        console.log('SCMETAS:', activeTitleScreencaptureMetas);
         this.#gameConsoleData(
           configuration,
         ).activeTitleScreencaptureMetas.update(
@@ -367,8 +363,8 @@ export class AuroraStateService {
   }
 
   // TODO use this
-  clearData(configuration: GameConsoleConfiguration): void {
-    this.#gameConsoleDatas.delete(configuration.id);
+  clearState(configuration: GameConsoleConfiguration): void {
+    this.#states.delete(configuration.id);
   }
 
   deleteScreencapture(
@@ -497,8 +493,8 @@ export class AuroraStateService {
     return value;
   }
 
-  #gameConsoleData(configuration: GameConsoleConfiguration): GameConsoleData {
-    let value = this.#gameConsoleDatas.get(configuration.id);
+  #gameConsoleData(configuration: GameConsoleConfiguration): AuroraState {
+    let value = this.#states.get(configuration.id);
     if (value === undefined) {
       value = {
         activeTitle: signal<AuroraTitle | null>(null),
@@ -520,7 +516,7 @@ export class AuroraStateService {
         threadState: signal<AuroraThreadState | null>(null),
         threads: signal<AuroraThread[]>([]),
       };
-      this.#gameConsoleDatas.set(configuration.id, value);
+      this.#states.set(configuration.id, value);
     }
     return value;
   }

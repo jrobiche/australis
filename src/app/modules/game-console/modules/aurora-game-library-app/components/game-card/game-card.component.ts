@@ -44,7 +44,7 @@ import { GameBoxartSceneComponent } from '../game-boxart-scene/game-boxart-scene
 export class GameCardComponent implements OnChanges, OnInit {
   readonly #auroraState = inject(AuroraStateService);
   readonly #snackBar = inject(MatSnackBar);
-  readonly breakpointService = inject(BreakpointService);
+  readonly breakpoint = inject(BreakpointService);
   readonly accordionRef: Signal<MatAccordion> =
     viewChild.required(MatAccordion);
   @Input({ required: true })

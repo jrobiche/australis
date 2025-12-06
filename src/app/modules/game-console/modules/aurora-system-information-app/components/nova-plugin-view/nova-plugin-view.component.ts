@@ -35,7 +35,7 @@ import { GameConsoleConfiguration } from '@app/shared/types/app';
 })
 export class NovaPluginViewComponent implements OnInit {
   readonly #auroraState = inject(AuroraStateService);
-  readonly breakpointService = inject(BreakpointService);
+  readonly breakpoint = inject(BreakpointService);
   @Input({ required: true })
   gameConsoleConfiguration!: GameConsoleConfiguration;
   plugin: Signal<AuroraPlugin | null>;

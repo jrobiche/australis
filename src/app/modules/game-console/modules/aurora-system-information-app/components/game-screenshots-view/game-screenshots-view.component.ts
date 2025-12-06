@@ -23,7 +23,7 @@ import { ScreencapturesCardComponent } from '../screencaptures-card/screencaptur
 })
 export class GameScreenshotsViewComponent implements OnInit {
   readonly #auroraState = inject(AuroraStateService);
-  readonly breakpointService = inject(BreakpointService);
+  readonly breakpoint = inject(BreakpointService);
   @Input({ required: true })
   gameConsoleConfiguration!: GameConsoleConfiguration;
   screenCaptureMetas: Signal<AuroraScreencaptureMeta[]>;

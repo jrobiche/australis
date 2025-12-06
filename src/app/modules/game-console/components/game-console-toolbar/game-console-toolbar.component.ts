@@ -32,7 +32,7 @@ export class GameConsoleToolbarComponent {
   );
   readonly #router = inject(Router);
   readonly #snackBar = inject(MatSnackBar);
-  readonly breakpointService = inject(BreakpointService);
+  readonly breakpoint = inject(BreakpointService);
   gameConsoleConfiguration = model<GameConsoleConfiguration | null>(null);
 
   constructor() {}

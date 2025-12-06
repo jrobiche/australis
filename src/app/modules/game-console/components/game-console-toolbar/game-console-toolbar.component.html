@@ -1,4 +1,4 @@
-@if (breakpointService.isHandset$ | async) {
+@if (breakpoint.isHandset$ | async) {
   <app-page-toolbar [heading]="heading">
     <button
       aria-label="More actions menu"
@@ -37,7 +37,7 @@
       </button>
     </mat-menu>
   </app-page-toolbar>
-} @else if (breakpointService.isTablet$ | async) {
+} @else if (breakpoint.isTablet$ | async) {
   <app-page-toolbar [heading]="heading">
     <button
       aria-label="More actions menu"

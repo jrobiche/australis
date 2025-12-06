@@ -9,7 +9,7 @@
   </button>
   <span>Game Library</span>
   <span class="toolbar-spacer"></span>
-  @if (breakpointService.isHandset$ | async) {
+  @if (breakpoint.isHandset$ | async) {
     <button
       aria-label="Import Game Data"
       mat-icon-button
@@ -17,7 +17,7 @@
     >
       <mat-icon fontSet="material-icons-round"> download </mat-icon>
     </button>
-  } @else if (breakpointService.isTablet$ | async) {
+  } @else if (breakpoint.isTablet$ | async) {
     <button
       class="trailing-button"
       mat-flat-button
@@ -43,13 +43,10 @@
 </mat-toolbar>
 <mat-drawer-container
   class="navigation-drawer"
-  [hasBackdrop]="!(breakpointService.isWeb$ | async)"
-  [class.layout-web]="breakpointService.isWeb$ | async"
+  [hasBackdrop]="!(breakpoint.isWeb$ | async)"
+  [class.layout-web]="breakpoint.isWeb$ | async"
 >
-  <mat-drawer
-    #drawer
-    [mode]="(breakpointService.isWeb$ | async) ? 'side' : 'over'"
-  >
+  <mat-drawer #drawer [mode]="(breakpoint.isWeb$ | async) ? 'side' : 'over'">
     @if (gameList.length == 0) {
       <p class="centered-text">Import game data for games to show up here</p>
     }

@@ -32,7 +32,7 @@ import { AchievementCardComponent } from '../achievement-card/achievement-card.c
 })
 export class GameAchievementsViewComponent implements OnInit {
   readonly #auroraState = inject(AuroraStateService);
-  readonly breakpointService = inject(BreakpointService);
+  readonly breakpoint = inject(BreakpointService);
   @Input({ required: true })
   gameConsoleConfiguration!: GameConsoleConfiguration;
   achievements: Signal<AuroraAchievement[]>;

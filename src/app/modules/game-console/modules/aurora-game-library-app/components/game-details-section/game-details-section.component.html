@@ -5,9 +5,9 @@
   >
     <div
       class="content-wrapper"
-      [class.handset]="breakpointService.isHandset$ | async"
-      [class.tablet]="breakpointService.isTablet$ | async"
-      [class.web]="breakpointService.isWeb$ | async"
+      [class.handset]="breakpoint.isHandset$ | async"
+      [class.tablet]="breakpoint.isTablet$ | async"
+      [class.web]="breakpoint.isWeb$ | async"
     >
       <div class="title-wrapper">
         @if (assetIconUrl) {

@@ -36,7 +36,7 @@ import { GameConsoleConfiguration } from '@app/shared/types/app';
 })
 export class OverviewViewComponent implements OnInit {
   readonly #auroraState = inject(AuroraStateService);
-  readonly breakpointService = inject(BreakpointService);
+  readonly breakpoint = inject(BreakpointService);
   @Input({ required: true })
   gameConsoleConfiguration!: GameConsoleConfiguration;
   memory: Signal<AuroraMemory | null>;

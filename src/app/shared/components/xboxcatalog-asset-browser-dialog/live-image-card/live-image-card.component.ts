@@ -40,7 +40,7 @@ export class LiveImageCardComponent implements OnInit {
   ngOnInit() {
     this.isLoadingImage = true;
     this.#xboxcatalogService
-      .liveImageBytesUrl(this.liveImage)
+      .liveImageDataUrl(this.liveImage)
       .then((url) => {
         this.imageUrl = url;
       })
