@@ -1,0 +1,9 @@
+<h2 mat-dialog-title>Delete Console</h2>
+<mat-dialog-content>
+  <p>Delete console named '{{ inputData.name }}'?</p>
+  <p>This will delete all local data for the console.</p>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button cdkFocusInitial (click)="onCancelClick()">Cancel</button>
+  <button mat-button type="submit" (click)="onDeleteClick()">Delete</button>
+</mat-dialog-actions>
