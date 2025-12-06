@@ -31,7 +31,7 @@ USER circleci
 # install rust
 RUN set -eux; \
   curl --proto '=https' --tlsv1.2 -sSf -o rustup_installer.sh https://sh.rustup.rs; \
-  sh rustup_installer.sh -y --default-toolchain 1.83.0-x86_64-unknown-linux-gnu; \
+  sh rustup_installer.sh -y --default-toolchain 1.89.0-x86_64-unknown-linux-gnu; \
   rm rustup_installer.sh
 
 # install android target (required for building windows executable)

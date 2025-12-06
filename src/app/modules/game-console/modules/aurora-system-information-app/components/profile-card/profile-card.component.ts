@@ -1,12 +1,12 @@
 import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatCardModule } from '@angular/material/card';
 
 import { AuroraProfile } from '@app/modules/aurora/types/aurora';
 
 @Component({
   selector: 'app-profile-card',
-  imports: [CommonModule, MatCardModule],
+  imports: [MatCardModule],
   templateUrl: './profile-card.component.html',
   styleUrl: './profile-card.component.sass',
 })

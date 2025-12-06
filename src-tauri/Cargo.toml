@@ -18,17 +18,14 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2.0.2", features = [] }
 
 [dependencies]
-serde_json = "1.0"
-serde = { version = "1.0", features = ["derive"] }
-sqlite = "0.36.1"
-log = "0.4"
-# the feature "devtools" can be added for inspect element to appear in right-click menu
-tauri = { version = "2.1.0", features = [] }
-tauri-plugin-log = "2.0.0-rc"
-uuid = { version = "1.11.0", features = ["v4", "fast-rng"] }
-# TODO set to latest tag
-# libaustralis = { git = "https://github.com/jrobiche/libaustralis.git", tag = "0.1.0" }
-# libaustralis = { git = "https://github.com/jrobiche/libaustralis.git", branch = "next" }
-libaustralis = { git = "https://github.com/jrobiche/libaustralis.git", branch = "fix/improve-modules" }
 base64 = "0.22.1"
-env_logger = "0.11.6"
+env_logger = "0.11.8"
+libaustralis = { git = "https://github.com/jrobiche/libaustralis.git", tag = "0.2.0" }
+log = "0.4.29"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.145"
+sqlite = "0.37.0"
+# the feature "devtools" can be added for inspect element to appear in right-click menu
+tauri = { version = "2.9.4", features = [] }
+tauri-plugin-log = "2.7.1"
+uuid = { version = "1.19.0", features = ["v4", "fast-rng"] }
