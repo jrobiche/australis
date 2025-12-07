@@ -1,4 +1,3 @@
-// TODO remove
 export interface NavLink {
   href: string;
   label: string;

@@ -1,78 +1,15 @@
-export interface ConsoleAchievement {
-  cred: number;
-  hidden: number;
-  id: number;
-  imageid: number;
-  strings: ConsoleAchievementStrings;
-  type: number;
-}
-
-export interface ConsoleAchievementPlayer {
-  id: number;
-  player: [number, number, number, number];
-}
-
-export interface ConsoleAchievementStrings {
-  caption: string;
-  description: string;
-  unachieved: string;
-}
-
-export interface ConsoleDashlaunch {
-  options: ConsoleDashlaunchOption[];
-  version: ConsoleDashlaunchVersion;
-}
-
-export interface ConsoleDashlaunchOption {
-  id: number;
-  category: string;
-  name: string;
-  value: string;
-}
-
-export interface ConsoleDashlaunchVersion {
-  kernel: number;
-  number: ConsoleDashlaunchVersionNumber;
-}
-
-export interface ConsoleDashlaunchVersionNumber {
-  build: number;
-  major: number;
-  minor: number;
-}
-
-export interface ConsoleFilebrowserEntry {
-  name: string;
-  attributes: number;
-  size: number;
+export interface ConsoleTemperature {
+  celsius: boolean;
+  case: number;
+  cpu: number;
+  gpu: number;
+  memory: number;
 }
 
 export interface ConsoleMemory {
   free: number;
   total: number;
   used: number;
-}
-
-export interface ConsoleMultidisc {
-  disc: ConsoleMultidiscDisc;
-  entries: [
-    ConsoleMultidiscEntry,
-    ConsoleMultidiscEntry,
-    ConsoleMultidiscEntry,
-    ConsoleMultidiscEntry,
-    ConsoleMultidiscEntry,
-  ];
-  titleid: string;
-}
-
-export interface ConsoleMultidiscDisc {
-  current: number;
-  total: number;
-}
-
-export interface ConsoleMultidiscEntry {
-  container: number;
-  path: string;
 }
 
 export interface ConsolePlugin {
@@ -110,24 +47,6 @@ export interface ConsoleProfile {
   index: number;
   signedin: number;
   xuid: string;
-}
-
-export interface ConsoleScreencaptureMeta {
-  filename: string;
-  filesize: number;
-  info: ConsoleScreencaptureMetaInfo;
-  timestamp: string;
-  titleid: string;
-}
-
-export interface ConsoleScreencaptureMetaInfo {
-  format: string;
-  height: number;
-  width: number;
-}
-
-export interface ConsoleScreencaptureMetaListCount {
-  total: number;
 }
 
 export interface ConsoleSmc {
@@ -168,41 +87,6 @@ export interface ConsoleSystem {
   };
 }
 
-export interface ConsoleSystemlink {
-  apikey: string;
-  broadcastport: number;
-  dataport: number;
-  enabled: number;
-  gatewayip: string;
-  gatewaymac: string;
-  username: string;
-  xboxip: string;
-  xboxmac: string;
-}
-
-export interface ConsoleSystemlinkBandwidth {
-  bytes: ConsoleSystemlinkBandwidthBytes;
-  rate: ConsoleSystemlinkBandwidthRate;
-}
-
-export interface ConsoleSystemlinkBandwidthBytes {
-  downstream: number;
-  upstream: number;
-}
-
-export interface ConsoleSystemlinkBandwidthRate {
-  downstream: number;
-  upstream: number;
-}
-
-export interface ConsoleTemperature {
-  celsius: boolean;
-  case: number;
-  cpu: number;
-  gpu: number;
-  memory: number;
-}
-
 export interface ConsoleThread {
   address: string;
   flags: string;
@@ -214,36 +98,4 @@ export interface ConsoleThread {
 
 export interface ConsoleThreadState {
   state: number;
-}
-
-export interface ConsoleTitle {
-  disc: ConsoleTitleDisc;
-  mediaid: string;
-  path: string;
-  resolution: ConsoleTitleResolution;
-  titleid: string;
-  tuver: number;
-  version: ConsoleTitleVersion;
-}
-
-export interface ConsoleTitleDisc {
-  count: number;
-  current: number;
-}
-
-export interface ConsoleTitleResolution {
-  height: number;
-  width: number;
-}
-
-export interface ConsoleTitleVersion {
-  base: string;
-  current: string;
-}
-
-export interface ConsoleUpdateNotification {
-  achievements: number;
-  profiles: number;
-  screencapture: number;
-  title: number;
 }

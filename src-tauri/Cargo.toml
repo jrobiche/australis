@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "A desktop client for the Aurora Xbox 360 Dashboard"
 authors = ["jrobiche"]
 license = "GPL-3.0-or-later"
-repository = "https://github.com/jrobiche/australis"
+repository = ""
 edition = "2021"
 rust-version = "1.83.0"
 
@@ -20,11 +20,8 @@ tauri-build = { version = "2.0.2", features = [] }
 [dependencies]
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-sqlite = "0.36.1"
 log = "0.4"
 tauri = { version = "2.1.0", features = [] }
 tauri-plugin-log = "2.0.0-rc"
 uuid = { version = "1.11.0", features = ["v4", "fast-rng"] }
-libaustralis = { git = "https://github.com/jrobiche/libaustralis.git", tag = "0.1.0" }
-base64 = "0.22.1"
-env_logger = "0.11.6"
+libaustralis = { git = "https://github.com/jrobiche/libaustralis.git", branch = "next" }
