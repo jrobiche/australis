@@ -32,8 +32,6 @@ echo "storeFile=${KEYSTORE_PATH}" >> "$KEYSTORE_PROPS_PATH"
 # for information on how this file was created see: https://v2.tauri.app/distribute/sign/android/#configure-gradle-to-use-the-signing-key
 rm src-tauri/gen/android/app/build.gradle.kts
 cp "${HOME}/.local/etc/com.github.jrobiche.australis/build.gradle.kts" src-tauri/gen/android/app/build.gradle.kts
-rm src-tauri/gen/android/app/src/main/java/com/github/jrobiche/australis/MainActivity.kt
-cp "${HOME}/.local/etc/com.github.jrobiche.australis/MainActivity.kt" src-tauri/gen/android/app/src/main/java/com/github/jrobiche/australis/MainActivity.kt
 
 npx tauri icon app-icon.png
 npm run tauri android build -- --apk true
