@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "australis",
   "version": "0.1.0",
-  "identifier": "com.github.jrobiche.australis",
+  "identifier": "com.tauri.dev",
   "build": {
     "frontendDist": "../dist/australis",
     "devUrl": "http://localhost:4200",
