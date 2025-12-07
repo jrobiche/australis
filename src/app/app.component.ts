@@ -27,7 +27,7 @@ import { NavLink } from './interfaces/navlink';
   styleUrl: './app.component.sass',
 })
 export class AppComponent {
-  private _breakpointObserver = inject(BreakpointObserver);
+  private breakpointObserver = inject(BreakpointObserver);
   title = 'australis';
   sidenavLinks: NavLink[];
 
@@ -40,7 +40,7 @@ export class AppComponent {
     ];
   }
 
-  isHandset$: Observable<boolean> = this._breakpointObserver
+  isHandset$: Observable<boolean> = this.breakpointObserver
     .observe(Breakpoints.Handset)
     .pipe(
       map((result) => result.matches),
