@@ -1,0 +1,13 @@
+@media only screen and (max-width: 599px)
+  .field-group
+    width: 100%
+  .field-group .mat-mdc-form-field
+    width: 100%
+
+@media only screen and (min-width: 600px)
+  .field-group .mat-mdc-form-field
+    width: calc(50% - 8px)
+  .field-group .mat-mdc-form-field:not(:first-child)
+    margin-left: 8px
+  .field-group .mat-mdc-form-field:not(:last-child)
+    margin-right: 8px

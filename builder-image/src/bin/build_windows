@@ -1,6 +1,0 @@
-#!/bin/bash
-
-. "$HOME/.cargo/env"
-npm ci
-npx tauri icon app-icon.png
-npm run tauri build -- --runner cargo-xwin --target x86_64-pc-windows-msvc

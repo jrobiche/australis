@@ -29,7 +29,6 @@
     "@tauri-apps/api": "^2.1.1",
     "material-icons": "^1.13.12",
     "rxjs": "~7.8.0",
-    "three": "^0.172.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
   },
@@ -39,7 +38,6 @@
     "@angular/compiler-cli": "^19.0.0",
     "@tauri-apps/cli": "^2.1.0",
     "@types/jasmine": "~5.1.0",
-    "@types/three": "^0.171.0",
     "jasmine-core": "~5.4.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",

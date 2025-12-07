@@ -1,165 +1,6 @@
-use std::path::PathBuf;
-use tauri::AppHandle;
 use uuid::Uuid;
 
-use log::error;
-use tauri::Manager;
-
 use crate::australis::utils::uuid_to_string;
-
-pub struct PathResolver {
-    app_handle: tauri::AppHandle,
-}
-
-impl PathResolver {
-    pub fn new(app_handle: &AppHandle) -> Self {
-        Self {
-            app_handle: app_handle.clone(),
-        }
-    }
-
-    pub fn game_console_configurations_root(&self) -> Result<PathBuf, String> {
-        self.app_handle
-            .path()
-            .resolve("game-consoles", tauri::path::BaseDirectory::AppData)
-            .map_err(|err| {
-                let msg = format!(
-                    "Failed to resolve consoles root directory. Got the following error: {}",
-                    err
-                );
-                error!("{}", msg);
-                msg
-            })
-    }
-
-    pub fn game_console_configuration_directory(
-        &self,
-        console_configuration_id: &Uuid,
-    ) -> Result<PathBuf, String> {
-        Ok(self
-            .game_console_configurations_root()?
-            .join(uuid_to_string(console_configuration_id)))
-    }
-
-    pub fn game_console_configuration_file(
-        &self,
-        console_configuration_id: &Uuid,
-    ) -> Result<PathBuf, String> {
-        Ok(self
-            .game_console_configuration_directory(console_configuration_id)?
-            .join("configuration.json"))
-    }
-
-    // file system within `aurora-data` should mirror remote aurora installation directory
-    pub fn game_console_aurora_data(
-        &self,
-        console_configuration: &GameConsoleConfiguration,
-    ) -> Result<PathBuf, String> {
-        Ok(self
-            .game_console_configurations_root()?
-            .join(console_configuration.id_string())
-            .join("aurora-data"))
-    }
-
-    pub fn game_console_aurora_game_data(
-        &self,
-        console_configuration: &GameConsoleConfiguration,
-    ) -> Result<PathBuf, String> {
-        Ok(self
-            .game_console_aurora_data(console_configuration)?
-            .join("Data")
-            .join("GameData"))
-    }
-
-    pub fn game_console_aurora_content_db(
-        &self,
-        console_configuration: &GameConsoleConfiguration,
-    ) -> Result<PathBuf, String> {
-        Ok(self
-            .game_console_aurora_data(console_configuration)?
-            .join("Data")
-            .join("Databases")
-            .join("content.db"))
-    }
-
-    pub fn game_console_aurora_settings_db(
-        &self,
-        console_configuration: &GameConsoleConfiguration,
-    ) -> Result<PathBuf, String> {
-        Ok(self
-            .game_console_aurora_data(console_configuration)?
-            .join("Data")
-            .join("Databases")
-            .join("settings.db"))
-    }
-
-    pub fn game_console_aurora_assets_root(
-        &self,
-        console_configuration: &GameConsoleConfiguration,
-        title_id: u32,
-        game_id: u32,
-    ) -> Result<PathBuf, String> {
-        Ok(self
-            .game_console_aurora_data(console_configuration)?
-            .join("Data")
-            .join("GameData")
-            .join(format!("{:0>8X}_{:0>8X}", title_id, game_id)))
-    }
-
-    pub fn game_console_aurora_asset(
-        &self,
-        console_configuration: &GameConsoleConfiguration,
-        title_id: u32,
-        game_id: u32,
-        asset_type: libaustralis::aurora::assets::AssetType,
-    ) -> Result<PathBuf, String> {
-        let asset_file_name = match asset_type {
-            libaustralis::aurora::assets::AssetType::Background => {
-                format!("BK{:0>8X}.asset", title_id)
-            }
-            libaustralis::aurora::assets::AssetType::Boxart => {
-                format!("GC{:0>8X}.asset", title_id)
-            }
-            libaustralis::aurora::assets::AssetType::Icon
-            | libaustralis::aurora::assets::AssetType::Banner => {
-                format!("GL{:0>8X}.asset", title_id)
-            }
-            libaustralis::aurora::assets::AssetType::Screenshot1
-            | libaustralis::aurora::assets::AssetType::Screenshot2
-            | libaustralis::aurora::assets::AssetType::Screenshot3
-            | libaustralis::aurora::assets::AssetType::Screenshot4
-            | libaustralis::aurora::assets::AssetType::Screenshot5
-            | libaustralis::aurora::assets::AssetType::Screenshot6
-            | libaustralis::aurora::assets::AssetType::Screenshot7
-            | libaustralis::aurora::assets::AssetType::Screenshot8
-            | libaustralis::aurora::assets::AssetType::Screenshot9
-            | libaustralis::aurora::assets::AssetType::Screenshot10
-            | libaustralis::aurora::assets::AssetType::Screenshot11
-            | libaustralis::aurora::assets::AssetType::Screenshot12
-            | libaustralis::aurora::assets::AssetType::Screenshot13
-            | libaustralis::aurora::assets::AssetType::Screenshot14
-            | libaustralis::aurora::assets::AssetType::Screenshot15
-            | libaustralis::aurora::assets::AssetType::Screenshot16
-            | libaustralis::aurora::assets::AssetType::Screenshot17
-            | libaustralis::aurora::assets::AssetType::Screenshot18
-            | libaustralis::aurora::assets::AssetType::Screenshot19
-            | libaustralis::aurora::assets::AssetType::Screenshot20 => {
-                format!("SS{:0>8X}.asset", title_id)
-            }
-            _ => {
-                let msg = format!(
-                    "Could not determine file name containing asset type {}.",
-                    asset_type
-                );
-                error!("{}", &msg);
-                return Err(msg.into());
-            }
-        };
-        Ok(self
-            .game_console_aurora_assets_root(console_configuration, title_id, game_id)?
-            .join(asset_file_name))
-    }
-}
 
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -199,9 +40,18 @@ impl GameConsoleConfiguration {
     }
 }
 
+// TODO is this still used?
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct GameListEntry {
+pub struct AuroraAssetImageData {
+    pub width: u32,
+    pub height: u32,
+    pub rgba8: Vec<u8>,
+}
+
+#[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AuroraGameListEntry {
     pub id: u64,
     pub title_name: String,
 }
@@ -212,8 +62,8 @@ pub struct AuroraGame {
     pub id: u64,
     pub directory: String,
     pub executable: String,
-    pub title_id: u32,
-    pub media_id: u32,
+    pub title_id: u64,
+    pub media_id: u64,
     pub base_version: u64,
     pub disc_num: u64,
     pub discs_in_set: u64,
@@ -238,29 +88,4 @@ pub struct AuroraGame {
     pub system_link: u64,
     pub scan_path_id: u64,
     pub case_index: u64,
-}
-
-impl AuroraGame {
-    // TODO create enum
-    pub fn executable_type(&self) -> u32 {
-        // 0: Xbox 360 Executable (xex)
-        // 1: Classic Xbox Executable (xbe)
-        // 2: Xbox 360 Container
-        // 3: Classic Xbox Container
-        // 4: XNA Container
-        if self.executable.to_lowercase().ends_with(".xex") {
-            return 0;
-        }
-        if self.executable.to_lowercase().ends_with(".xbe") {
-            return 1;
-        }
-        // assume game is in container format
-        if self.default_group == 3 {
-            return 4;
-        }
-        if self.default_group == 4 {
-            return 3;
-        }
-        return 2;
-    }
 }
