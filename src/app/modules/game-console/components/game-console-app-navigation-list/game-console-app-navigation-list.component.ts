@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { RouterModule } from '@angular/router';
 
@@ -6,7 +7,12 @@ import { PageTitleToolbarComponent } from '@app/shared/components/page-title-too
 
 @Component({
   selector: 'app-game-console-app-navigation-list',
-  imports: [MatListModule, RouterModule, PageTitleToolbarComponent],
+  imports: [
+    MatIconModule,
+    MatListModule,
+    RouterModule,
+    PageTitleToolbarComponent,
+  ],
   templateUrl: './game-console-app-navigation-list.component.html',
   styleUrl: './game-console-app-navigation-list.component.sass',
 })
