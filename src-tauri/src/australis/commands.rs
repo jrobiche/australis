@@ -1445,6 +1445,140 @@ pub fn game_console_configuration_update(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// telnet commands
+////////////////////////////////////////////////////////////////////////////////
+fn telnet_client(
+    console_configuration: &GameConsoleConfiguration,
+) -> Result<libaustralis::telnet::TelnetClient, String> {
+    libaustralis::telnet::TelnetClient::new(&console_configuration.ip_address, 730).map_err(|err| {
+        let msg = format!(
+            "Failed to create TelnetClient. Got the following error: {}",
+            err
+        );
+        error!("{}", &msg);
+        msg
+    })
+}
+
+#[tauri::command]
+pub async fn telnet_exec(
+    console_configuration: GameConsoleConfiguration,
+    command: String,
+) -> Result<libaustralis::telnet::TelnetResponse, String> {
+    std::panic::catch_unwind(|| {
+        telnet_client(&console_configuration)?
+            .execute_and_disconnect(&command)
+            .map_err(|err| {
+                let msg = format!(
+                    "Failed to run the telnet command '{}'. Got the following error: {}",
+                    command, err
+                );
+                error!("{}", &msg);
+                msg
+            })
+    })
+    .map_err(|_| "Application ran into an error executing the command.")?
+}
+
+#[tauri::command]
+pub async fn telnet_exec_dirlist(
+    console_configuration: GameConsoleConfiguration,
+    path: Vec<&str>,
+) -> Result<Vec<libaustralis::telnet::DirlistEntry>, String> {
+    telnet_client(&console_configuration)?
+        .dirlist(path)
+        .map_err(|err| {
+            let msg = format!(
+                "Failed to run telnet dirlist command. Got the following error: {}",
+                err
+            );
+            error!("{}", &msg);
+            msg
+        })
+}
+
+#[tauri::command]
+pub async fn telnet_exec_drivelist(
+    console_configuration: GameConsoleConfiguration,
+) -> Result<Vec<String>, String> {
+    telnet_client(&console_configuration)?
+        .drivelist()
+        .map_err(|err| {
+            let msg = format!(
+                "Failed to run telnet drivelist command. Got the following error: {}",
+                err
+            );
+            error!("{}", &msg);
+            msg
+        })
+}
+
+#[tauri::command]
+pub fn telnet_exec_getmem(
+    console_configuration: GameConsoleConfiguration,
+    address: usize,
+    length: usize,
+) -> Result<Vec<u8>, String> {
+    telnet_client(&console_configuration)?
+        .getmem(address, length)
+        .map_err(|err| {
+            let msg = format!(
+                "Failed to run telnet getmem command. Got the following error: {}",
+                err
+            );
+            error!("{}", &msg);
+            msg
+        })
+}
+
+#[tauri::command]
+pub fn telnet_exec_go(
+    console_configuration: GameConsoleConfiguration,
+) -> Result<libaustralis::telnet::TelnetResponse, String> {
+    telnet_client(&console_configuration)?.go().map_err(|err| {
+        let msg = format!(
+            "Failed to run telnet go command. Got the following error: {}",
+            err
+        );
+        error!("{}", &msg);
+        msg
+    })
+}
+
+#[tauri::command]
+pub async fn telnet_exec_magicboot(
+    console_configuration: GameConsoleConfiguration,
+    path: Vec<&str>,
+) -> Result<libaustralis::telnet::TelnetResponse, String> {
+    telnet_client(&console_configuration)?
+        .magicboot(path)
+        .map_err(|err| {
+            let msg = format!(
+                "Failed to run telnet magicboot command. Got the following error: {}",
+                err
+            );
+            error!("{}", &msg);
+            msg
+        })
+}
+
+#[tauri::command]
+pub fn telnet_exec_stop(
+    console_configuration: GameConsoleConfiguration,
+) -> Result<libaustralis::telnet::TelnetResponse, String> {
+    telnet_client(&console_configuration)?
+        .stop()
+        .map_err(|err| {
+            let msg = format!(
+                "Failed to run telnet stop command. Got the following error: {}",
+                err
+            );
+            error!("{}", &msg);
+            msg
+        })
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // xbox catalog commands
 ////////////////////////////////////////////////////////////////////////////////
 #[tauri::command]

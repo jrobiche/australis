@@ -1,0 +1,68 @@
+<div
+  class="responsive-width-container"
+  [class.layout-handset]="breakpoint.isHandset$ | async"
+  [class.layout-tablet]="breakpoint.isTablet$ | async"
+  [class.layout-web]="breakpoint.isWeb$ | async"
+>
+  <app-page-title-toolbar heading="File Browser">
+    @if (breakpoint.isHandset$ | async) {
+      <button
+        mat-icon-button
+        aria-label="Refresh file entries"
+        (click)="onRefreshEntriesClick()"
+      >
+        <mat-icon>refresh</mat-icon>
+      </button>
+    } @else {
+      <button
+        aria-label="Refresh file entries"
+        class="trailing-button"
+        mat-stroked-button
+        (click)="onRefreshEntriesClick()"
+      >
+        <mat-icon fontSet="material-icons-outlined"> refresh </mat-icon>
+        <span>Refresh</span>
+      </button>
+    }
+  </app-page-title-toolbar>
+  <span>Location: {{ cwdString }}</span>
+  @if (fileListError) {
+    <mat-card class="error-card" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Error</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>{{ fileListErrorMsg }}</p>
+      </mat-card-content>
+    </mat-card>
+  }
+  <mat-action-list>
+    @for (entry of drivelistEntries; track $index) {
+      <mat-list-item (click)="onDrivelistEntryClick(entry)">
+        <mat-icon matListItemIcon>storage</mat-icon>
+        <div matListItemTitle>{{ entry }}</div>
+      </mat-list-item>
+    }
+    @if (cwd.length > 0) {
+      <mat-list-item (click)="onPopDirClick()">
+        <div matListItemTitle><code>..</code></div>
+      </mat-list-item>
+    }
+    @for (entry of dirlistEntries; track $index) {
+      @if (entry.directory) {
+        <mat-list-item (click)="onDirlistEntryClick(entry)">
+          <mat-icon matListItemIcon>folder</mat-icon>
+          <div matListItemTitle>{{ entry.name }}</div>
+        </mat-list-item>
+      } @else {
+        <mat-list-item (click)="onDirlistEntryClick(entry)">
+          <mat-icon matListItemIcon [class.executable]="isExecutable(entry)">
+            description
+          </mat-icon>
+          <div matListItemTitle>{{ entry.name }}</div>
+          <div matListItemLine>{{ sizeText(entry) }}</div>
+        </mat-list-item>
+      }
+    }
+  </mat-action-list>
+</div>
