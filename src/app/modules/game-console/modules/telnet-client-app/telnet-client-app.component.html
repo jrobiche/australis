@@ -1,0 +1,59 @@
+<mat-toolbar class="game-console-app-toolbar">
+  <button
+    mat-icon-button
+    class="leading-button"
+    aria-label="Toggle game list"
+    (click)="drawer.toggle()"
+  >
+    <mat-icon>menu</mat-icon>
+  </button>
+  <span>Telnet Client</span>
+</mat-toolbar>
+<mat-drawer-container
+  class="navigation-drawer"
+  [hasBackdrop]="!(breakpoint.isWeb$ | async)"
+  [class.layout-web]="breakpoint.isWeb$ | async"
+>
+  <mat-drawer #drawer [mode]="(breakpoint.isWeb$ | async) ? 'side' : 'over'">
+    <mat-selection-list
+      aria-label="Details selection"
+      hideSingleSelectionIndicator
+      [multiple]="false"
+      (selectionChange)="onDetailsViewSelectionChange($event)"
+    >
+      @for (item of viewListItems; track item.value) {
+        <mat-list-option
+          [selected]="selectedView == item.value"
+          [value]="item.value"
+        >
+          {{ item.title }}
+        </mat-list-option>
+      }
+    </mat-selection-list>
+  </mat-drawer>
+  <mat-drawer-content>
+    @switch (selectedView) {
+      @case ("execute-command") {
+        <app-telnet-execute-command
+          [gameConsoleConfiguration]="gameConsoleConfiguration()"
+        />
+      }
+      @case ("file-browser") {
+        <app-telnet-file-browser
+          [gameConsoleConfiguration]="gameConsoleConfiguration()"
+        />
+      }
+      @case ("memory-editor") {
+        <app-telnet-memory-editor
+          [gameConsoleConfiguration]="gameConsoleConfiguration()"
+        />
+      }
+      @default {
+        <app-responsive-width-container>
+          <app-page-title-toolbar heading="Unknown" />
+          <p>Invalid view selection.</p>
+        </app-responsive-width-container>
+      }
+    }
+  </mat-drawer-content>
+</mat-drawer-container>

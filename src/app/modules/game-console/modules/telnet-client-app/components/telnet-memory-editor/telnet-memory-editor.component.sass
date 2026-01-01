@@ -1,0 +1,48 @@
+app-responsive-width-container
+  display: block
+  margin-bottom: 32px
+
+.input-form
+  .field-group
+    width: 100%
+    mat-form-field
+      width: calc(50% - 8px)
+    mat-form-field:not(:last-child)
+      margin-right: 16px
+  margin-bottom: 8px
+  width: 100%
+
+.warning-card
+  p
+    margin-top: 8px
+  background-color: var(--mat-sys-tertiary-container)
+  color: var(--mat-sys-on-tertiary-container)
+  margin-bottom: 16px
+
+.table-card
+  th:not(:first-of-type), td:not(:first-of-type)
+    border-left: 1px solid var(--mat-sys-outline-variant)
+  .mat-mdc-cell
+    border: none
+  .mat-mdc-header-row th
+    border-bottom: 1px solid var(--mat-sys-outline-variant)
+    border-top: none
+    font-weight: bold
+    text-align: center
+  .mat-mdc-row
+    font-size: var(--mat-sys-body-medium-size)
+    height: 24px
+    text-wrap: nowrap
+  .mat-column-memory-actions, .mat-column-memory-address, .mat-column-memory-hex, .mat-column-memory-ascii
+    text-align: center
+  mat-form-field
+    width: 100%
+  margin: 0px auto
+  margin-top: 16px
+  overflow-x: scroll
+
+.edit-buttons
+  button:not(:last-of-kind)
+    margin-right: 4px
+  margin-bottom: 8px
+  text-align: right

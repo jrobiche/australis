@@ -1445,6 +1445,237 @@ pub fn game_console_configuration_update(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// telnet commands
+////////////////////////////////////////////////////////////////////////////////
+fn telnet_client(
+    console_configuration: &GameConsoleConfiguration,
+) -> Result<libaustralis::telnet::TelnetClient, String> {
+    libaustralis::telnet::TelnetClient::new(&console_configuration.ip_address, 730).map_err(|err| {
+        let msg = format!(
+            "Failed to create TelnetClient. Got the following error: {}",
+            err
+        );
+        error!("{}", &msg);
+        msg
+    })
+}
+
+#[tauri::command]
+pub async fn telnet_exec(
+    console_configuration: GameConsoleConfiguration,
+    command: String,
+) -> Result<libaustralis::telnet::TelnetResponse, String> {
+    std::panic::catch_unwind(|| {
+        telnet_client(&console_configuration)?
+            .execute_and_disconnect(&command)
+            .map_err(|err| {
+                let msg = format!(
+                    "Failed to run the telnet command '{}'. Got the following error: {}",
+                    command, err
+                );
+                error!("{}", &msg);
+                msg
+            })
+    })
+    .map_err(|_| "Application ran into an error executing the command.")?
+}
+
+#[tauri::command]
+pub async fn telnet_exec_dirlist(
+    console_configuration: GameConsoleConfiguration,
+    path: Vec<&str>,
+) -> Result<Vec<libaustralis::telnet::DirlistEntry>, String> {
+    telnet_client(&console_configuration)?
+        .dirlist(path)
+        .map_err(|err| {
+            let msg = format!(
+                "Failed to run telnet dirlist command. Got the following error: {}",
+                err
+            );
+            error!("{}", &msg);
+            msg
+        })
+}
+
+#[tauri::command]
+pub async fn telnet_exec_drivefreespace(
+    console_configuration: GameConsoleConfiguration,
+    name: &str,
+) -> Result<libaustralis::telnet::Drivefreespace, String> {
+    telnet_client(&console_configuration)?
+        .drivefreespace(name)
+        .map_err(|err| {
+            let msg = format!(
+                "Failed to run telnet drivefreespace command. Got the following error: {}",
+                err
+            );
+            error!("{}", &msg);
+            msg
+        })
+}
+
+#[tauri::command]
+pub async fn telnet_exec_drivelist(
+    console_configuration: GameConsoleConfiguration,
+) -> Result<Vec<libaustralis::telnet::DrivelistEntry>, String> {
+    telnet_client(&console_configuration)?
+        .drivelist()
+        .map_err(|err| {
+            let msg = format!(
+                "Failed to run telnet drivelist command. Got the following error: {}",
+                err
+            );
+            error!("{}", &msg);
+            msg
+        })
+}
+
+#[tauri::command]
+pub async fn telnet_exec_dvdeject(
+    console_configuration: GameConsoleConfiguration,
+) -> Result<(), String> {
+    telnet_client(&console_configuration)?
+        .dvdeject()
+        .map_err(|err| {
+            let msg = format!(
+                "Failed to run telnet dvdeject command. Got the following error: {}",
+                err
+            );
+            error!("{}", &msg);
+            msg
+        })
+}
+
+#[tauri::command]
+pub async fn telnet_exec_getmem(
+    console_configuration: GameConsoleConfiguration,
+    address: usize,
+    length: usize,
+) -> Result<Vec<u8>, String> {
+    telnet_client(&console_configuration)?
+        .getmem(address, length)
+        .map_err(|err| {
+            let msg = format!(
+                "Failed to run telnet getmem command. Got the following error: {}",
+                err
+            );
+            error!("{}", &msg);
+            msg
+        })
+}
+
+#[tauri::command]
+pub async fn telnet_exec_go(console_configuration: GameConsoleConfiguration) -> Result<(), String> {
+    telnet_client(&console_configuration)?.go().map_err(|err| {
+        let msg = format!(
+            "Failed to run telnet go command. Got the following error: {}",
+            err
+        );
+        error!("{}", &msg);
+        msg
+    })
+}
+
+#[tauri::command]
+pub async fn telnet_exec_magicboot(
+    console_configuration: GameConsoleConfiguration,
+) -> Result<(), String> {
+    telnet_client(&console_configuration)?
+        .magicboot()
+        .map_err(|err| {
+            let msg = format!(
+                "Failed to run telnet magicboot command. Got the following error: {}",
+                err
+            );
+            error!("{}", &msg);
+            msg
+        })
+}
+
+#[tauri::command]
+pub async fn telnet_exec_magicboot_cold(
+    console_configuration: GameConsoleConfiguration,
+) -> Result<(), String> {
+    telnet_client(&console_configuration)?
+        .magicboot_cold()
+        .map_err(|err| {
+            let msg = format!(
+                "Failed to run telnet magicboot command. Got the following error: {}",
+                err
+            );
+            error!("{}", &msg);
+            msg
+        })
+}
+
+#[tauri::command]
+pub async fn telnet_exec_magicboot_path(
+    console_configuration: GameConsoleConfiguration,
+    path: Vec<&str>,
+) -> Result<(), String> {
+    telnet_client(&console_configuration)?
+        .magicboot_path(path)
+        .map_err(|err| {
+            let msg = format!(
+                "Failed to run telnet magicboot command. Got the following error: {}",
+                err
+            );
+            error!("{}", &msg);
+            msg
+        })
+}
+
+#[tauri::command]
+pub async fn telnet_exec_setmem(
+    console_configuration: GameConsoleConfiguration,
+    address: usize,
+    data: String,
+) -> Result<(), String> {
+    telnet_client(&console_configuration)?
+        .setmem(address, data)
+        .map_err(|err| {
+            let msg = format!(
+                "Failed to run telnet setmem command. Got the following error: {}",
+                err
+            );
+            error!("{}", &msg);
+            msg
+        })
+}
+
+#[tauri::command]
+pub async fn telnet_exec_stop(
+    console_configuration: GameConsoleConfiguration,
+) -> Result<(), String> {
+    telnet_client(&console_configuration)?
+        .stop()
+        .map_err(|err| {
+            let msg = format!(
+                "Failed to run telnet stop command. Got the following error: {}",
+                err
+            );
+            error!("{}", &msg);
+            msg
+        })
+}
+
+#[tauri::command]
+pub async fn telnet_exec_shutdown(
+    console_configuration: GameConsoleConfiguration,
+) -> Result<(), String> {
+    telnet_client(&console_configuration)?
+        .shutdown()
+        .map_err(|err| {
+            let msg = format!(
+                "Failed to run telnet shutdown command. Got the following error: {}",
+                err
+            );
+            error!("{}", &msg);
+            msg
+        })
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // xbox catalog commands
 ////////////////////////////////////////////////////////////////////////////////
 #[tauri::command]

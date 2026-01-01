@@ -1,0 +1,74 @@
+<app-responsive-width-container>
+  <app-page-title-toolbar heading="Run Command" />
+  <mat-card class="warning-card" appearance="outlined">
+    <mat-card-header>
+      <mat-card-title-group>
+        <mat-card-title>
+          <mat-icon fontSet="material-icons-round">warning</mat-icon>
+          Warning
+        </mat-card-title>
+      </mat-card-title-group>
+    </mat-card-header>
+    <mat-card-content>
+      <p>
+        Use caution when running commands. Improper use can lead to data loss or
+        damage to the system.
+      </p>
+      <p>Proceed at your own risk.</p>
+    </mat-card-content>
+  </mat-card>
+  <mat-card class="info-card" appearance="outlined">
+    <mat-card-header>
+      <mat-card-title-group>
+        <mat-card-title>
+          <mat-icon fontSet="material-icons-outlined">info</mat-icon>
+          Information
+        </mat-card-title>
+      </mat-card-title-group>
+    </mat-card-header>
+    <mat-card-content>
+      <p>
+        The connection is closed after each command is executed. Commands that
+        require running multiple commands in the same connection are not
+        supported at this time.
+      </p>
+    </mat-card-content>
+  </mat-card>
+  <form [formGroup]="commandForm">
+    <mat-form-field>
+      <mat-label>Command</mat-label>
+      <input matInput formControlName="cmd" type="text" cdkFocusInitial />
+    </mat-form-field>
+    <button mat-button type="submit" (click)="onSubmitClick()">Submit</button>
+  </form>
+  @if (errorText) {
+    <mat-card appearance="outlined" class="error-card">
+      <mat-card-content>
+        <p>{{ errorText }}</p>
+      </mat-card-content>
+    </mat-card>
+  }
+  @if (telnetResponse) {
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Response</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>
+          {{ errorText }}
+          {{ telnetResponse.status.code }} - {{ telnetResponse.status.text }}
+        </p>
+        @if (telnetResponse.data.length > 0) {
+          <mat-card appearance="raised">
+            <mat-card-header>
+              <mat-card-title>Data</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+              <pre>{{ telnetResponseDataString }}</pre>
+            </mat-card-content>
+          </mat-card>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</app-responsive-width-container>
