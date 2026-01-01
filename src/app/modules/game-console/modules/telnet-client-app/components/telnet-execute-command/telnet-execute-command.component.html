@@ -1,0 +1,109 @@
+<div class="responsive-width-container">
+  <app-page-title-toolbar heading="Commands" />
+  <button
+    aria-label="Power options"
+    mat-stroked-button
+    [matMenuTriggerFor]="powerMenu"
+  >
+    <mat-icon fontSet="material-icons-round">power_settings_new</mat-icon>
+    <span>Power</span>
+  </button>
+  <mat-menu #powerMenu="matMenu">
+    <button mat-menu-item (click)="onReturnToLauncherClick()">
+      Return to Launcher
+    </button>
+    <button mat-menu-item (click)="onPowerRebootClick()">Reboot</button>
+    <button mat-menu-item (click)="onPowerShutdownClick()">Shutdown</button>
+  </mat-menu>
+
+  <button
+    aria-label="Resume console"
+    class="trailing-button"
+    mat-stroked-button
+    (click)="onGoClick()"
+  >
+    <mat-icon fontSet="material-icons-round">play_arrow</mat-icon>
+    <span>Resume</span>
+  </button>
+  <button
+    aria-label="Suspend console"
+    class="trailing-button"
+    mat-stroked-button
+    (click)="onStopClick()"
+  >
+    <mat-icon fontSet="material-icons-round">pause</mat-icon>
+    <span>Suspend</span>
+  </button>
+  <button
+    aria-label="Eject DVD tray"
+    class="trailing-button"
+    mat-stroked-button
+    (click)="onDvdEjectClick()"
+  >
+    <mat-icon fontSet="material-icons-round">eject</mat-icon>
+    <span>Eject DVD</span>
+  </button>
+
+  <button
+    aria-label="Return to launcher"
+    class="trailing-button"
+    mat-stroked-button
+    (click)="onReturnToLauncherClick()"
+  >
+    <mat-icon fontSet="material-icons-round">home</mat-icon>
+    <span>Launcher</span>
+  </button>
+
+  <!-- TODO show `drivefreespace name="HDD:\"` for each item in `drivelist` on file browser -->
+
+  <h2>Run Command</h2>
+  <p>TODO description and warning</p>
+  <form [formGroup]="commandForm">
+    <div class="field-group">
+      <mat-form-field>
+        <mat-label>Command</mat-label>
+        <input matInput formControlName="cmd" type="text" cdkFocusInitial />
+      </mat-form-field>
+    </div>
+    <button mat-button type="submit" (click)="onSubmitClick()">Submit</button>
+  </form>
+  @if (errorText) {
+    <mat-card appearance="outlined" class="error-card">
+      <mat-card-content>
+        <p class="error-text">
+          {{ errorText }}
+        </p>
+      </mat-card-content>
+    </mat-card>
+  }
+  @if (telnetResponse) {
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Response</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>
+          {{ errorText }}
+          {{ telnetResponse.status.code }} - {{ telnetResponse.status.text }}
+        </p>
+        @if (telnetResponse.data.length > 0) {
+          <mat-accordion>
+            <!-- <mat-expansion-panel> -->
+            <!--   <mat-expansion-panel-header> -->
+            <!--     <mat-panel-title>Data as Bytes</mat-panel-title> -->
+            <!--   </mat-expansion-panel-header> -->
+            <!--   <!-1- TODO format better -1-> -->
+            <!--   <pre>{{ telnetResponse.data }}</pre> -->
+            <!-- </mat-expansion-panel> -->
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>Data</mat-panel-title>
+              </mat-expansion-panel-header>
+              <pre>{{ telnetResponseDataString }}</pre>
+            </mat-expansion-panel>
+          </mat-accordion>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

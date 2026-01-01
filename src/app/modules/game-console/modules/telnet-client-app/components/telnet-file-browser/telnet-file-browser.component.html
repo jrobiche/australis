@@ -1,0 +1,91 @@
+<div
+  class="responsive-width-container"
+  [class.layout-handset]="breakpoint.isHandset$ | async"
+  [class.layout-tablet]="breakpoint.isTablet$ | async"
+  [class.layout-web]="breakpoint.isWeb$ | async"
+>
+  <app-page-title-toolbar heading="File Browser">
+    @if (breakpoint.isHandset$ | async) {
+      <button
+        mat-icon-button
+        aria-label="Return to launcher"
+        (click)="onReturnToLauncherClick()"
+      >
+        <mat-icon>home</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        aria-label="Refresh file entries"
+        (click)="onRefreshEntriesClick()"
+      >
+        <mat-icon>refresh</mat-icon>
+      </button>
+    } @else {
+      <button
+        aria-label="Return to launcher"
+        class="trailing-button"
+        mat-stroked-button
+        (click)="onReturnToLauncherClick()"
+      >
+        <mat-icon fontSet="material-icons-round">home</mat-icon>
+        <span>Launcher</span>
+      </button>
+      <button
+        aria-label="Refresh file entries"
+        class="trailing-button"
+        mat-stroked-button
+        (click)="onRefreshEntriesClick()"
+      >
+        <mat-icon fontSet="material-icons-round">refresh</mat-icon>
+        <span>Refresh</span>
+      </button>
+    }
+  </app-page-title-toolbar>
+  <div class="button-row">
+    <button matButton (click)="onAncestorEntryClick(-1)">ROOT</button>
+    @for (entry of cwd; track $index) {
+      <span>/</span>
+      <button matButton (click)="onAncestorEntryClick($index)">
+        {{ entry }}
+      </button>
+    }
+  </div>
+  @if (fileListError) {
+    <mat-card class="error-card" appearance="outlined">
+      <mat-card-content>
+        <p>{{ fileListErrorMsg }}</p>
+      </mat-card-content>
+    </mat-card>
+  }
+  <mat-action-list>
+    @for (entry of drivelistEntries; track $index) {
+      <mat-list-item (click)="onDrivelistEntryClick(entry)">
+        <mat-icon matListItemIcon>storage</mat-icon>
+        <div matListItemTitle>{{ entry }}</div>
+        <div matListItemLine>{{ driveSizeText(entry) }}</div>
+      </mat-list-item>
+    }
+    @if (cwd.length > 0) {
+      <mat-list-item (click)="onPopDirClick()">
+        <mat-icon matListItemIcon>keyboard_backspace</mat-icon>
+        <div matListItemTitle>(Parent Directory)</div>
+      </mat-list-item>
+    }
+    @for (entry of dirlistEntries; track $index) {
+      @if (entry.directory) {
+        <mat-list-item (click)="onDirlistEntryClick(entry)">
+          <mat-icon matListItemIcon>folder</mat-icon>
+          <div matListItemTitle>{{ entry.name }}</div>
+        </mat-list-item>
+      } @else {
+        <mat-list-item (click)="onDirlistEntryClick(entry)">
+          <mat-icon matListItemIcon [class.executable]="isExecutable(entry)">
+            description
+          </mat-icon>
+          <div matListItemTitle>{{ entry.name }}</div>
+          <div matListItemLine>{{ fileSizeText(entry) }}</div>
+        </mat-list-item>
+      }
+    }
+  </mat-action-list>
+</div>

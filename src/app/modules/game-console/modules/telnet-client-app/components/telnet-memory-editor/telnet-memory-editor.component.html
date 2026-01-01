@@ -1,0 +1,96 @@
+<div
+  class="responsive-width-container"
+  [class.layout-handset]="breakpoint.isHandset$ | async"
+  [class.layout-tablet]="breakpoint.isTablet$ | async"
+  [class.layout-web]="breakpoint.isWeb$ | async"
+>
+  <!-- <app-page-title-toolbar heading="Memory Editor"> -->
+  <app-page-title-toolbar heading="Memory">
+    @if (breakpoint.isHandset$ | async) {
+      <button
+        aria-label="Resume threads"
+        class="trailing-button"
+        (click)="onResumeClick()"
+        mat-icon-button
+      >
+        <mat-icon fontSet="material-icons-round">play_arrow</mat-icon>
+      </button>
+      <button
+        aria-label="Suspend threads"
+        class="trailing-button"
+        (click)="onSuspendClick()"
+        mat-icon-button
+      >
+        <mat-icon fontSet="material-icons-round">pause</mat-icon>
+      </button>
+    } @else {
+      <button
+        aria-label="Resume threads"
+        (click)="onResumeClick()"
+        mat-stroked-button
+        class="trailing-button"
+      >
+        <mat-icon fontSet="material-icons-round">play_arrow</mat-icon>
+        Resume
+      </button>
+      <button
+        aria-label="Suspend threads"
+        (click)="onSuspendClick()"
+        mat-stroked-button
+        class="trailing-button"
+      >
+        <mat-icon fontSet="material-icons-round">pause</mat-icon>
+        Suspend
+      </button>
+    }
+  </app-page-title-toolbar>
+  <button mat-icon-button aria-label="Getmem" (click)="onGetmemClick()">
+    <mat-icon>memory</mat-icon>
+  </button>
+  <p>Form - Start Address - Length</p>
+  <div class="table-wrapper">
+    <table
+      mat-table
+      [dataSource]="dataSource"
+      class="mat-elevation-z8 demo-table"
+    >
+      <!-- Address Column -->
+      <ng-container matColumnDef="memory-address">
+        <th mat-header-cell *matHeaderCellDef>Address</th>
+        <td mat-cell *matCellDef="let element">
+          <code>{{ element.address }}</code>
+        </td>
+      </ng-container>
+
+      <!-- Hex Column -->
+      <ng-container matColumnDef="memory-hex">
+        <th mat-header-cell *matHeaderCellDef>Hex</th>
+        <td mat-cell *matCellDef="let element">
+          <code>{{ element.hex }}</code>
+        </td>
+      </ng-container>
+
+      <!-- ASCII Column -->
+      <ng-container matColumnDef="memory-ascii">
+        <th mat-header-cell *matHeaderCellDef>ASCII</th>
+        <td mat-cell *matCellDef="let element">
+          <code>{{ element.ascii }}</code>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+
+  <!-- <div class="mem"> -->
+  <!--   <!-1- @for (byte of data; let idx = $index; track $index) { -1-> -->
+  <!--   @for (rowIndex of rowIndiciesList; track $index) { -->
+  <!--     <div class="mem-row"> -->
+  <!--       <code class="mem-address">{{ rowAddressText(rowIndex) }}</code> -->
+  <!--       <code class="mem-data">{{ rowDataText(rowIndex) }}</code> -->
+  <!--       <code class="mem-text">{{ rowStringText(rowIndex) }}</code> -->
+  <!--     </div> -->
+  <!--   } -->
+  <!-- </div> -->
+</div>
