@@ -1,0 +1,61 @@
+form
+  margin-bottom: 8px
+  width: 100%
+
+app-responsive-width-container
+  display: block
+  margin-bottom: 32px
+
+// TODO support --mat-sys-body-small-size and --mat-sys-body-large-size
+// --mat-sys-body-small-size = 630px width
+// --mat-sys-body-medium-size = 704px width
+// --mat-sys-body-large-size = 850px width
+.mat-mdc-row
+  font-size: var(--mat-sys-body-medium-size)
+
+.table-card
+  overflow-x: scroll
+  margin: 0px auto
+  max-width: 704px
+  margin-bottom: 32px
+  margin-top: 32px
+  tr.mat-mdc-header-row th
+    border-top: none
+
+.field-group
+  width: 100%
+
+.field-group mat-form-field
+  width: calc(50% - 8px)
+
+.field-group mat-form-field:not(:first-child)
+  margin-left: 8px
+
+.field-group mat-form-field:not(:last-child)
+  margin-right: 8px
+
+.mat-mdc-cell, .mat-mdc-header-cell
+  border: none
+
+.mat-mdc-row
+  height: 24px
+  text-wrap: nowrap
+
+// .mat-column-memory-address
+//   width: 20px
+//   // text-align: left
+
+.mat-column-memory-hex
+  border-right: 1px solid var(--mat-sys-outline-variant)
+  border-left: 1px solid var(--mat-sys-outline-variant)
+  // text-align: left
+  // width: 20px
+
+// .mat-column-memory-ascii
+//   text-align: center
+
+tr.mat-mdc-header-row th
+  font-weight: bold
+  border-bottom: 1px solid var(--mat-sys-outline-variant)
+  border-top: 1px solid var(--mat-sys-outline-variant)
+  text-align: center

@@ -1,0 +1,129 @@
+<app-responsive-width-container>
+  <app-page-title-toolbar heading="Run Command" />
+  <!-- <h2>Common Commands</h2> -->
+  <!-- <div class="button-group"> -->
+  <!--   <button -->
+  <!--     aria-label="Shutdown console" -->
+  <!--     class="trailing-button" -->
+  <!--     mat-stroked-button -->
+  <!--     (click)="onPowerShutdownClick()" -->
+  <!--   > -->
+  <!--     <mat-icon fontSet="material-icons-round">power_settings_new</mat-icon> -->
+  <!--     <span>Shutdown</span> -->
+  <!--   </button> -->
+  <!--   <button -->
+  <!--     aria-label="Reboot console" -->
+  <!--     class="trailing-button" -->
+  <!--     mat-stroked-button -->
+  <!--     (click)="onPowerRebootClick()" -->
+  <!--   > -->
+  <!--     <mat-icon fontSet="material-icons-round">power_settings_new</mat-icon> -->
+  <!--     <span>Reboot</span> -->
+  <!--   </button> -->
+  <!-- </div> -->
+  <!-- <div class="button-group"> -->
+  <!--   <button -->
+  <!--     aria-label="Return to launcher" -->
+  <!--     class="trailing-button" -->
+  <!--     mat-stroked-button -->
+  <!--     (click)="onReturnToLauncherClick()" -->
+  <!--   > -->
+  <!--     <mat-icon fontSet="material-icons-round">home</mat-icon> -->
+  <!--     <span>Launcher</span> -->
+  <!--   </button> -->
+  <!--   <button -->
+  <!--     aria-label="Open DVD tray" -->
+  <!--     class="trailing-button" -->
+  <!--     mat-stroked-button -->
+  <!--     (click)="onDvdEjectClick()" -->
+  <!--   > -->
+  <!--     <mat-icon fontSet="material-icons-round">eject</mat-icon> -->
+  <!--     <span>Open DVD</span> -->
+  <!--   </button> -->
+  <!--   <button -->
+  <!--     aria-label="Resume console" -->
+  <!--     class="trailing-button" -->
+  <!--     mat-stroked-button -->
+  <!--     (click)="onGoClick()" -->
+  <!--   > -->
+  <!--     <mat-icon fontSet="material-icons-round">play_arrow</mat-icon> -->
+  <!--     <span>Resume</span> -->
+  <!--   </button> -->
+  <!--   <button -->
+  <!--     aria-label="Suspend console" -->
+  <!--     class="trailing-button" -->
+  <!--     mat-stroked-button -->
+  <!--     (click)="onStopClick()" -->
+  <!--   > -->
+  <!--     <mat-icon fontSet="material-icons-round">pause</mat-icon> -->
+  <!--     <span>Suspend</span> -->
+  <!--   </button> -->
+  <!-- </div> -->
+
+  <!-- <h2>Run Command</h2> -->
+  <mat-card class="warning-card" appearance="outlined">
+    <mat-card-header>
+      <mat-card-title-group>
+        <mat-card-title>
+          <mat-icon fontSet="material-icons-round">warning</mat-icon>
+          Warning
+        </mat-card-title>
+      </mat-card-title-group>
+    </mat-card-header>
+    <mat-card-content>
+      <p>
+        Use caution when running commands. Improper use can lead to data loss or
+        damage to the system.
+      </p>
+      <p>Proceed at your own risk.</p>
+    </mat-card-content>
+  </mat-card>
+  <form [formGroup]="commandForm">
+    <div class="field-group">
+      <mat-form-field>
+        <mat-label>Command</mat-label>
+        <input matInput formControlName="cmd" type="text" cdkFocusInitial />
+      </mat-form-field>
+    </div>
+    <button mat-button type="submit" (click)="onSubmitClick()">Submit</button>
+  </form>
+  @if (errorText) {
+    <mat-card appearance="outlined" class="error-card">
+      <mat-card-content>
+        <p class="error-text">
+          {{ errorText }}
+        </p>
+      </mat-card-content>
+    </mat-card>
+  }
+  @if (telnetResponse) {
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Response</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>
+          {{ errorText }}
+          {{ telnetResponse.status.code }} - {{ telnetResponse.status.text }}
+        </p>
+        @if (telnetResponse.data.length > 0) {
+          <mat-accordion>
+            <!-- <mat-expansion-panel> -->
+            <!--   <mat-expansion-panel-header> -->
+            <!--     <mat-panel-title>Data as Bytes</mat-panel-title> -->
+            <!--   </mat-expansion-panel-header> -->
+            <!--   <!-1- TODO format better -1-> -->
+            <!--   <pre>{{ telnetResponse.data }}</pre> -->
+            <!-- </mat-expansion-panel> -->
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>Data</mat-panel-title>
+              </mat-expansion-panel-header>
+              <pre>{{ telnetResponseDataString }}</pre>
+            </mat-expansion-panel>
+          </mat-accordion>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</app-responsive-width-container>

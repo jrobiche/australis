@@ -33,7 +33,8 @@
             "styles": [
               "src/custom-theme.scss",
               "src/styles.sass",
-              "src/assets/fonts/Roboto/Roboto.css"
+              "src/assets/fonts/Roboto/Roboto.css",
+              "src/assets/fonts/Source_Code_Pro/static/SourceCodePro.css"
             ],
             "scripts": []
           },
