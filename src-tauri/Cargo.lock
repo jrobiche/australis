@@ -2284,13 +2284,15 @@ dependencies = [
 [[package]]
 name = "libaustralis"
 version = "0.2.0"
-source = "git+https://github.com/jrobiche/libaustralis.git?tag=0.2.0#627ef1a026c8a47a5564dab78aed9bafbaed89ca"
+source = "git+https://github.com/jrobiche/libaustralis.git?branch=feature%2Ftelnet-client#fb900423b30440bd36d52fea7a03bebd6e95970b"
 dependencies = [
  "image",
  "log",
+ "regex",
  "reqwest",
  "serde",
  "suppaftp",
+ "telnet",
  "texpresso",
  "xml-rs",
 ]
@@ -3646,9 +3648,9 @@ dependencies = [
 
 [[package]]
 name = "regex"
-version = "1.11.1"
+version = "1.12.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b544ef1b4eac5dc2db33ea63606ae9ffcfac26c1416a2806ae0bf5f56b201191"
+checksum = "843bc0191f75f3e22651ae5f1e72939ab2f72a4bc30fa80a066bd66edefc24d4"
 dependencies = [
  "aho-corasick",
  "memchr",
@@ -3658,9 +3660,9 @@ dependencies = [
 
 [[package]]
 name = "regex-automata"
-version = "0.4.9"
+version = "0.4.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "809e8dc61f6de73b46c85f4c96486310fe304c434cfa43669d7b40f711150908"
+checksum = "5276caf25ac86c8d810222b3dbb938e512c55c6831a10f3e6ed1c93b84041f1c"
 dependencies = [
  "aho-corasick",
  "memchr",
@@ -4705,6 +4707,12 @@ dependencies = [
  "embed-resource",
  "toml 0.9.8",
 ]
+
+[[package]]
+name = "telnet"
+version = "0.2.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fe470bf03e694eccaac03d81297cbc22e681f60d3af29d4b69369f014895bf06"
 
 [[package]]
 name = "tendril"

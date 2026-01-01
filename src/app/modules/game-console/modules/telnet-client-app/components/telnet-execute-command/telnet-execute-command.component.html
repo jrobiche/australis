@@ -1,0 +1,51 @@
+<div class="responsive-width-container">
+  <app-page-title-toolbar heading="Execute Command" />
+  <form [formGroup]="commandForm">
+    <div class="field-group">
+      <mat-form-field>
+        <mat-label>Command</mat-label>
+        <input matInput formControlName="cmd" type="text" cdkFocusInitial />
+      </mat-form-field>
+    </div>
+    <button mat-button type="submit" (click)="onSubmitClick()">Submit</button>
+  </form>
+  @if (errorText) {
+    <mat-card appearance="outlined" class="error-card">
+      <mat-card-content>
+        <p class="error-text">
+          {{ errorText }}
+        </p>
+      </mat-card-content>
+    </mat-card>
+  }
+  @if (telnetResponse) {
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Response</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>
+          {{ errorText }}
+          {{ telnetResponse.status.code }} - {{ telnetResponse.status.text }}
+        </p>
+        @if (telnetResponse.data.length > 0) {
+          <mat-accordion>
+            <!-- <mat-expansion-panel> -->
+            <!--   <mat-expansion-panel-header> -->
+            <!--     <mat-panel-title>Data as Bytes</mat-panel-title> -->
+            <!--   </mat-expansion-panel-header> -->
+            <!--   <!-1- TODO format better -1-> -->
+            <!--   <pre>{{ telnetResponse.data }}</pre> -->
+            <!-- </mat-expansion-panel> -->
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>Data</mat-panel-title>
+              </mat-expansion-panel-header>
+              <pre>{{ telnetResponseDataString }}</pre>
+            </mat-expansion-panel>
+          </mat-accordion>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

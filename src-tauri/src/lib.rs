@@ -68,6 +68,13 @@ pub fn run() {
             commands::game_console_configuration_read,
             commands::game_console_configuration_read_all,
             commands::game_console_configuration_update,
+            // telnet commands
+            commands::telnet_exec,
+            commands::telnet_exec_dirlist,
+            commands::telnet_exec_drivelist,
+            commands::telnet_exec_go,
+            commands::telnet_exec_magicboot,
+            commands::telnet_exec_stop,
             // xboxcatalog commands
             commands::xboxcatalog_live_image_bytes_url,
             commands::xboxcatalog_live_images,

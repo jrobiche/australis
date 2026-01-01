@@ -1,0 +1,44 @@
+<div
+  class="responsive-width-container"
+  [class.layout-handset]="breakpoint.isHandset$ | async"
+  [class.layout-tablet]="breakpoint.isTablet$ | async"
+  [class.layout-web]="breakpoint.isWeb$ | async"
+>
+  <app-page-title-toolbar heading="File Browser">
+    <button
+      mat-icon-button
+      aria-label="Refresh file entries"
+      (click)="onRefreshEntriesClick()"
+    >
+      <mat-icon>refresh</mat-icon>
+    </button>
+  </app-page-title-toolbar>
+  <span>Location: {{ cwdString }}</span>
+  <mat-action-list>
+    @for (entry of drivelistEntries; track $index) {
+      <mat-list-item (click)="onDrivelistEntryClick(entry)">
+        <mat-icon matListItemIcon>storage</mat-icon>
+        <div matListItemTitle>{{ entry }}</div>
+      </mat-list-item>
+    }
+    @if (cwd.length > 0) {
+      <mat-list-item (click)="onPopDirClick()">
+        <div matListItemTitle>..</div>
+      </mat-list-item>
+    }
+    @for (entry of dirlistEntries; track $index) {
+      <mat-list-item (click)="onDirlistEntryClick(entry)">
+        @if (entry.directory) {
+          <mat-icon matListItemIcon>folder</mat-icon>
+        } @else {
+          <mat-icon matListItemIcon [class.executable]="isExecutable(entry)">
+            description
+          </mat-icon>
+        }
+        <div matListItemTitle>
+          {{ entry.name }}
+        </div>
+      </mat-list-item>
+    }
+  </mat-action-list>
+</div>
