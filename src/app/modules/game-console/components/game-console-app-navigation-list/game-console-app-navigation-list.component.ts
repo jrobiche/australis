@@ -23,5 +23,6 @@ export class GameConsoleAppNavigationListComponent {
     { route: 'assets', title: 'Asset Manager' },
     { route: 'games', title: 'Game Library' },
     { route: 'system', title: 'System Information' },
+    { route: 'telnet', title: 'Telnet Client' },
   ];
 }
