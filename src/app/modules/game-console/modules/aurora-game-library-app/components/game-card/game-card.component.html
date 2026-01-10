@@ -6,17 +6,37 @@
 >
   <div class="boxart-scene-wrapper">
     <app-game-boxart-scene
-      [autorotate]="autoRotateBoxart"
+      #boxartScene
+      [autoRotate]="isBoxartAutoRotate"
+      [interactive]="isBoxartInteractive"
       [textureUrl]="assetBoxartUrl"
     />
     <button
-      mat-mini-fab
-      aria-label="Toggle Boxart Rotation"
+      matIconButton
+      [matMenuTriggerFor]="boxartSettingsMenu"
+      aria-label="Example icon-button with a menu"
       class="toggle-boxart-rotation"
-      (click)="onToggleBoxartRotationClick()"
     >
-      <mat-icon>{{ rotateBoxartIcon }}</mat-icon>
+      <mat-icon>settings</mat-icon>
     </button>
+    <mat-menu
+      #boxartSettingsMenu="matMenu"
+      xPosition="before"
+      yPosition="above"
+    >
+      <button mat-menu-item (click)="onBoxartSettingsAutoRotateClick($event)">
+        <mat-checkbox [checked]="isBoxartAutoRotate">Auto-Rotate</mat-checkbox>
+      </button>
+      <button mat-menu-item (click)="onBoxartSettingsInteractiveClick($event)">
+        <mat-checkbox [checked]="isBoxartInteractive">
+          Interactive
+        </mat-checkbox>
+      </button>
+      <button mat-menu-item (click)="boxartScene.reset()">
+        <mat-icon>refresh</mat-icon>
+        <span>Reset</span>
+      </button>
+    </mat-menu>
   </div>
   <mat-divider class="divider-variant"></mat-divider>
   <mat-card-content>

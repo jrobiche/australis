@@ -6,6 +6,7 @@ import {
   OnChanges,
   OnDestroy,
   OnInit,
+  SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import * as THREE from 'three';
@@ -24,11 +25,13 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 })
 export class GameBoxartSceneComponent implements OnChanges, OnDestroy, OnInit {
   @Input()
-  autorotate: boolean;
+  autoRotate: boolean;
   @Input()
   boxPlasticColor: number | string;
   @Input()
   defaultCoverColor: number | string;
+  @Input()
+  interactive: boolean;
   @Input()
   textureUrl: string | null;
   @ViewChild('rendererCanvasWrapper', { static: true })
@@ -46,7 +49,8 @@ export class GameBoxartSceneComponent implements OnChanges, OnDestroy, OnInit {
   #textureUrl: string | null;
 
   constructor(private ngZone: NgZone) {
-    this.autorotate = false;
+    this.autoRotate = false;
+    this.interactive = false;
     this.boxPlasticColor = 0x00ff00;
     this.defaultCoverColor = 0x7f7f7f;
     this.textureUrl = null;
@@ -70,6 +74,9 @@ export class GameBoxartSceneComponent implements OnChanges, OnDestroy, OnInit {
       10000,
     );
     this.#controls = new OrbitControls(this.#camera, this.#renderer.domElement);
+    this.#controls.enablePan = false;
+    this.#controls.enabled = this.interactive;
+    this.#controls.autoRotate = this.autoRotate;
   }
 
   ngOnInit(): void {
@@ -88,8 +95,16 @@ export class GameBoxartSceneComponent implements OnChanges, OnDestroy, OnInit {
     observer.observe(this.rendererCanvasWrapper.nativeElement);
   }
 
-  ngOnChanges() {
-    this.#updateBoxMaterial();
+  ngOnChanges(changes: SimpleChanges) {
+    if (Object.hasOwn(changes, 'autoRotate')) {
+      this.#controls.autoRotate = this.autoRotate;
+    }
+    if (Object.hasOwn(changes, 'interactive')) {
+      this.#controls.enabled = this.interactive;
+    }
+    if (Object.hasOwn(changes, 'textureUrl')) {
+      this.#updateBoxMaterial();
+    }
   }
 
   ngOnDestroy(): void {
@@ -126,10 +141,7 @@ export class GameBoxartSceneComponent implements OnChanges, OnDestroy, OnInit {
   }
 
   #render(): void {
-    if (this.autorotate) {
-      this.#boxartMesh.rotation.y += 0.01;
-    }
-    this.#controls.update();
+    this.#controls.update(0.075);
     this.#renderer.render(this.#scene, this.#camera);
     this.#frameId = requestAnimationFrame(() => {
       this.#render();
@@ -177,5 +189,13 @@ export class GameBoxartSceneComponent implements OnChanges, OnDestroy, OnInit {
         ];
       });
     }
+  }
+
+  reset(): void {
+    this.#boxartMesh.rotation.y = 0;
+    this.#boxartMesh.rotation.x = 0;
+    this.#camera.position.x = 0;
+    this.#camera.position.y = 0;
+    this.#camera.position.z = 1100;
   }
 }
