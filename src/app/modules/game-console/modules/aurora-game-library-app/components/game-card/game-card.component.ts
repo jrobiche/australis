@@ -11,10 +11,12 @@ import {
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatAccordion, MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import {
@@ -32,10 +34,12 @@ import { GameBoxartSceneComponent } from '../game-boxart-scene/game-boxart-scene
     AsyncPipe,
     MatButtonModule,
     MatCardModule,
+    MatCheckboxModule,
     MatDividerModule,
     MatExpansionModule,
     MatIconModule,
     MatListModule,
+    MatMenuModule,
     GameBoxartSceneComponent,
   ],
   templateUrl: './game-card.component.html',
@@ -53,12 +57,14 @@ export class GameCardComponent implements OnChanges, OnInit {
   gameData!: AuroraGameData;
   assetBoxartUrl: string | null;
   assetScreenshotUrls: (string | null)[];
-  autoRotateBoxart: boolean;
+  isBoxartAutoRotate: boolean;
+  isBoxartInteractive: boolean;
 
   constructor() {
     this.assetBoxartUrl = null;
     this.assetScreenshotUrls = [];
-    this.autoRotateBoxart = false;
+    this.isBoxartAutoRotate = false;
+    this.isBoxartInteractive = false;
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -137,10 +143,6 @@ export class GameCardComponent implements OnChanges, OnInit {
     return 'Unknown';
   }
 
-  get rotateBoxartIcon(): string {
-    return this.autoRotateBoxart ? 'pause' : 'play_arrow';
-  }
-
   get titleIdText(): string {
     if (this.gameData.titleId || this.gameData.titleId == 0) {
       return this.gameData?.titleId.toString(16).padStart(8, '0').toUpperCase();
@@ -178,7 +180,11 @@ export class GameCardComponent implements OnChanges, OnInit {
     }
   }
 
-  onToggleBoxartRotationClick() {
-    this.autoRotateBoxart = !this.autoRotateBoxart;
+  onBoxartSettingsAutoRotateClick(event: any): void {
+    this.isBoxartAutoRotate = !this.isBoxartAutoRotate;
+  }
+
+  onBoxartSettingsInteractiveClick(event: any): void {
+    this.isBoxartInteractive = !this.isBoxartInteractive;
   }
 }
