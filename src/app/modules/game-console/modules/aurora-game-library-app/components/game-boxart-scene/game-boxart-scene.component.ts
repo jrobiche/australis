@@ -41,7 +41,7 @@ export class GameBoxartSceneComponent implements OnChanges, OnDestroy, OnInit {
   #boxPlasticColor: number | string;
   #boxartMesh: THREE.Mesh;
   #camera: THREE.PerspectiveCamera;
-  #controls: OrbitControls;
+  #controls: OrbitControls | null;
   #defaultCoverColor: number | string;
   #frameId: number | null;
   #renderer: THREE.WebGLRenderer;
@@ -96,11 +96,18 @@ export class GameBoxartSceneComponent implements OnChanges, OnDestroy, OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (Object.hasOwn(changes, 'autoRotate')) {
-      this.#controls.autoRotate = this.autoRotate;
-    }
     if (Object.hasOwn(changes, 'interactive')) {
-      this.#controls.enabled = this.interactive;
+      if (this.interactive) {
+        this.#controls = new OrbitControls(
+          this.#camera,
+          this.#renderer.domElement,
+        );
+      } else {
+        this.#controls = null;
+      }
+    }
+    if (Object.hasOwn(changes, 'autoRotate') && this.#controls) {
+      this.#controls.autoRotate = this.autoRotate;
     }
     if (Object.hasOwn(changes, 'textureUrl')) {
       this.#updateBoxMaterial();
@@ -141,7 +148,9 @@ export class GameBoxartSceneComponent implements OnChanges, OnDestroy, OnInit {
   }
 
   #render(): void {
-    this.#controls.update(0.075);
+    if (this.#controls) {
+      this.#controls.update(0.075);
+    }
     this.#renderer.render(this.#scene, this.#camera);
     this.#frameId = requestAnimationFrame(() => {
       this.#render();
