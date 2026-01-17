@@ -61,6 +61,7 @@ export class GameBoxartSceneComponent implements OnChanges, OnDestroy, OnInit {
       alpha: true,
       antialias: true,
     });
+    this.#renderer.domElement.style.touchAction = 'auto';
     this.#scene = new THREE.Scene();
     this.#textureUrl = this.textureUrl;
     this.#boxartMesh = new THREE.Mesh(
@@ -101,6 +102,11 @@ export class GameBoxartSceneComponent implements OnChanges, OnDestroy, OnInit {
     }
     if (Object.hasOwn(changes, 'interactive')) {
       this.#controls.enabled = this.interactive;
+      if (this.interactive) {
+        this.#renderer.domElement.style.touchAction = 'none';
+      } else {
+        this.#renderer.domElement.style.touchAction = 'auto';
+      }
     }
     if (Object.hasOwn(changes, 'textureUrl')) {
       this.#updateBoxMaterial();
