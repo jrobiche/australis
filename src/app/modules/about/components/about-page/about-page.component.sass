@@ -1,10 +1,31 @@
 @use '../../../../../variables'
 
+mat-card
+  margin-bottom: 16px
+
 app-page-toolbar
   position: fixed
   top: 0
   width: 100%
   z-index: 1000
+
+.app-avatar-wrapper
+  overflow: auto
+
+.app-avatar
+  margin-bottom: 64px
+  margin-top: 64px
+
+.app-icon
+  display: block
+  height: 140px
+  margin: auto
+  margin-bottom: 8px
+  width: 140px
+
+.app-subtitle
+  display: block
+  text-align: center
 
 .content-wrapper
   h2:first-of-type
@@ -17,15 +38,21 @@ app-page-toolbar
     font: var(--mat-sys-headline-small)
   p
     font: var(--mat-sys-body-small)
+  span.app-subtitle
+    font: var(--mat-sys-body-small)
 
 .content-wrapper.font-medium
   h2
     font: var(--mat-sys-headline-medium)
   p
     font: var(--mat-sys-body-medium)
+  span.app-subtitle
+    font: var(--mat-sys-body-medium)
 
 .content-wrapper.font-large
   h2
     font: var(--mat-sys-headline-large)
   p
+    font: var(--mat-sys-body-large)
+  span.app-subtitle
     font: var(--mat-sys-body-large)

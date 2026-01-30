@@ -1,14 +1,22 @@
 import { Component, OnInit, inject } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { getVersion } from '@tauri-apps/api/app';
+import { openUrl } from '@tauri-apps/plugin-opener';
 
 import { AppSettingsService } from '@app/shared/services/app-settings.service';
-import { PageTitleToolbarComponent } from '@app/shared/components/page-title-toolbar/page-title-toolbar.component';
 import { PageToolbarComponent } from '@app/shared/components/page-toolbar/page-toolbar.component';
 
 @Component({
   selector: 'app-about-page',
-  imports: [PageTitleToolbarComponent, PageToolbarComponent],
+  imports: [
+    MatButtonModule,
+    MatCardModule,
+    MatIconModule,
+    PageToolbarComponent,
+  ],
   templateUrl: './about-page.component.html',
   styleUrl: './about-page.component.sass',
 })
@@ -38,5 +46,17 @@ export class AboutPageComponent {
       return 'Unknown';
     }
     return `v${this.#appVersion}`;
+  }
+
+  openGitHubIssues(): void {
+    openUrl('https://github.com/jrobiche/australis/issues');
+  }
+
+  openGPL(): void {
+    openUrl('https://www.gnu.org/licenses/#GPL');
+  }
+
+  openSourceCode(): void {
+    openUrl('https://github.com/jrobiche/australis');
   }
 }
