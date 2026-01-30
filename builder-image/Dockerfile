@@ -23,7 +23,8 @@ RUN set -eux; \
     libxdo-dev \
     libssl-dev \
     libayatana-appindicator3-dev \
-    librsvg2-dev
+    librsvg2-dev \
+    xdg-utils
 
 # install nodejs
 RUN set -eux; \

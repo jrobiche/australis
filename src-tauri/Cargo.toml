@@ -28,4 +28,5 @@ sqlite = "0.37.0"
 # the feature "devtools" can be added for inspect element to appear in right-click menu
 tauri = { version = "2.9.4", features = [] }
 tauri-plugin-log = "2.7.1"
+tauri-plugin-opener = "2.5.3"
 uuid = { version = "1.19.0", features = ["v4", "fast-rng"] }

@@ -5,34 +5,92 @@
   [class.font-medium]="appSettings.isFontSizeMedium"
   [class.font-large]="appSettings.isFontSizeLarge"
 >
-  <app-page-title-toolbar heading="Australis {{ appVersion }}" />
-  <h2>Looking for the source code?</h2>
-  <p>
-    Source code for this program is available on GitHub at
-    &lt;https://github.com/jrobiche/australis&gt;
-  </p>
-  <h2>Found a problem?</h2>
-  <p>
-    Open an issue on GitHub at
-    &lt;https://github.com/jrobiche/australis/issues&gt;
-  </p>
-  <h2>Licensed under GPLv3 or later</h2>
-  <p>Australis is a client for the Aurora Xbox 360 Dashboard.</p>
-  <p>Copyright (C) 2025-2026 jrobiche</p>
-  <p>
-    This program is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License as published by the Free
-    Software Foundation, either version 3 of the License, or (at your option)
-    any later version.
-  </p>
-  <p>
-    This program is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
-    more details.
-  </p>
-  <p>
-    You should have received a copy of the GNU General Public License along with
-    this program. If not, see &lt;https://www.gnu.org/licenses/&gt;.
-  </p>
+  <div class="app-avatar-wrapper">
+    <div class="app-avatar">
+      <img
+        class="app-icon"
+        src="/assets/icons/Square310x310Logo.png"
+        alt="Australis Icon"
+      />
+      <span class="app-subtitle">Australis</span>
+      <span class="app-subtitle">{{ appVersion }}</span>
+    </div>
+  </div>
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>Looking for the source code?</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p>
+        Source code for this program is available on GitHub at
+        &lt;https://github.com/jrobiche/australis&gt;
+      </p>
+    </mat-card-content>
+    <mat-card-actions>
+      <button matButton (click)="openSourceCode()">
+        <mat-icon
+          aria-hidden="false"
+          aria-label="Open external link"
+          fontIcon="open_in_new"
+        />
+        Source Code
+      </button>
+    </mat-card-actions>
+  </mat-card>
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>Found a problem?</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p>
+        Open an issue on GitHub at
+        &lt;https://github.com/jrobiche/australis/issues&gt;
+      </p>
+    </mat-card-content>
+    <mat-card-actions>
+      <button matButton (click)="openGitHubIssues()">
+        <mat-icon
+          aria-hidden="false"
+          aria-label="Open external link"
+          fontIcon="open_in_new"
+        />
+        GitHub Issues
+      </button>
+    </mat-card-actions>
+  </mat-card>
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>Licensed under GPLv3 or later</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p>Australis is a client for the Aurora Xbox 360 Dashboard.</p>
+      <p>Copyright (C) 2025-2026 jrobiche</p>
+      <p>
+        This program is free software: you can redistribute it and/or modify it
+        under the terms of the GNU General Public License as published by the
+        Free Software Foundation, either version 3 of the License, or (at your
+        option) any later version.
+      </p>
+      <p>
+        This program is distributed in the hope that it will be useful, but
+        WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+        Public License for more details.
+      </p>
+      <p>
+        You should have received a copy of the GNU General Public License along
+        with this program. If not, see &lt;https://www.gnu.org/licenses/&gt;.
+      </p>
+    </mat-card-content>
+    <mat-card-actions>
+      <button matButton (click)="openGPL()">
+        <mat-icon
+          aria-hidden="false"
+          aria-label="Open external link"
+          fontIcon="open_in_new"
+        />
+        GNU General Public License
+      </button>
+    </mat-card-actions>
+  </mat-card>
 </div>
