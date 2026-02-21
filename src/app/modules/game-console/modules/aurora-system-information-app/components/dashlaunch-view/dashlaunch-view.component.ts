@@ -18,6 +18,7 @@ import {
   AuroraDashlaunchOption,
 } from '@app/modules/aurora/types/aurora';
 import { PageTitleToolbarComponent } from '@app/shared/components/page-title-toolbar/page-title-toolbar.component';
+import { ResponsiveWidthContainerComponent } from '@app/shared/components/responsive-width-container/responsive-width-container.component';
 import { BreakpointService } from '@app/shared/services/breakpoint.service';
 import { GameConsoleConfiguration } from '@app/shared/types/app';
 
@@ -30,6 +31,7 @@ import { GameConsoleConfiguration } from '@app/shared/types/app';
     MatExpansionModule,
     MatListModule,
     PageTitleToolbarComponent,
+    ResponsiveWidthContainerComponent,
   ],
   templateUrl: './dashlaunch-view.component.html',
   styleUrl: './dashlaunch-view.component.sass',

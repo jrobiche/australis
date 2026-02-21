@@ -7,6 +7,7 @@ import { RouterModule } from '@angular/router';
 
 import { PageTitleToolbarComponent } from '@app/shared/components/page-title-toolbar/page-title-toolbar.component';
 import { PageToolbarComponent } from '@app/shared/components/page-toolbar/page-toolbar.component';
+import { ResponsiveWidthContainerComponent } from '@app/shared/components/responsive-width-container/responsive-width-container.component';
 import { BreakpointService } from '@app/shared/services/breakpoint.service';
 import { DialogService } from '@app/shared/services/dialog.service';
 import { GameConsoleConfigurationStoreService } from '@app/shared/services/game-console-configuration-store.service';
@@ -23,6 +24,7 @@ import { ConsoleNavigationListComponent } from '../console-navigation-list/conso
     ConsoleNavigationListComponent,
     PageTitleToolbarComponent,
     PageToolbarComponent,
+    ResponsiveWidthContainerComponent,
   ],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.sass',

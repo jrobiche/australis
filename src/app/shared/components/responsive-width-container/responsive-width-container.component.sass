@@ -1,0 +1,53 @@
+// This responsive-width-container is an older material design concept
+// https://material.io/design/layout/responsive-layout-grid.html#breakpoints
+// TODO use panes that follow the Material 3 specs
+// https://m3.material.io/foundations/layout/applying-layout/window-size-classes
+.wrapper
+  container-type: inline-size
+  container-name: test
+  width: 100%
+
+.container
+  margin-left: 16px
+  margin-right: 16px
+  padding-left: 0px
+  padding-right: 0px
+  width: auto
+
+@container test (0 <= width < 600px)
+  .container
+    margin-left: 16px
+    margin-right: 16px
+    padding-left: 0px
+    padding-right: 0px
+    width: auto
+
+@container test (600px <= width < 905px)
+  .container
+    margin-left: 32px
+    margin-right: 32px
+    padding-left: 0px
+    padding-right: 0px
+    width: auto
+
+@container test (905px <= width < 1240px)
+  .container
+    margin: 0 auto
+    padding-left: 0px
+    padding-right: 0px
+    width: 840px
+
+@container test (1240px <= width < 1440px)
+  .container
+    margin-left: 200px
+    margin-right: 200px
+    padding-left: 0px
+    padding-right: 0px
+    width: auto
+
+@container test (1440px <= width)
+  .container
+    margin: 0 auto
+    padding-left: 0px
+    padding-right: 0px
+    width: 1040px

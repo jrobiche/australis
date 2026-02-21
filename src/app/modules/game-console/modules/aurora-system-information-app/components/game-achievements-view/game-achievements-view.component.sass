@@ -1,6 +1,13 @@
 app-achievement-card
   display: block
 
+app-achievement-card:not(:first-of-type)
+  margin-top: 8px
+
+app-responsive-width-container
+  display: block
+  margin-bottom: 32px
+
 .description
   margin-top: 0px
 
@@ -8,18 +15,3 @@ app-achievement-card
   display: block
   margin-bottom: 16px
   margin-top: 16px
-
-.responsive-width-container.layout-handset
-  app-achievement-card:not(:first-of-type)
-    margin-top: 8px
-  margin-bottom: 16px
-
-.responsive-width-container.layout-tablet
-  app-achievement-card:not(:first-of-type)
-    margin-top: 12px
-  margin-bottom: 32px
-
-.responsive-width-container.layout-web
-  app-achievement-card:not(:first-of-type)
-    margin-top: 16px
-  margin-bottom: 32px

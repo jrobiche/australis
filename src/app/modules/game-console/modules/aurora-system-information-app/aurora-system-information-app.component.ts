@@ -19,6 +19,7 @@ import { AuroraStateService } from '@app/modules/aurora/services/aurora-state.se
 import { BreakpointService } from '@app/shared/services/breakpoint.service';
 import { GameConsoleConfiguration, IntervalState } from '@app/shared/types/app';
 import { PageTitleToolbarComponent } from '@app/shared/components/page-title-toolbar/page-title-toolbar.component';
+import { ResponsiveWidthContainerComponent } from '@app/shared/components/responsive-width-container/responsive-width-container.component';
 import { DashlaunchViewComponent } from './components/dashlaunch-view/dashlaunch-view.component';
 import { GameAchievementsViewComponent } from './components/game-achievements-view/game-achievements-view.component';
 import { GameScreenshotsViewComponent } from './components/game-screenshots-view/game-screenshots-view.component';
@@ -37,6 +38,7 @@ import { ThreadsViewComponent } from './components/threads-view/threads-view.com
     MatSidenavModule,
     MatToolbarModule,
     PageTitleToolbarComponent,
+    ResponsiveWidthContainerComponent,
     DashlaunchViewComponent,
     GameAchievementsViewComponent,
     GameScreenshotsViewComponent,

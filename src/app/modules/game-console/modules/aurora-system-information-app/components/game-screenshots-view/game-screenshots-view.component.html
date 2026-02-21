@@ -1,5 +1,4 @@
-<div
-  class="responsive-width-container"
+<app-responsive-width-container
   [class.layout-handset]="breakpoint.isHandset$ | async"
   [class.layout-tablet]="breakpoint.isTablet$ | async"
   [class.layout-web]="breakpoint.isWeb$ | async"
@@ -10,4 +9,4 @@
     [gameConsoleConfiguration]="gameConsoleConfiguration"
     [screencaptureMetas]="screenCaptureMetas()"
   />
-</div>
+</app-responsive-width-container>

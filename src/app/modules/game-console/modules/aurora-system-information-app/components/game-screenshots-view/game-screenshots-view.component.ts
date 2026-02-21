@@ -11,13 +11,19 @@ import {
 import { AuroraStateService } from '@app/modules/aurora/services/aurora-state.service';
 import { AuroraScreencaptureMeta } from '@app/modules/aurora/types/aurora';
 import { PageTitleToolbarComponent } from '@app/shared/components/page-title-toolbar/page-title-toolbar.component';
+import { ResponsiveWidthContainerComponent } from '@app/shared/components/responsive-width-container/responsive-width-container.component';
 import { BreakpointService } from '@app/shared/services/breakpoint.service';
 import { GameConsoleConfiguration } from '@app/shared/types/app';
 import { ScreencapturesCardComponent } from '../screencaptures-card/screencaptures-card.component';
 
 @Component({
   selector: 'app-game-screenshots-view',
-  imports: [AsyncPipe, ScreencapturesCardComponent, PageTitleToolbarComponent],
+  imports: [
+    AsyncPipe,
+    ScreencapturesCardComponent,
+    PageTitleToolbarComponent,
+    ResponsiveWidthContainerComponent,
+  ],
   templateUrl: './game-screenshots-view.component.html',
   styleUrl: './game-screenshots-view.component.sass',
 })

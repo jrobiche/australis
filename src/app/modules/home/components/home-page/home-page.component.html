@@ -10,7 +10,7 @@
     </a>
   }
 </app-page-toolbar>
-<div class="content-wrapper responsive-width-container">
+<app-responsive-width-container>
   <app-page-title-toolbar heading="Consoles">
     @if (breakpoint.isWeb$ | async) {
       <button
@@ -49,8 +49,8 @@
     <p>Add a console and it will show up here.</p>
   } @else {
     <app-console-navigation-list
-      class="navigation-list"
+      class="navigation-list-wrapper"
       [configurations]="gameConsoleConfigurations"
     />
   }
-</div>
+</app-responsive-width-container>

@@ -15,6 +15,7 @@ import {
 import { AuroraStateService } from '@app/modules/aurora/services/aurora-state.service';
 import { AuroraAchievement } from '@app/modules/aurora/types/aurora';
 import { PageTitleToolbarComponent } from '@app/shared/components/page-title-toolbar/page-title-toolbar.component';
+import { ResponsiveWidthContainerComponent } from '@app/shared/components/responsive-width-container/responsive-width-container.component';
 import { BreakpointService } from '@app/shared/services/breakpoint.service';
 import { GameConsoleConfiguration } from '@app/shared/types/app';
 import { AchievementCardComponent } from '../achievement-card/achievement-card.component';
@@ -26,6 +27,7 @@ import { AchievementCardComponent } from '../achievement-card/achievement-card.c
     AchievementCardComponent,
     MatSlideToggleModule,
     PageTitleToolbarComponent,
+    ResponsiveWidthContainerComponent,
   ],
   templateUrl: './game-achievements-view.component.html',
   styleUrl: './game-achievements-view.component.sass',

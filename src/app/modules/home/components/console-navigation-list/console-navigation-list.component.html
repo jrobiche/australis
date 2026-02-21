@@ -1,4 +1,4 @@
-<mat-nav-list aria-label="Select a game console" class="navigation-list">
+<mat-nav-list aria-label="Select a game console">
   @for (configuration of configurations; track configuration.id) {
     <a mat-list-item [routerLink]="['/', 'consoles', configuration.id]">
       {{ configuration.name }}
