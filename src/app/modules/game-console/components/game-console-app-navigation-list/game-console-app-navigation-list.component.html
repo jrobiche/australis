@@ -1,6 +1,6 @@
-<div class="content-wrapper navigation-list responsive-width-container">
+<app-responsive-width-container class="navigation-list-wrapper">
   <app-page-title-toolbar heading="Apps" />
-  <mat-nav-list aria-label="Select a game console">
+  <mat-nav-list aria-label="Select an application">
     @for (link of links; track link.route) {
       <a mat-list-item [routerLink]="link.route">
         <span matListItemTitle>{{ link.title }}</span>
@@ -10,4 +10,4 @@
       </a>
     }
   </mat-nav-list>
-</div>
+</app-responsive-width-container>
