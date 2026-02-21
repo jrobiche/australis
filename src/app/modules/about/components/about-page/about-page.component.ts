@@ -8,6 +8,7 @@ import { openUrl } from '@tauri-apps/plugin-opener';
 
 import { AppSettingsService } from '@app/shared/services/app-settings.service';
 import { PageToolbarComponent } from '@app/shared/components/page-toolbar/page-toolbar.component';
+import { ResponsiveWidthContainerComponent } from '@app/shared/components/responsive-width-container/responsive-width-container.component';
 
 @Component({
   selector: 'app-about-page',
@@ -16,6 +17,7 @@ import { PageToolbarComponent } from '@app/shared/components/page-toolbar/page-t
     MatCardModule,
     MatIconModule,
     PageToolbarComponent,
+    ResponsiveWidthContainerComponent,
   ],
   templateUrl: './about-page.component.html',
   styleUrl: './about-page.component.sass',

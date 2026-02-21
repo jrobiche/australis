@@ -1,20 +1,17 @@
 <app-page-toolbar heading="About" />
-<div
-  class="content-wrapper responsive-width-container"
+<app-responsive-width-container
   [class.font-small]="appSettings.isFontSizeSmall"
   [class.font-medium]="appSettings.isFontSizeMedium"
   [class.font-large]="appSettings.isFontSizeLarge"
 >
-  <div class="app-avatar-wrapper">
-    <div class="app-avatar">
-      <img
-        class="app-icon"
-        src="/assets/icons/Square310x310Logo.png"
-        alt="Australis Icon"
-      />
-      <span class="app-subtitle">Australis</span>
-      <span class="app-subtitle">{{ appVersion }}</span>
-    </div>
+  <div class="app-badge">
+    <img
+      class="app-icon"
+      src="/assets/icons/Square310x310Logo.png"
+      alt="Australis Icon"
+    />
+    <span class="app-subtitle">Australis</span>
+    <span class="app-subtitle">{{ appVersion }}</span>
   </div>
   <mat-card appearance="outlined">
     <mat-card-header>
@@ -30,7 +27,7 @@
       <button matButton (click)="openSourceCode()">
         <mat-icon
           aria-hidden="false"
-          aria-label="Open external link"
+          aria-label="Open external link to source code"
           fontIcon="open_in_new"
         />
         Source Code
@@ -51,7 +48,7 @@
       <button matButton (click)="openGitHubIssues()">
         <mat-icon
           aria-hidden="false"
-          aria-label="Open external link"
+          aria-label="Open external link to GitHub issues"
           fontIcon="open_in_new"
         />
         GitHub Issues
@@ -86,11 +83,11 @@
       <button matButton (click)="openGPL()">
         <mat-icon
           aria-hidden="false"
-          aria-label="Open external link"
+          aria-label="Open external link to GPL"
           fontIcon="open_in_new"
         />
         GNU General Public License
       </button>
     </mat-card-actions>
   </mat-card>
-</div>
+</app-responsive-width-container>

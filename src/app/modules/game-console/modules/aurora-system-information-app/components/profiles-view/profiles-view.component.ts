@@ -15,6 +15,7 @@ import {
 import { AuroraStateService } from '@app/modules/aurora/services/aurora-state.service';
 import { AuroraProfile } from '@app/modules/aurora/types/aurora';
 import { PageTitleToolbarComponent } from '@app/shared/components/page-title-toolbar/page-title-toolbar.component';
+import { ResponsiveWidthContainerComponent } from '@app/shared/components/responsive-width-container/responsive-width-container.component';
 import { BreakpointService } from '@app/shared/services/breakpoint.service';
 import { GameConsoleConfiguration } from '@app/shared/types/app';
 import { ProfileCardComponent } from '../profile-card/profile-card.component';
@@ -26,6 +27,7 @@ import { ProfileCardComponent } from '../profile-card/profile-card.component';
     MatSlideToggleModule,
     PageTitleToolbarComponent,
     ProfileCardComponent,
+    ResponsiveWidthContainerComponent,
   ],
   templateUrl: './profiles-view.component.html',
   styleUrl: './profiles-view.component.sass',

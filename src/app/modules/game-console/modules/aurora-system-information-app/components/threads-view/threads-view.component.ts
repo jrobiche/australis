@@ -19,6 +19,7 @@ import {
   AuroraThreadState,
 } from '@app/modules/aurora/types/aurora';
 import { PageTitleToolbarComponent } from '@app/shared/components/page-title-toolbar/page-title-toolbar.component';
+import { ResponsiveWidthContainerComponent } from '@app/shared/components/responsive-width-container/responsive-width-container.component';
 import { BreakpointService } from '@app/shared/services/breakpoint.service';
 import { GameConsoleConfiguration } from '@app/shared/types/app';
 
@@ -31,6 +32,7 @@ import { GameConsoleConfiguration } from '@app/shared/types/app';
     MatIconModule,
     MatTableModule,
     PageTitleToolbarComponent,
+    ResponsiveWidthContainerComponent,
   ],
   templateUrl: './threads-view.component.html',
   styleUrl: './threads-view.component.sass',

@@ -6,20 +6,21 @@ app-page-toolbar
   width: 100%
   z-index: 1000
 
-.content-wrapper
-  margin-top: calc(variables.$page-toolbar-height)
-  margin-bottom: 32px
+app-responsive-width-container
   p:first-of-type
     margin-top: 0px
+  display: block
+  margin-bottom: 32px
+  margin-top: calc(variables.$page-toolbar-height)
 
-.content-wrapper.font-small
+app-responsive-width-container.font-small
   p
     font: var(--mat-sys-body-small)
 
-.content-wrapper.font-medium
+app-responsive-width-container.font-medium
   p
     font: var(--mat-sys-body-medium)
 
-.content-wrapper.font-large
+app-responsive-width-container.font-large
   p
     font: var(--mat-sys-body-large)

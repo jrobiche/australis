@@ -94,8 +94,7 @@
     </mat-selection-list>
   </mat-drawer>
   <mat-drawer-content>
-    <div
-      class="content-wrapper responsive-width-container"
+    <app-responsive-width-container
       [class.layout-handset]="breakpoint.isHandset$ | async"
       [class.layout-tablet]="breakpoint.isTablet$ | async"
       [class.layout-web]="breakpoint.isWeb$ | async"
@@ -112,6 +111,6 @@
       } @else {
         <p class="description">No game data available.</p>
       }
-    </div>
+    </app-responsive-width-container>
   </mat-drawer-content>
 </mat-drawer-container>
