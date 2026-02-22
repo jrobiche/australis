@@ -1,4 +1,3 @@
-import { AsyncPipe } from '@angular/common';
 import {
   Component,
   Input,
@@ -8,9 +7,9 @@ import {
   inject,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterModule } from '@angular/router';
 
 import {
@@ -18,20 +17,19 @@ import {
   AuroraGameData,
 } from '@app/modules/aurora/types/aurora';
 import { AuroraStateService } from '@app/modules/aurora/services/aurora-state.service';
-import { BreakpointService } from '@app/shared/services/breakpoint.service';
 import { GameConsoleConfiguration } from '@app/shared/types/app';
-import { GameCardComponent } from '../game-card/game-card.component';
-// import { UiService } from '@app/shared/services/ui.service';
+import { GameBoxartCardComponent } from '../game-boxart-card/game-boxart-card.component';
+import { GameDetailsCardComponent } from '../game-details-card/game-details-card.component';
 
 @Component({
   selector: 'app-game-details-section',
   imports: [
-    AsyncPipe,
     MatButtonModule,
-    MatDividerModule,
     MatIconModule,
+    MatToolbarModule,
     RouterModule,
-    GameCardComponent,
+    GameBoxartCardComponent,
+    GameDetailsCardComponent,
   ],
   templateUrl: './game-details-section.component.html',
   styleUrl: './game-details-section.component.sass',
@@ -39,7 +37,6 @@ import { GameCardComponent } from '../game-card/game-card.component';
 export class GameDetailsSectionComponent implements OnChanges, OnInit {
   readonly #auroraState = inject(AuroraStateService);
   readonly #snackBar = inject(MatSnackBar);
-  readonly breakpoint = inject(BreakpointService);
   @Input({ required: true })
   gameConsoleConfiguration!: GameConsoleConfiguration;
   @Input({ required: true })
@@ -109,9 +106,9 @@ export class GameDetailsSectionComponent implements OnChanges, OnInit {
 
   get backgroundImageStyle(): string | null {
     if (this.assetBackgroundUrl) {
-      return `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${this.assetBackgroundUrl}')`;
+      return `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('${this.assetBackgroundUrl}')`;
     }
-    return `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))`;
+    return `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3))`;
   }
 
   get editGameAssetsRouterLink(): string[] {
