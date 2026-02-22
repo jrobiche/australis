@@ -31,6 +31,24 @@ app-page-title-toolbar {
   ));
 }
 
+app-game-details-section {
+  mat-toolbar {
+    // TODO do not use hard coded values
+    @include mat.toolbar-overrides((
+      mobile-height: 96px,
+      standard-height: 96px,
+    ));
+    border-radius: 24px;
+  }
+}
+
+app-game-details-card {
+  @include mat.expansion-overrides((
+    container-background-color: var(--mat-sys-surface-container-low),
+    container-text-color:  var(--mat-sys-on-surface),
+  ));
+}
+
 .divider-variant {
   @include mat.divider-overrides((
     color: var(--mat-sys-outline-variant),
