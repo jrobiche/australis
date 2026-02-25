@@ -36,4 +36,4 @@ rm src-tauri/gen/android/app/src/main/java/com/github/jrobiche/australis/MainAct
 cp "${HOME}/.local/etc/com.github.jrobiche.australis/MainActivity.kt" src-tauri/gen/android/app/src/main/java/com/github/jrobiche/australis/MainActivity.kt
 
 npx tauri icon app-icon.png
-npm run tauri android build -- --apk true
+npm run tauri android build -- --apk
