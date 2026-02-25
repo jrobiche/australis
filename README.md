@@ -10,8 +10,7 @@ A client for the Aurora Xbox 360 Dashboard.
 - Import game data from console
 - Upload assets to console
 
-<details>
-  <summary>View screenshot</summary>
+<details> <summary>View screenshot</summary>
 
 ![Asset Manager](docs/img/asset_manager.png)
 
@@ -19,7 +18,7 @@ A client for the Aurora Xbox 360 Dashboard.
 
 ### Game Library
 
-- Card featuring interactive 3D cover art, a description, details, and screenshots for the game
+- Cards featuring interactive 3D cover art, a description, details, and screenshots for the game
 - Launch the game on the console
 - Manage artwork
 - Import game data from console
@@ -47,6 +46,23 @@ A client for the Aurora Xbox 360 Dashboard.
 ![System Information](docs/img/system_information.png)
 
 </details>
+
+### Telnet Client
+
+- Run telnet commands
+- Navigate the file structure and launch executables
+- View and edit memory values
+
+<details>
+  <summary>View screenshot</summary>
+
+![Telnet Client](docs/img/telnet_client.png)
+
+</details>
+
+## Changelog
+
+For a list of changes between releases see [CHANGELOG.md](./CHANGELOG.md).
 
 ## License
 
