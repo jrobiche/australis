@@ -1,6 +1,6 @@
 # Australis Changelog
 
-## 0.2.0 (2026-02-24)
+## 0.2.0 (2026-02-26)
 
 `Added` Telnet Client App
 
