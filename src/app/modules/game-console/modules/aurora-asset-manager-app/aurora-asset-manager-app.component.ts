@@ -15,6 +15,7 @@ import {
   AuroraGameData,
 } from '@app/modules/aurora/types/aurora';
 import { PageTitleToolbarComponent } from '@app/shared/components/page-title-toolbar/page-title-toolbar.component';
+import { ResponsiveWidthContainerComponent } from '@app/shared/components/responsive-width-container/responsive-width-container.component';
 import { BreakpointService } from '@app/shared/services/breakpoint.service';
 import { DialogService } from '@app/shared/services/dialog.service';
 import { GameConsoleConfiguration, GameListEntry } from '@app/shared/types/app';
@@ -31,6 +32,7 @@ import { EditAssetCardComponent } from './components/edit-asset-card/edit-asset-
     MatToolbarModule,
     EditAssetCardComponent,
     PageTitleToolbarComponent,
+    ResponsiveWidthContainerComponent,
   ],
   templateUrl: './aurora-asset-manager-app.component.html',
   styleUrl: './aurora-asset-manager-app.component.sass',

@@ -31,6 +31,24 @@ app-page-title-toolbar {
   ));
 }
 
+app-game-details-section {
+  mat-toolbar {
+    // TODO do not use hard coded values
+    @include mat.toolbar-overrides((
+      mobile-height: 96px,
+      standard-height: 96px,
+    ));
+    border-radius: 24px;
+  }
+}
+
+app-game-details-card {
+  @include mat.expansion-overrides((
+    container-background-color: var(--mat-sys-surface-container-low),
+    container-text-color:  var(--mat-sys-on-surface),
+  ));
+}
+
 .divider-variant {
   @include mat.divider-overrides((
     color: var(--mat-sys-outline-variant),
@@ -64,12 +82,22 @@ app-page-title-toolbar {
   ));
 }
 
-.navigation-list {
+.navigation-list-wrapper {
   @include mat.list-overrides((
     list-item-container-color: var(--mat-sys-surface-container-high),
     list-item-label-text-color: var(--mat-sys-on-surface),
     list-item-one-line-container-height: variables.$console-nav-list-card-height,
   ));
+
+  mat-nav-list {
+     padding-top: 0px;
+     padding-bottom: 0px;
+  }
+
+  mat-nav-list a:not(:first-of-type) {
+     margin-top: 8px;
+  }
+
   // list-item-container-shape override not supported for `mat-nav-list`
   .mat-mdc-nav-list .mat-mdc-list-item {
     border-radius: variables.$console-nav-list-card-border-radius;
@@ -99,50 +127,6 @@ body {
 
 body.color-scheme-light {
   color-scheme: light;
-}
-
-// This responsive-width-container is an older material design concept
-// https://material.io/design/layout/responsive-layout-grid.html#breakpoints
-// TODO use panes that follow the Material 3 specs
-// https://m3.material.io/foundations/layout/applying-layout/window-size-classes
-.responsive-width-container {
-  margin-left: 16px;
-  margin-right: 16px;
-}
-
-@media only screen and (max-width: 599px) {
-  .responsive-width-container {
-    margin-left: 16px;
-    margin-right: 16px;
-  }
-}
-
-@media only screen and (min-width: 600px) and (max-width: 904px) {
-  .responsive-width-container {
-    margin-left: 32px;
-    margin-right: 32px;
-  }
-}
-
-@media only screen and (min-width: 905px) and (max-width: 1239px) {
-  .responsive-width-container {
-    margin: 0 auto;
-    width: 840px;
-  }
-}
-
-@media only screen and (min-width: 1240px) and (max-width: 1439px) {
-  .responsive-width-container {
-    margin-left: 200px;
-    margin-right: 200px;
-  }
-}
-
-@media only screen and (min-width: 1440px) {
-  .responsive-width-container {
-    margin: 0 auto;
-    width: 1040px;
-  }
 }
 
 .leading-button {

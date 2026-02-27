@@ -1,126 +1,110 @@
-
-// TODO clean up styles
-
-.key-value-columns
-  display: flex
-  justify-content: space-between
-
-app-game-card, app-game-details-card
-  display: block
-  margin: 0px auto
-  max-width: 800px
-
-app-game-details-card.handheld
-  margin-left: 32px
-  margin-right: 32px
-
 section
-  height: 100%
-  width: 100%
-
-mat-card:not(:first-of-type)
-  margin-top: 16px
-
-.screenshots-container
-  margin-left: -20px
-  margin-right: -20px
-
-.game-screenshot
-  width: 100%
-
-.mat-mdc-outlined-button
-  background-color: var(--mat-sys-surface)
-
-app-game-boxart-scene
-  background: radial-gradient(rgba(255, 255, 255, 0.2), rgba(0, 0, 0, 0))
-  display: block
-  height: 400px
-  position: relative
-
-.toggle-boxart-rotation
-  bottom: 12px
-  right: 12px
-  position: absolute
-
-.game-description
-  white-space: pre-wrap
-
-.game-details-card
-  display: block
-  margin: 0px auto
-  max-width: 1040px
-
-.button-row
-  display: table-cell
-
-.button-row .mat-mdc-button-base
-  margin: 16px 8px 16px 0
-
-.game-background
   background-position: center
   background-repeat: no-repeat
   background-size: cover
-
-
-.game-icon
-  height: 64px
-  vertical-align: text-top
-  width: 64px
-
-.game-title
-  color: light-dark(rgb(224, 227, 226), var(--mat-sys-on-background))
-  font: var(--mat-sys-display-medium)
-  margin-left: 16px
-  margin-top: 0px
-
-.page-content
   overflow: scroll
   height: 100%
   width: 100%
 
-.boxart-card-wrapper
-  position: relative
-
-.content-wrapper.handset
-  margin-bottom: 16px
-  margin-left: 24px
-  margin-right: 24px
-  margin-top: 16px
-  mat-card-content
-    margin-top: 16px
-  app-game-boxart-scene
-    height: 500px
-    border-radius: 12px 12px 12px 12px
-  app-game-card, .game-details-card
+mat-toolbar
+  .game-icon
+    height: 64px
     margin-left: 16px
     margin-right: 16px
-
-.content-wrapper.tablet
-  margin-left: 64px
-  margin-right: 64px
+    width: 64px
+  background-color: rgba(0, 0, 0, 0.7)
+  border: 1px solid var(--mat-sys-outline-variant)
+  color: light-dark(rgb(224, 227, 226), var(--mat-sys-on-background))
+  font: var(--mat-sys-display-medium)
   margin-bottom: 16px
-  margin-top: 16px
-  mat-card-content
-    margin-top: 16px
-  app-game-boxart-scene
-    height: 600px
-    border-radius: 12px 12px 0 0
-  .boxart-card-wrapper
-    margin: 0px
+  overflow: scroll
+  width: 100%
 
-.content-wrapper.web
-  margin-left: 64px
-  margin-right: 64px
+app-game-boxart-card
+  aspect-ratio: 1/1
+  display: block
+  float: left
   margin-bottom: 16px
-  margin-top: 16px
-  mat-card-content
-    margin-top: 16px
-  app-game-boxart-scene
-    height: 800px
-    border-radius: 8px 8px 0 0
-  .boxart-card-wrapper
-    margin: 0px
+  width: calc(33.333% - 8px)
 
-.title-wrapper
+app-game-details-card
+  display: block
+  float: right
+  margin-bottom: 16px
+  padding-bottom: 16px
+  width: calc(66.666% - 8px)
+
+.content-wrapper
+  container-type: inline-size
+  container-name: wrapper
+  height: calc(100% - 32px)
+  margin: 0px auto
+  margin-top: 16px
+  margin-bottom: 16px
+  width: calc(100% - 32px)
+
+.game-actions
+  button
+    margin-left: 8px
+    margin-right: 8px
+  .mat-mdc-outlined-button
+    background-color: var(--mat-sys-surface)
   display: flex
-  flex-direction: row
+  align-items: center
+  float: right
+  margin-bottom: 16px
+  width: calc(66.666% - 8px)
+
+@container wrapper (0 <= width < 1240px)
+  mat-toolbar
+    margin: 0px auto
+    margin-bottom: 8px
+    max-width: 600px
+    width: 100%
+
+  app-game-boxart-card
+    aspect-ratio: 1/1
+    display: block
+    float: none
+    margin: 0px auto
+    margin-bottom: 8px
+    max-width: 600px
+    width: 100%
+
+  app-game-details-card
+    display: block
+    float: none
+    margin: 0px auto
+    margin-bottom: 16px
+    padding-bottom: 16px
+    max-width: 600px
+    width: 100%
+
+  .game-actions
+    button
+      margin-left: 8px
+      margin-right: 8px
+    display: flex
+    align-items: center
+    float: none
+    margin-bottom: 8px
+    width: 100%
+
+@container wrapper (1240px <= width)
+  mat-toolbar
+    margin-bottom: 16px
+    width: 100%
+
+  app-game-boxart-card
+    aspect-ratio: 1/1
+    display: block
+    float: left
+    margin-bottom: 16px
+    width: calc(33.333% - 8px)
+
+  app-game-details-card
+    display: block
+    float: right
+    margin-bottom: 16px
+    padding-bottom: 16px
+    width: calc(66.666% - 8px)

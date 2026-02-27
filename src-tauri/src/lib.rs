@@ -5,6 +5,7 @@ use australis::commands;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             if cfg!(debug_assertions) {
                 app.handle().plugin(
@@ -68,6 +69,20 @@ pub fn run() {
             commands::game_console_configuration_read,
             commands::game_console_configuration_read_all,
             commands::game_console_configuration_update,
+            // telnet commands
+            commands::telnet_exec,
+            commands::telnet_exec_dirlist,
+            commands::telnet_exec_drivefreespace,
+            commands::telnet_exec_drivelist,
+            commands::telnet_exec_dvdeject,
+            commands::telnet_exec_getmem,
+            commands::telnet_exec_go,
+            commands::telnet_exec_magicboot,
+            commands::telnet_exec_magicboot_cold,
+            commands::telnet_exec_magicboot_path,
+            commands::telnet_exec_setmem,
+            commands::telnet_exec_stop,
+            commands::telnet_exec_shutdown,
             // xboxcatalog commands
             commands::xboxcatalog_live_image_bytes_url,
             commands::xboxcatalog_live_images,

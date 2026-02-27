@@ -1,0 +1,117 @@
+<app-responsive-width-container
+  [class.layout-handset]="breakpoint.isHandset$ | async"
+  [class.layout-tablet]="breakpoint.isTablet$ | async"
+  [class.layout-web]="breakpoint.isWeb$ | async"
+>
+  <app-page-title-toolbar heading="Files">
+    @if (breakpoint.isHandset$ | async) {
+      <button
+        mat-icon-button
+        aria-label="Return to launcher"
+        (click)="onLauncherClick()"
+      >
+        <mat-icon>home</mat-icon>
+      </button>
+      <button
+        mat-icon-button
+        aria-label="Refresh file entries"
+        (click)="onRefreshClick()"
+        [disabled]="isRefreshDisabled"
+      >
+        <mat-icon>refresh</mat-icon>
+      </button>
+    } @else {
+      <button
+        aria-label="Return to launcher"
+        class="trailing-button"
+        mat-stroked-button
+        (click)="onLauncherClick()"
+      >
+        <mat-icon fontSet="material-icons-round">home</mat-icon>
+        <span>Launcher</span>
+      </button>
+      <button
+        aria-label="Refresh file entries"
+        class="trailing-button"
+        mat-stroked-button
+        (click)="onRefreshClick()"
+        [disabled]="isRefreshDisabled"
+      >
+        <mat-icon fontSet="material-icons-round">refresh</mat-icon>
+        <span>Refresh</span>
+      </button>
+    }
+  </app-page-title-toolbar>
+  <mat-card class="cwd-card" appearance="outlined">
+    <mat-card-content>
+      <button matButton (click)="onAncestorEntryClick(-1)">ROOT</button>
+      @for (entry of cwd; track $index) {
+        <span>/</span>
+        <button matButton (click)="onAncestorEntryClick($index)">
+          {{ entry }}
+        </button>
+      }
+    </mat-card-content>
+  </mat-card>
+  @if (errorMsg) {
+    <mat-card class="error-card" appearance="outlined">
+      <mat-card-content>
+        <p>{{ errorMsg }}</p>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    <mat-card appearance="outlined">
+      <mat-card-content>
+        @if (isLoading) {
+          <mat-spinner />
+        } @else {
+          <mat-action-list role="list">
+            @if (cwd.length > 0) {
+              <div role="listitem">
+                <button mat-list-item (click)="onParentDirClick()">
+                  <mat-icon matListItemIcon>keyboard_backspace</mat-icon>
+                  <div matListItemTitle>(Parent Directory)</div>
+                </button>
+              </div>
+            }
+            @for (entry of drivelistAndFreespaceEntries; track $index) {
+              <div role="listitem">
+                <button
+                  mat-list-item
+                  (click)="onDrivelistEntryClick(entry.drivelistEntry)"
+                >
+                  <mat-icon matListItemIcon>storage</mat-icon>
+                  <!-- prettier-ignore -->
+                  <div matListItemTitle>{{ entry.drivelistEntry.drivename }}</div>
+                  @if (entry.drivefreespace) {
+                    <!-- prettier-ignore -->
+                    <div matListItemLine>{{ driveSizeText(entry.drivefreespace) }}</div>
+                  }
+                </button>
+              </div>
+            }
+            @for (entry of dirlistEntries; track $index) {
+              @if (entry.directory) {
+                <button mat-list-item (click)="onDirlistEntryClick(entry)">
+                  <mat-icon matListItemIcon>folder</mat-icon>
+                  <div matListItemTitle>{{ entry.name }}</div>
+                </button>
+              } @else {
+                <button mat-list-item (click)="onDirlistEntryClick(entry)">
+                  <mat-icon
+                    matListItemIcon
+                    [class.executable]="isExecutable(entry)"
+                  >
+                    description
+                  </mat-icon>
+                  <div matListItemTitle>{{ entry.name }}</div>
+                  <div matListItemLine>{{ fileSizeText(entry) }}</div>
+                </button>
+              }
+            }
+          </mat-action-list>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+</app-responsive-width-container>

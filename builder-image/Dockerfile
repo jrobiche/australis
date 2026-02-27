@@ -23,11 +23,12 @@ RUN set -eux; \
     libxdo-dev \
     libssl-dev \
     libayatana-appindicator3-dev \
-    librsvg2-dev
+    librsvg2-dev \
+    xdg-utils
 
 # install nodejs
 RUN set -eux; \
-  curl -fsSL -o nodesource_setup.sh https://deb.nodesource.com/setup_20.x; \
+  curl -fsSL -o nodesource_setup.sh https://deb.nodesource.com/setup_24.x; \
   bash nodesource_setup.sh; \
   rm nodesource_setup.sh; \
   apt-get install -y nodejs
@@ -49,7 +50,7 @@ ENV PATH="/home/builder/.local/bin/:$PATH"
 # install rust
 RUN set -eux; \
   curl --proto '=https' --tlsv1.2 -sSf -o rustup_installer.sh https://sh.rustup.rs; \
-  sh rustup_installer.sh -y --default-toolchain 1.89.0-x86_64-unknown-linux-gnu; \
+  sh rustup_installer.sh -y --default-toolchain 1.93.1-x86_64-unknown-linux-gnu; \
   rm rustup_installer.sh
 
 # install windows target (required for building windows executable)
