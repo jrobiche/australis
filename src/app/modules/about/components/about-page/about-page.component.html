@@ -4,16 +4,26 @@
   [class.font-medium]="appSettings.isFontSizeMedium"
   [class.font-large]="appSettings.isFontSizeLarge"
 >
+  @for (errorMessage of errorMessages; track $index) {
+    <mat-card class="error-card" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Error</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>{{ errorMessage }}</p>
+      </mat-card-content>
+    </mat-card>
+  }
   <div class="app-badge">
     <img
       class="app-icon"
-      src="/assets/icons/Square310x310Logo.png"
       alt="Australis Icon"
+      src="/assets/icons/Square310x310Logo.png"
     />
-    <span class="app-subtitle">Australis</span>
+    <span class="app-subtitle">{{ appName }}</span>
     <span class="app-subtitle">{{ appVersion }}</span>
   </div>
-  <mat-card appearance="outlined">
+  <mat-card class="info-card" appearance="outlined">
     <mat-card-header>
       <mat-card-title>Looking for the source code?</mat-card-title>
     </mat-card-header>
@@ -34,7 +44,7 @@
       </button>
     </mat-card-actions>
   </mat-card>
-  <mat-card appearance="outlined">
+  <mat-card class="info-card" appearance="outlined">
     <mat-card-header>
       <mat-card-title>Found a problem?</mat-card-title>
     </mat-card-header>
@@ -55,7 +65,7 @@
       </button>
     </mat-card-actions>
   </mat-card>
-  <mat-card appearance="outlined">
+  <mat-card class="info-card" appearance="outlined">
     <mat-card-header>
       <mat-card-title>Licensed under GPLv3 or later</mat-card-title>
     </mat-card-header>
