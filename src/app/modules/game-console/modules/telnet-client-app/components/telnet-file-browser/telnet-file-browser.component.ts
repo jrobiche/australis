@@ -13,6 +13,7 @@ import {
   Drivefreespace,
   DrivelistEntry,
 } from '@app/modules/telnet/types/telnet';
+import { NotificationCardComponent } from '@app/shared/components/notification-card/notification-card.component';
 import { PageTitleToolbarComponent } from '@app/shared/components/page-title-toolbar/page-title-toolbar.component';
 import { ResponsiveWidthContainerComponent } from '@app/shared/components/responsive-width-container/responsive-width-container.component';
 import { BreakpointService } from '@app/shared/services/breakpoint.service';
@@ -36,6 +37,7 @@ type DrivelistAndFreespaceEntry = {
     MatIconModule,
     MatListModule,
     MatProgressSpinnerModule,
+    NotificationCardComponent,
     PageTitleToolbarComponent,
     ResponsiveWidthContainerComponent,
   ],
@@ -52,14 +54,14 @@ export class TelnetFileBrowserComponent implements OnInit {
   cwd: string[];
   dirlistEntries: DirlistEntry[];
   drivelistAndFreespaceEntries: DrivelistAndFreespaceEntry[];
-  errorMsg: string;
+  errorMessage: string;
   isLoading: boolean;
 
   constructor() {
     this.cwd = [];
     this.dirlistEntries = [];
     this.drivelistAndFreespaceEntries = [];
-    this.errorMsg = '';
+    this.errorMessage = '';
     this.isLoading = false;
   }
 
@@ -115,6 +117,10 @@ export class TelnetFileBrowserComponent implements OnInit {
   onDrivelistEntryClick(entry: DrivelistEntry) {
     this.cwd = [entry.drivename];
     this.#updateEntryLists(this.cwd);
+  }
+
+  onErrorDismissed(): void {
+    this.errorMessage = '';
   }
 
   onLauncherClick() {
@@ -218,7 +224,7 @@ export class TelnetFileBrowserComponent implements OnInit {
       .catch((error) => {
         console.error('Failed to get dirlist. Got the following error:', error);
         this.dirlistEntries = [];
-        this.errorMsg = `There was an error loading directory content. ${error}`;
+        this.errorMessage = `There was an error loading directory content. ${error}`;
       });
   }
 
@@ -266,14 +272,14 @@ export class TelnetFileBrowserComponent implements OnInit {
           error,
         );
         this.drivelistAndFreespaceEntries = [];
-        this.errorMsg = `There was an error loading drive list. ${error}`;
+        this.errorMessage = `There was an error loading drive list. ${error}`;
       });
   }
 
   #updateEntryLists(path: string[]): void {
     this.drivelistAndFreespaceEntries = [];
     this.dirlistEntries = [];
-    this.errorMsg = '';
+    this.errorMessage = '';
     this.isLoading = true;
     if (path.length == 0) {
       this.#updateDrivelistAndFreespaceEntries().finally(() => {

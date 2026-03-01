@@ -15,6 +15,7 @@ import { ROUTER_OUTLET_DATA } from '@angular/router';
 
 import { TelnetService } from '@app/modules/telnet/services/telnet.service';
 import { TelnetResponse } from '@app/modules/telnet/types/telnet';
+import { NotificationCardComponent } from '@app/shared/components/notification-card/notification-card.component';
 import { PageTitleToolbarComponent } from '@app/shared/components/page-title-toolbar/page-title-toolbar.component';
 import { ResponsiveWidthContainerComponent } from '@app/shared/components/responsive-width-container/responsive-width-container.component';
 import { GameConsoleConfiguration } from '@app/shared/types/app';
@@ -31,6 +32,7 @@ import { GameConsoleConfiguration } from '@app/shared/types/app';
     MatInputModule,
     PageTitleToolbarComponent,
     ResponsiveWidthContainerComponent,
+    NotificationCardComponent,
   ],
   templateUrl: './telnet-execute-command.component.html',
   styleUrl: './telnet-execute-command.component.sass',
@@ -57,6 +59,10 @@ export class TelnetExecuteCommandComponent {
       return String.fromCharCode(...this.telnetResponse.data);
     }
     return '';
+  }
+
+  onErrorDismissed(): void {
+    this.errorText = '';
   }
 
   onSubmitClick(): void {

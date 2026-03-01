@@ -45,6 +45,13 @@
       Add Console
     </button>
   }
+  @for (errorMessage of errorMessages; track $index) {
+    <app-notification-card
+      error-card
+      [message]="errorMessage"
+      (dismissed)="onErrorDismissed($index)"
+    />
+  }
   @if (gameConsoleConfigurations.length == 0) {
     <p>Add a console and it will show up here.</p>
   } @else {

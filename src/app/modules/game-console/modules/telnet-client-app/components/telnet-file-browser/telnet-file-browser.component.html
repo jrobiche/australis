@@ -42,6 +42,13 @@
       </button>
     }
   </app-page-title-toolbar>
+  @if (errorMessage) {
+    <app-notification-card
+      error-card
+      [message]="errorMessage"
+      (dismissed)="onErrorDismissed()"
+    />
+  }
   <mat-card class="cwd-card" appearance="outlined">
     <mat-card-content>
       <button matButton (click)="onAncestorEntryClick(-1)">ROOT</button>
@@ -53,65 +60,59 @@
       }
     </mat-card-content>
   </mat-card>
-  @if (errorMsg) {
-    <mat-card class="error-card" appearance="outlined">
-      <mat-card-content>
-        <p>{{ errorMsg }}</p>
-      </mat-card-content>
-    </mat-card>
-  } @else {
-    <mat-card appearance="outlined">
-      <mat-card-content>
-        @if (isLoading) {
-          <mat-spinner />
-        } @else {
-          <mat-action-list role="list">
-            @if (cwd.length > 0) {
-              <div role="listitem">
-                <button mat-list-item (click)="onParentDirClick()">
-                  <mat-icon matListItemIcon>keyboard_backspace</mat-icon>
-                  <div matListItemTitle>(Parent Directory)</div>
-                </button>
-              </div>
-            }
-            @for (entry of drivelistAndFreespaceEntries; track $index) {
-              <div role="listitem">
-                <button
-                  mat-list-item
-                  (click)="onDrivelistEntryClick(entry.drivelistEntry)"
-                >
-                  <mat-icon matListItemIcon>storage</mat-icon>
+  <mat-card appearance="outlined">
+    <mat-card-content>
+      @if (isLoading) {
+        <mat-spinner />
+      } @else if (dirlistEntries.length < 1) {
+        <span>No entries available.</span>
+      } @else {
+        <mat-action-list role="list">
+          @if (cwd.length > 0) {
+            <div role="listitem">
+              <button mat-list-item (click)="onParentDirClick()">
+                <mat-icon matListItemIcon>keyboard_backspace</mat-icon>
+                <div matListItemTitle>(Parent Directory)</div>
+              </button>
+            </div>
+          }
+          @for (entry of drivelistAndFreespaceEntries; track $index) {
+            <div role="listitem">
+              <button
+                mat-list-item
+                (click)="onDrivelistEntryClick(entry.drivelistEntry)"
+              >
+                <mat-icon matListItemIcon>storage</mat-icon>
+                <!-- prettier-ignore -->
+                <div matListItemTitle>{{ entry.drivelistEntry.drivename }}</div>
+                @if (entry.drivefreespace) {
                   <!-- prettier-ignore -->
-                  <div matListItemTitle>{{ entry.drivelistEntry.drivename }}</div>
-                  @if (entry.drivefreespace) {
-                    <!-- prettier-ignore -->
-                    <div matListItemLine>{{ driveSizeText(entry.drivefreespace) }}</div>
-                  }
-                </button>
-              </div>
+                  <div matListItemLine>{{ driveSizeText(entry.drivefreespace) }}</div>
+                }
+              </button>
+            </div>
+          }
+          @for (entry of dirlistEntries; track $index) {
+            @if (entry.directory) {
+              <button mat-list-item (click)="onDirlistEntryClick(entry)">
+                <mat-icon matListItemIcon>folder</mat-icon>
+                <div matListItemTitle>{{ entry.name }}</div>
+              </button>
+            } @else {
+              <button mat-list-item (click)="onDirlistEntryClick(entry)">
+                <mat-icon
+                  matListItemIcon
+                  [class.executable]="isExecutable(entry)"
+                >
+                  description
+                </mat-icon>
+                <div matListItemTitle>{{ entry.name }}</div>
+                <div matListItemLine>{{ fileSizeText(entry) }}</div>
+              </button>
             }
-            @for (entry of dirlistEntries; track $index) {
-              @if (entry.directory) {
-                <button mat-list-item (click)="onDirlistEntryClick(entry)">
-                  <mat-icon matListItemIcon>folder</mat-icon>
-                  <div matListItemTitle>{{ entry.name }}</div>
-                </button>
-              } @else {
-                <button mat-list-item (click)="onDirlistEntryClick(entry)">
-                  <mat-icon
-                    matListItemIcon
-                    [class.executable]="isExecutable(entry)"
-                  >
-                    description
-                  </mat-icon>
-                  <div matListItemTitle>{{ entry.name }}</div>
-                  <div matListItemLine>{{ fileSizeText(entry) }}</div>
-                </button>
-              }
-            }
-          </mat-action-list>
-        }
-      </mat-card-content>
-    </mat-card>
-  }
+          }
+        </mat-action-list>
+      }
+    </mat-card-content>
+  </mat-card>
 </app-responsive-width-container>

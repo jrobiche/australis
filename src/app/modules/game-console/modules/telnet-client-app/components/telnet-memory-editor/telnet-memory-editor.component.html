@@ -42,26 +42,16 @@
       </button>
     }
   </app-page-title-toolbar>
-  <mat-card class="warning-card" appearance="outlined">
+  <app-notification-card warning-card [dismissable]="false">
+    <p>
+      Use caution when editing memory. Improper use can lead to data loss or
+      damage to the system.
+    </p>
+    <p>Proceed at your own risk.</p>
+  </app-notification-card>
+  <mat-card class="form-card" appearance="outlined">
     <mat-card-header>
-      <mat-card-title-group>
-        <mat-card-title>
-          <mat-icon fontSet="material-icons-round">warning</mat-icon>
-          Warning
-        </mat-card-title>
-      </mat-card-title-group>
-    </mat-card-header>
-    <mat-card-content>
-      <p>
-        Use caution when editing memory. Improper use can lead to data loss or
-        damage to the system.
-      </p>
-      <p>Proceed at your own risk.</p>
-    </mat-card-content>
-  </mat-card>
-  <mat-card appearance="outlined">
-    <mat-card-header>
-      <form class="input-form" [formGroup]="inputForm">
+      <form [formGroup]="inputForm">
         <div class="field-group">
           <mat-form-field>
             <mat-label>Start Address</mat-label>
@@ -78,6 +68,13 @@
       </form>
     </mat-card-header>
   </mat-card>
+  @if (errorMessage) {
+    <app-notification-card
+      error-card
+      [message]="errorMessage"
+      (dismissed)="onErrorDismissed()"
+    />
+  }
   @if (dataSource.length > 0) {
     <mat-card class="table-card" appearance="outlined">
       <table mat-table [dataSource]="dataSource">

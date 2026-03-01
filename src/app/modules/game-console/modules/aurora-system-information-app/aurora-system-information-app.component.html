@@ -55,6 +55,15 @@
     </mat-selection-list>
   </mat-drawer>
   <mat-drawer-content>
+    <app-responsive-width-container>
+      @for (errorMessage of errorMessages; track $index) {
+        <app-notification-card
+          error-card
+          [message]="errorMessage"
+          (dismissed)="onErrorDismissed($index)"
+        />
+      }
+    </app-responsive-width-container>
     @switch (selectedView) {
       @case ("overview") {
         <app-overview-view
@@ -99,7 +108,7 @@
         />
       }
       @default {
-        <app-responsive-width-container>
+        <app-responsive-width-container class="unknown-view-wrapper">
           <app-page-title-toolbar heading="Unknown" />
           <p>Invalid view selection.</p>
         </app-responsive-width-container>
