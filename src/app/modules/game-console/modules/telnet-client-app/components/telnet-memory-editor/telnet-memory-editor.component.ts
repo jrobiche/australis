@@ -15,6 +15,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
 
+import { NotificationCardComponent } from '@app/shared/components/notification-card/notification-card.component';
 import { PageTitleToolbarComponent } from '@app/shared/components/page-title-toolbar/page-title-toolbar.component';
 import { ResponsiveWidthContainerComponent } from '@app/shared/components/responsive-width-container/responsive-width-container.component';
 import { BreakpointService } from '@app/shared/services/breakpoint.service';
@@ -40,6 +41,7 @@ export interface MemoryEntry {
     MatInputModule,
     MatTableModule,
     ReactiveFormsModule,
+    NotificationCardComponent,
     PageTitleToolbarComponent,
     ResponsiveWidthContainerComponent,
   ],
@@ -57,6 +59,7 @@ export class TelnetMemoryEditorComponent {
   dataSource: MemoryEntry[];
   displayedColumns: string[];
   inputForm: FormGroup;
+  errorMessage: string;
 
   constructor() {
     this.rowLength = 16;
@@ -71,6 +74,7 @@ export class TelnetMemoryEditorComponent {
       address: ['0x82000000', [Validators.required]],
       length: ['0x1000', [Validators.required]],
     });
+    this.errorMessage = '';
   }
 
   rowAddressText(rowIndex: number, startAddress: number): string {
@@ -124,13 +128,17 @@ export class TelnetMemoryEditorComponent {
     entry.isEditing = !entry.isEditing;
   }
 
+  onErrorDismissed(): void {
+    this.errorMessage = '';
+  }
+
   onResumeClick(): void {
     this.#telnet.go(this.gameConsoleConfiguration).catch((error) => {
       console.error(
         'Failed to get resume console. Got the following error:',
         error,
       );
-      this.#snackBar.open('Failed to communicate with console.', 'Close');
+      this.#snackBar.open('Failed to resume console.', 'Close');
     });
   }
 
@@ -140,7 +148,7 @@ export class TelnetMemoryEditorComponent {
         'Failed to get suspend console. Got the following error:',
         error,
       );
-      this.#snackBar.open('Failed to communicate with console.', 'Close');
+      this.#snackBar.open('Failed to suspend console.', 'Close');
     });
   }
 
@@ -167,10 +175,11 @@ export class TelnetMemoryEditorComponent {
         })
         .catch((error) => {
           console.error(
-            'Failed to call getmem. Got the following error:',
+            'Failed to run telnet getmem command. Got the following error:',
             error,
           );
-          this.#snackBar.open('Failed to communicate with console.', 'Close');
+          // this.#snackBar.open('Failed to communicate with console.', 'Close');
+          this.errorMessage = `Failed to run telnet getmem command. Got the following error: ${error}`;
         });
     }
   }

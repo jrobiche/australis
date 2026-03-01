@@ -11,12 +11,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { ROUTER_OUTLET_DATA } from '@angular/router';
 
 import { AuroraStateService } from '@app/modules/aurora/services/aurora-state.service';
 import { BreakpointService } from '@app/shared/services/breakpoint.service';
+import { NotificationCardComponent } from '@app/shared/components/notification-card/notification-card.component';
 import { GameConsoleConfiguration, IntervalState } from '@app/shared/types/app';
 import { PageTitleToolbarComponent } from '@app/shared/components/page-title-toolbar/page-title-toolbar.component';
 import { ResponsiveWidthContainerComponent } from '@app/shared/components/responsive-width-container/responsive-width-container.component';
@@ -37,14 +37,15 @@ import { ThreadsViewComponent } from './components/threads-view/threads-view.com
     MatListModule,
     MatSidenavModule,
     MatToolbarModule,
-    PageTitleToolbarComponent,
-    ResponsiveWidthContainerComponent,
     DashlaunchViewComponent,
     GameAchievementsViewComponent,
     GameScreenshotsViewComponent,
+    NotificationCardComponent,
     NovaPluginViewComponent,
     OverviewViewComponent,
+    PageTitleToolbarComponent,
     ProfilesViewComponent,
+    ResponsiveWidthContainerComponent,
     ThreadsViewComponent,
   ],
   templateUrl: './aurora-system-information-app.component.html',
@@ -52,7 +53,6 @@ import { ThreadsViewComponent } from './components/threads-view/threads-view.com
 })
 export class AuroraSystemInformationAppComponent implements OnDestroy, OnInit {
   readonly #auroraState = inject(AuroraStateService);
-  readonly #snackBar = inject(MatSnackBar);
   readonly breakpoint = inject(BreakpointService);
   readonly gameConsoleConfiguration = inject(
     ROUTER_OUTLET_DATA,
@@ -69,6 +69,7 @@ export class AuroraSystemInformationAppComponent implements OnDestroy, OnInit {
     | null;
   @ViewChild('drawer')
   drawer: MatDrawer | null;
+  errorMessages: string[];
   intervalState: IntervalState;
   selectedView: string;
   viewListItems: { title: string; value: string }[];
@@ -76,6 +77,7 @@ export class AuroraSystemInformationAppComponent implements OnDestroy, OnInit {
   constructor() {
     this.detailsView = null;
     this.drawer = null;
+    this.errorMessages = [];
     this.intervalState = {
       id: null,
       delay: 1000,
@@ -139,6 +141,10 @@ export class AuroraSystemInformationAppComponent implements OnDestroy, OnInit {
     }
   }
 
+  onErrorDismissed(index: number): void {
+    this.errorMessages.splice(index, 1);
+  }
+
   onReconnectClick(): void {
     this.#startInterval();
   }
@@ -158,7 +164,7 @@ export class AuroraSystemInformationAppComponent implements OnDestroy, OnInit {
       scope.intervalState.consecutiveErrorsMax
     ) {
       scope.#stopInterval();
-      scope.#snackBar.open('Failed to communicate with console.', 'Close');
+      this.errorMessages.push('Failed to communicate with console.');
       return Promise.resolve();
     }
     // call `update()` on current "view" component
@@ -204,9 +210,7 @@ export class AuroraSystemInformationAppComponent implements OnDestroy, OnInit {
           'Failed to authenticate with console. Got the following error:',
           error,
         );
-        this.#snackBar.open('Failed to connect to console.', 'Close', {
-          duration: 3000,
-        });
+        this.errorMessages.push('Failed to connect to console.');
       });
   }
 

@@ -4,7 +4,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatDrawer, MatSidenavModule } from '@angular/material/sidenav';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { ActivatedRoute } from '@angular/router';
 import { ROUTER_OUTLET_DATA } from '@angular/router';
@@ -14,6 +13,7 @@ import {
   AuroraAssetType,
   AuroraGameData,
 } from '@app/modules/aurora/types/aurora';
+import { NotificationCardComponent } from '@app/shared/components/notification-card/notification-card.component';
 import { PageTitleToolbarComponent } from '@app/shared/components/page-title-toolbar/page-title-toolbar.component';
 import { ResponsiveWidthContainerComponent } from '@app/shared/components/responsive-width-container/responsive-width-container.component';
 import { BreakpointService } from '@app/shared/services/breakpoint.service';
@@ -31,6 +31,7 @@ import { EditAssetCardComponent } from './components/edit-asset-card/edit-asset-
     MatSidenavModule,
     MatToolbarModule,
     EditAssetCardComponent,
+    NotificationCardComponent,
     PageTitleToolbarComponent,
     ResponsiveWidthContainerComponent,
   ],
@@ -41,7 +42,6 @@ export class AuroraAssetManagerAppComponent implements OnInit {
   readonly #activatedRoute = inject(ActivatedRoute);
   readonly #auroraState = inject(AuroraStateService);
   readonly #dialogService = inject(DialogService);
-  readonly #snackBar = inject(MatSnackBar);
   readonly breakpoint = inject(BreakpointService);
   readonly gameConsoleConfiguration = inject(
     ROUTER_OUTLET_DATA,
@@ -49,6 +49,7 @@ export class AuroraAssetManagerAppComponent implements OnInit {
   @ViewChild('drawer')
   drawer: MatDrawer | null;
   assetTypes: AuroraAssetType[];
+  errorMessages: string[];
   gameData: AuroraGameData | null;
   gameList: GameListEntry[];
 
@@ -81,6 +82,7 @@ export class AuroraAssetManagerAppComponent implements OnInit {
       AuroraAssetType.Screenshot19,
       AuroraAssetType.Screenshot20,
     ];
+    this.errorMessages = [];
     this.gameList = [];
     this.gameData = null;
   }
@@ -115,6 +117,10 @@ export class AuroraAssetManagerAppComponent implements OnInit {
     return o1.id == o2.id;
   }
 
+  onErrorDismissed(index: number): void {
+    this.errorMessages.splice(index, 1);
+  }
+
   onDownloadGameDataClick() {
     let gameConsoleConfiguration = this.gameConsoleConfiguration();
     this.#dialogService
@@ -140,15 +146,11 @@ export class AuroraAssetManagerAppComponent implements OnInit {
 
   onUploadAssetsClick(): void {
     if (this.gameData == null) {
-      this.#snackBar.open('Invalid game data.', '', {
-        duration: 3000,
-      });
+      this.errorMessages.push('Invalid game data.');
       return;
     }
     if (this.gameConsoleConfiguration == null) {
-      this.#snackBar.open('Invalid game console configuration.', '', {
-        duration: 3000,
-      });
+      this.errorMessages.push('Invalid game console configuration.');
       return;
     }
     this.#dialogService.openUploadAssetsDialog({
@@ -171,7 +173,7 @@ export class AuroraAssetManagerAppComponent implements OnInit {
           'Failed to load game data. Got the following error:',
           error,
         );
-        this.#snackBar.open('Failed to load game data.', 'Close');
+        this.errorMessages.push('Failed to load game data.');
         return Promise.reject(error);
       });
   }
@@ -184,9 +186,7 @@ export class AuroraAssetManagerAppComponent implements OnInit {
           'Failed to load game list. Got the following error:',
           error,
         );
-        this.#snackBar.open('Failed to load game list', '', {
-          duration: 3000,
-        });
+        this.errorMessages.push('Failed to load game list');
         return Promise.resolve([]);
       });
   }

@@ -1,22 +1,27 @@
+app-notification-card
+  display: block
+  margin-bottom: 16px
+
 app-responsive-width-container
   display: block
   margin-bottom: 32px
 
-.input-form
-  .field-group
-    width: 100%
-    mat-form-field
-      width: calc(50% - 8px)
-    mat-form-field:not(:last-child)
-      margin-right: 16px
+.edit-buttons
+  button:not(:last-of-kind)
+    margin-right: 4px
   margin-bottom: 8px
-  width: 100%
+  text-align: right
 
-.warning-card
-  p
-    margin-top: 8px
-  background-color: var(--mat-sys-tertiary-container)
-  color: var(--mat-sys-on-tertiary-container)
+.form-card
+  form
+    .field-group
+      mat-form-field
+        width: calc(50% - 8px)
+      mat-form-field:not(:last-child)
+        margin-right: 16px
+      width: 100%
+    margin-bottom: 8px
+    width: 100%
   margin-bottom: 16px
 
 .table-card
@@ -40,9 +45,3 @@ app-responsive-width-container
   margin: 0px auto
   margin-top: 16px
   overflow-x: scroll
-
-.edit-buttons
-  button:not(:last-of-kind)
-    margin-right: 4px
-  margin-bottom: 8px
-  text-align: right

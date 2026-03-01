@@ -1,0 +1,28 @@
+<mat-card appearance="outlined" [class]="cardClass">
+  <mat-card-header class="header-row">
+    <mat-card-title>
+      <mat-icon [fontSet]="iconFontSet">{{ iconName }}</mat-icon>
+      {{ titleText }}
+    </mat-card-title>
+    @if (dismissable) {
+      <button
+        aria-label="Dismiss"
+        class="trailing-button"
+        type="button"
+        mat-icon-button
+        matTooltip="Dismiss"
+        (click)="dismissed.emit()"
+      >
+        <mat-icon aria-label="Dismiss" fontSet="material-icons-round">
+          close
+        </mat-icon>
+      </button>
+    }
+  </mat-card-header>
+  <mat-card-content>
+    @if (message) {
+      <p>{{ message }}</p>
+    }
+    <ng-content></ng-content>
+  </mat-card-content>
+</mat-card>

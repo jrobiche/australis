@@ -2,9 +2,9 @@ import { AsyncPipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { RouterModule } from '@angular/router';
 
+import { NotificationCardComponent } from '@app/shared/components/notification-card/notification-card.component';
 import { PageTitleToolbarComponent } from '@app/shared/components/page-title-toolbar/page-title-toolbar.component';
 import { PageToolbarComponent } from '@app/shared/components/page-toolbar/page-toolbar.component';
 import { ResponsiveWidthContainerComponent } from '@app/shared/components/responsive-width-container/responsive-width-container.component';
@@ -22,6 +22,7 @@ import { ConsoleNavigationListComponent } from '../console-navigation-list/conso
     MatIconModule,
     RouterModule,
     ConsoleNavigationListComponent,
+    NotificationCardComponent,
     PageTitleToolbarComponent,
     PageToolbarComponent,
     ResponsiveWidthContainerComponent,
@@ -34,12 +35,12 @@ export class HomePageComponent {
   readonly #gameConsoleConfigurationStore = inject(
     GameConsoleConfigurationStoreService,
   );
-  readonly #snackBar = inject(MatSnackBar);
   readonly breakpoint = inject(BreakpointService);
-
+  errorMessages: string[];
   gameConsoleConfigurations: GameConsoleConfiguration[];
 
   constructor() {
+    this.errorMessages = [];
     this.gameConsoleConfigurations = [];
   }
 
@@ -57,6 +58,10 @@ export class HomePageComponent {
       });
   }
 
+  onErrorDismissed(index: number): void {
+    this.errorMessages.splice(index, 1);
+  }
+
   #loadGameConsoleConfigurations(): void {
     this.#gameConsoleConfigurationStore
       .readAllSorted()
@@ -69,9 +74,7 @@ export class HomePageComponent {
           'Failed to load game console configurations. Got the following error:',
           error,
         );
-        this.#snackBar.open('Failed to load game console configurations.', '', {
-          duration: 3000,
-        });
+        this.errorMessages.push('Failed to load game console configurations.');
       });
   }
 }

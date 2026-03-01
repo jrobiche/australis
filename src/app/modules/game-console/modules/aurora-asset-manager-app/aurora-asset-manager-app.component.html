@@ -100,6 +100,13 @@
       [class.layout-web]="breakpoint.isWeb$ | async"
     >
       <app-page-title-toolbar [heading]="titleText" />
+      @for (errorMessage of errorMessages; track $index) {
+        <app-notification-card
+          error-card
+          [message]="errorMessage"
+          (dismissed)="onErrorDismissed($index)"
+        />
+      }
       @if (gameData) {
         @for (assetType of assetTypes; track $index) {
           <app-edit-asset-card
