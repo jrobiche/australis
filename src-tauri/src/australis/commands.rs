@@ -6,7 +6,7 @@ use uuid::Uuid;
 use crate::australis::structs::{
     AuroraGame, GameConsoleConfiguration, GameListEntry, PathResolver,
 };
-use crate::australis::utils::{determine_title_launch_data, write_str_to_path};
+use crate::australis::utils::{determine_title_launch_data, write_bin_to_path, write_str_to_path};
 use libaustralis;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1680,6 +1680,7 @@ pub async fn telnet_exec_shutdown(
 ////////////////////////////////////////////////////////////////////////////////
 #[tauri::command]
 pub async fn xboxcatalog_live_image_bytes_url(
+    app_handle: tauri::AppHandle,
     live_image: libaustralis::xboxcatalog::LiveImage,
 ) -> Result<Option<String>, String> {
     let media_type = match live_image.format {
@@ -1687,14 +1688,33 @@ pub async fn xboxcatalog_live_image_bytes_url(
         5 => "image/png",
         _ => "image/png", // TODO error?
     };
-    let image_bytes: Vec<u8> = live_image.file_bytes().await.map_err(|err| {
-        let msg = format!(
-            "Failed to retrieve image bytes from Xbox Catalog. Got the following error: {}",
-            err
-        );
-        error!("{}", msg);
-        msg
-    })?;
+    let image_bytes: Vec<u8>;
+    let path_resolver = PathResolver::new(&app_handle);
+    let cache_id = &live_image.file_url;
+    let cache_path = path_resolver.cache_path(cache_id)?;
+    let cache_path = cache_path.as_path();
+    if !cache_path.is_file() {
+        // image has not been cached
+        image_bytes = live_image.file_bytes().await.map_err(|err| {
+            let msg = format!(
+                "Failed to retrieve image bytes from Xbox Catalog. Got the following error: {}",
+                err
+            );
+            error!("{}", msg);
+            msg
+        })?;
+        write_bin_to_path(cache_path, &image_bytes)?;
+    } else {
+        // use cached image
+        image_bytes = std::fs::read(cache_path).map_err(|err| {
+            let msg = format!(
+                "Failed to read cache file. Got the following error: {}",
+                err
+            );
+            error!("{}", msg);
+            msg
+        })?;
+    }
     if image_bytes.len() == 0 {
         return Ok(None);
     }
@@ -1733,6 +1753,7 @@ pub async fn xboxcatalog_live_images(
 ////////////////////////////////////////////////////////////////////////////////
 #[tauri::command]
 pub async fn xboxunity_cover_image_bytes_url(
+    app_handle: tauri::AppHandle,
     cover_id: &str,
     cover_size: &str,
 ) -> Result<String, String> {
@@ -1753,7 +1774,14 @@ pub async fn xboxunity_cover_image_bytes_url(
             error!("{}", msg);
             msg
         })?;
-    let image_bytes = libaustralis::xboxunity::cover_image_bytes(cover_id_usize, cover_size_enum).await.map_err(|err| {
+    let image_bytes: Vec<u8>;
+    let path_resolver = PathResolver::new(&app_handle);
+    let cache_id = format!("xboxunity_cover_{}_{}", cover_id, cover_size);
+    let cache_path = path_resolver.cache_path(&cache_id)?;
+    let cache_path = cache_path.as_path();
+    if !cache_path.is_file() {
+        // image has not been cached
+        image_bytes = libaustralis::xboxunity::cover_image_bytes(cover_id_usize, cover_size_enum).await.map_err(|err| {
             let msg = format!(
                 "Failed to retrieve cover image bytes for cover with id '{}' and size '{}' from XboxUnity. Got the following error: {}",
                 cover_id, cover_size,
@@ -1761,7 +1789,19 @@ pub async fn xboxunity_cover_image_bytes_url(
             );
             error!("{}", msg);
             msg
-    })?;
+        })?;
+        write_bin_to_path(cache_path, &image_bytes)?;
+    } else {
+        // use cached image
+        image_bytes = std::fs::read(cache_path).map_err(|err| {
+            let msg = format!(
+                "Failed to read cache file. Got the following error: {}",
+                err
+            );
+            error!("{}", msg);
+            msg
+        })?;
+    }
     Ok(format!(
         "data:image/png;base64,{}",
         general_purpose::STANDARD.encode(&image_bytes)
@@ -1795,18 +1835,41 @@ pub async fn xboxunity_cover_info(
 
 #[tauri::command]
 pub async fn xboxunity_title_icon_image_bytes_url(
+    app_handle: tauri::AppHandle,
     title_list_item: libaustralis::xboxunity::TitleListItem,
 ) -> Result<String, String> {
-    let image_bytes: Vec<u8> = libaustralis::xboxunity::icon_image_bytes(title_list_item.title_id)
-        .await
-        .map_err(|err| {
+    let image_bytes: Vec<u8>;
+    let path_resolver = PathResolver::new(&app_handle);
+    let cache_id = format!(
+        "xboxunity_icon_{}_{}",
+        title_list_item.title_id, title_list_item.hb_title_id
+    );
+    let cache_path = path_resolver.cache_path(&cache_id)?;
+    let cache_path = cache_path.as_path();
+    if !cache_path.is_file() {
+        // image has not been cached
+        image_bytes = libaustralis::xboxunity::icon_image_bytes(title_list_item.title_id)
+            .await
+            .map_err(|err| {
+                let msg = format!(
+                    "Failed to retrieve icon image bytes from XboxUnity. Got the following error: {}",
+                    err
+                );
+                error!("{}", msg);
+                msg
+            })?;
+        write_bin_to_path(cache_path, &image_bytes)?;
+    } else {
+        // use cached image
+        image_bytes = std::fs::read(cache_path).map_err(|err| {
             let msg = format!(
-                "Failed to retrieve icon image bytes from XboxUnity. Got the following error: {}",
+                "Failed to read cache file. Got the following error: {}",
                 err
             );
             error!("{}", msg);
             msg
         })?;
+    }
     Ok(format!(
         "data:image/png;base64,{}",
         general_purpose::STANDARD.encode(&image_bytes)
