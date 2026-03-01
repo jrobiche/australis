@@ -2,6 +2,7 @@ use std::path::PathBuf;
 use tauri::AppHandle;
 use uuid::Uuid;
 
+use base64::{engine::general_purpose::STANDARD_NO_PAD, Engine as _};
 use log::error;
 use tauri::Manager;
 
@@ -16,6 +17,21 @@ impl PathResolver {
         Self {
             app_handle: app_handle.clone(),
         }
+    }
+
+    pub fn cache_path(&self, id: &str) -> Result<PathBuf, String> {
+        let id_b64 = STANDARD_NO_PAD.encode(id);
+        self.app_handle
+            .path()
+            .resolve(id_b64, tauri::path::BaseDirectory::AppCache)
+            .map_err(|err| {
+                let msg = format!(
+                    "Failed to resolve application's cache directory. Got the following error: {}",
+                    err
+                );
+                error!("{}", msg);
+                msg
+            })
     }
 
     pub fn game_console_configurations_root(&self) -> Result<PathBuf, String> {

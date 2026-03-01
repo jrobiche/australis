@@ -12,6 +12,44 @@ pub fn uuid_to_string(id: &Uuid) -> String {
     id.as_hyphenated().to_string()
 }
 
+pub fn write_bin_to_path(file_path: &Path, data: &Vec<u8>) -> Result<(), String> {
+    match file_path.parent() {
+        Some(file_path_parent) => std::fs::create_dir_all(file_path_parent).map_err(|err| {
+            let msg = format!(
+                "Failed to create parent directories of file '{}'. Got the following error: {}",
+                file_path.display(),
+                err
+            );
+            error!("{}", &msg);
+            msg
+        })?,
+        None => (),
+    }
+    let mut file = std::fs::OpenOptions::new()
+        .create(true)
+        .write(true)
+        .truncate(true)
+        .open(&file_path)
+        .map_err(|err| {
+            let msg = format!(
+                "Failed to open file at '{}' for writing. Got the following error: {}",
+                file_path.display(),
+                err
+            );
+            error!("{}", &msg);
+            msg
+        })?;
+    file.write_all(&data).map_err(|err| {
+        let msg = format!(
+            "Failed to write to file at '{}'. Got the following error: {}",
+            file_path.display(),
+            err
+        );
+        error!("{}", &msg);
+        msg
+    })
+}
+
 pub fn write_str_to_path(file_path: &Path, data: &str) -> Result<(), String> {
     match file_path.parent() {
         Some(file_path_parent) => std::fs::create_dir_all(file_path_parent).map_err(|err| {
