@@ -1,9 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { getVersion } from '@tauri-apps/api/app';
+import { getName, getVersion } from '@tauri-apps/api/app';
 import { openUrl } from '@tauri-apps/plugin-opener';
 
 import { AppSettingsService } from '@app/shared/services/app-settings.service';
@@ -23,24 +22,47 @@ import { ResponsiveWidthContainerComponent } from '@app/shared/components/respon
   styleUrl: './about-page.component.sass',
 })
 export class AboutPageComponent {
-  readonly #snackBar = inject(MatSnackBar);
   readonly appSettings = inject(AppSettingsService);
+  #appName: string | null;
   #appVersion: string | null;
+  errorMessages: string[];
 
   constructor() {
+    this.#appName = null;
     this.#appVersion = null;
+    this.errorMessages = [];
   }
 
   ngOnInit(): void {
+    getName()
+      .then((name) => {
+        this.#appName = name;
+      })
+      .catch((error) => {
+        console.error(
+          'Failed to get application name. Got the following error:',
+          error,
+        );
+        this.errorMessages.push('Failed to determine application name.');
+      });
     getVersion()
       .then((version) => {
         this.#appVersion = version;
       })
       .catch((error) => {
-        this.#snackBar.open('Failed to determine version.', '', {
-          duration: 3000,
-        });
+        console.error(
+          'Failed to get application version. Got the following error:',
+          error,
+        );
+        this.errorMessages.push('Failed to determine application version.');
       });
+  }
+
+  get appName(): string {
+    if (this.#appName == null) {
+      return 'Unknown';
+    }
+    return this.#appName;
   }
 
   get appVersion(): string {
