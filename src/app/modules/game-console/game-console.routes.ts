@@ -6,7 +6,7 @@ import { AuroraAssetManagerAppComponent } from './modules/aurora-asset-manager-a
 import { AuroraGameLibraryAppComponent } from './modules/aurora-game-library-app/aurora-game-library-app.component';
 import { AuroraSystemInformationAppComponent } from './modules/aurora-system-information-app/aurora-system-information-app.component';
 import { TelnetClientAppComponent } from './modules/telnet-client-app/telnet-client-app.component';
-import { GameConsoleAppNavigationListComponent } from './components/game-console-app-navigation-list/game-console-app-navigation-list.component';
+import { GameConsoleAppNavigationComponent } from './components/game-console-app-navigation/game-console-app-navigation.component';
 import { GameConsolePageComponent } from './components/game-console-page/game-console-page.component';
 
 export const GAME_CONSOLE_ROUTES: Routes = [
@@ -15,7 +15,7 @@ export const GAME_CONSOLE_ROUTES: Routes = [
     resolve: { gameConsoleConfiguration: gameConsoleConfigurationResolver },
     component: GameConsolePageComponent,
     children: [
-      { path: '', component: GameConsoleAppNavigationListComponent },
+      { path: '', component: GameConsoleAppNavigationComponent },
       { path: 'assets', component: AuroraAssetManagerAppComponent },
       { path: 'games', component: AuroraGameLibraryAppComponent },
       {

@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
 
+import { NavigationListComponent } from '@app/shared/components/navigation-list/navigation-list.component';
 import { NotificationCardComponent } from '@app/shared/components/notification-card/notification-card.component';
 import { PageTitleToolbarComponent } from '@app/shared/components/page-title-toolbar/page-title-toolbar.component';
 import { PageToolbarComponent } from '@app/shared/components/page-toolbar/page-toolbar.component';
@@ -11,8 +12,10 @@ import { ResponsiveWidthContainerComponent } from '@app/shared/components/respon
 import { BreakpointService } from '@app/shared/services/breakpoint.service';
 import { DialogService } from '@app/shared/services/dialog.service';
 import { GameConsoleConfigurationStoreService } from '@app/shared/services/game-console-configuration-store.service';
-import { GameConsoleConfiguration } from '@app/shared/types/app';
-import { ConsoleNavigationListComponent } from '../console-navigation-list/console-navigation-list.component';
+import {
+  GameConsoleConfiguration,
+  NavigationLink,
+} from '@app/shared/types/app';
 
 @Component({
   selector: 'app-home-page',
@@ -21,7 +24,7 @@ import { ConsoleNavigationListComponent } from '../console-navigation-list/conso
     MatButtonModule,
     MatIconModule,
     RouterModule,
-    ConsoleNavigationListComponent,
+    NavigationListComponent,
     NotificationCardComponent,
     PageTitleToolbarComponent,
     PageToolbarComponent,
@@ -37,15 +40,15 @@ export class HomePageComponent {
   );
   readonly breakpoint = inject(BreakpointService);
   errorMessages: string[];
-  gameConsoleConfigurations: GameConsoleConfiguration[];
+  links: NavigationLink[];
 
   constructor() {
     this.errorMessages = [];
-    this.gameConsoleConfigurations = [];
+    this.links = [];
   }
 
   ngOnInit() {
-    this.#loadGameConsoleConfigurations();
+    this.#loadLinks();
   }
 
   onAddConsoleClick(): void {
@@ -53,7 +56,7 @@ export class HomePageComponent {
       .openCreateConsoleDialog()
       .subscribe((newConfiguration) => {
         if (newConfiguration) {
-          this.#loadGameConsoleConfigurations();
+          this.#loadLinks();
         }
       });
   }
@@ -62,14 +65,19 @@ export class HomePageComponent {
     this.errorMessages.splice(index, 1);
   }
 
-  #loadGameConsoleConfigurations(): void {
+  #loadLinks(): void {
     this.#gameConsoleConfigurationStore
       .readAllSorted()
       .then((configs) => {
-        this.gameConsoleConfigurations = configs;
+        this.links = configs.map((config) => {
+          return {
+            routerLink: ['/', 'consoles', config.id],
+            title: config.name,
+          };
+        });
       })
       .catch((error) => {
-        this.gameConsoleConfigurations = [];
+        this.links = [];
         console.error(
           'Failed to load game console configurations. Got the following error:',
           error,

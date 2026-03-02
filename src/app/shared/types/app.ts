@@ -3,7 +3,14 @@
  * this application. They are not found in
  * Aurora.
  */
+import { UrlTree } from '@angular/router';
+
 import { AuroraGameData } from '@app/modules/aurora/types/aurora';
+
+export type NavigationLink = {
+  title: string;
+  routerLink: string | readonly any[] | UrlTree | null | undefined;
+};
 
 export type GameConsoleConfiguration = {
   id: string;

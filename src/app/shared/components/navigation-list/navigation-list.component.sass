@@ -1,0 +1,11 @@
+@use 'variables'
+
+mat-nav-list
+  a:not(:first-of-type)
+    margin-top: 8px
+  padding-top: 0px
+  padding-bottom: 0px
+
+// list-item-container-shape override not supported for `mat-nav-list`
+.mat-mdc-nav-list .mat-mdc-list-item
+  border-radius: variables.$nav-list-card-border-radius

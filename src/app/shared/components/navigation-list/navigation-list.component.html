@@ -1,0 +1,12 @@
+<mat-nav-list [aria-label]="ariaLabel">
+  @for (link of links; track link.routerLink) {
+    <a mat-list-item [routerLink]="link.routerLink">
+      <span matListItemTitle>{{ link.title }}</span>
+      @if (chevron) {
+        <div matListItemMeta>
+          <mat-icon>chevron_right</mat-icon>
+        </div>
+      }
+    </a>
+  }
+</mat-nav-list>

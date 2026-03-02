@@ -52,12 +52,13 @@
       (dismissed)="onErrorDismissed($index)"
     />
   }
-  @if (gameConsoleConfigurations.length == 0) {
+  @if (links.length == 0) {
     <p>Add a console and it will show up here.</p>
   } @else {
-    <app-console-navigation-list
-      class="app-navigation-list-wrapper"
-      [configurations]="gameConsoleConfigurations"
+    <app-navigation-list
+      ariaLabel="Select a game console"
+      [chevron]="false"
+      [links]="links"
     />
   }
 </app-responsive-width-container>
