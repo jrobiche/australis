@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, Input, ModelSignal, inject, model } from '@angular/core';
+import { Component, Input, inject, model } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
@@ -8,7 +8,6 @@ import { Router } from '@angular/router';
 
 import { BreakpointService } from '@app/shared/services/breakpoint.service';
 import { DialogService } from '@app/shared/services/dialog.service';
-import { GameConsoleConfigurationStoreService } from '@app/shared/services/game-console-configuration-store.service';
 import { GameConsoleConfiguration } from '@app/shared/types/app';
 import { PageToolbarComponent } from '@app/shared/components/page-toolbar/page-toolbar.component';
 
@@ -26,9 +25,6 @@ import { PageToolbarComponent } from '@app/shared/components/page-toolbar/page-t
 })
 export class GameConsolePageToolbarComponent {
   readonly #dialogService = inject(DialogService);
-  readonly #gameConsoleConfigurationStore = inject(
-    GameConsoleConfigurationStoreService,
-  );
   readonly #router = inject(Router);
   readonly #snackBar = inject(MatSnackBar);
   readonly breakpoint = inject(BreakpointService);

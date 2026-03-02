@@ -1,83 +1,5 @@
-@if (breakpoint.isHandset$ | async) {
-  <app-page-toolbar [heading]="heading">
-    <button
-      aria-label="More actions menu"
-      class="app-trailing-button"
-      mat-icon-button
-      [matMenuTriggerFor]="menu"
-    >
-      <mat-icon>more_vert</mat-icon>
-    </button>
-    <mat-menu #menu="matMenu" xPosition="before">
-      <button
-        mat-menu-item
-        (click)="onEditConsoleClick()"
-        [disabled]="isEditConsoleDisabled"
-      >
-        <mat-icon
-          aria-label="Edit console configuration"
-          fontSet="material-icons-outlined"
-        >
-          edit
-        </mat-icon>
-        <span>Edit console</span>
-      </button>
-      <button
-        mat-menu-item
-        (click)="onDeleteConsoleClick()"
-        [disabled]="isDeleteConsoleDisabled"
-      >
-        <mat-icon
-          aria-label="Delete console configuration"
-          fontSet="material-icons-outlined"
-        >
-          delete_forever
-        </mat-icon>
-        <span>Delete console</span>
-      </button>
-    </mat-menu>
-  </app-page-toolbar>
-} @else if (breakpoint.isTablet$ | async) {
-  <app-page-toolbar [heading]="heading">
-    <button
-      aria-label="More actions menu"
-      class="app-trailing-button"
-      mat-icon-button
-      [matMenuTriggerFor]="menu"
-    >
-      <mat-icon>more_vert</mat-icon>
-    </button>
-    <mat-menu #menu="matMenu" xPosition="before">
-      <button
-        mat-menu-item
-        (click)="onEditConsoleClick()"
-        [disabled]="isEditConsoleDisabled"
-      >
-        <mat-icon
-          aria-label="Edit console configuration"
-          fontSet="material-icons-outlined"
-        >
-          edit
-        </mat-icon>
-        <span>Edit console</span>
-      </button>
-      <button
-        mat-menu-item
-        (click)="onDeleteConsoleClick()"
-        [disabled]="isDeleteConsoleDisabled"
-      >
-        <mat-icon
-          aria-label="Delete console configuration"
-          fontSet="material-icons-outlined"
-        >
-          delete_forever
-        </mat-icon>
-        <span>Delete console</span>
-      </button>
-    </mat-menu>
-  </app-page-toolbar>
-} @else {
-  <app-page-toolbar [heading]="heading">
+<app-page-toolbar [heading]="heading">
+  @if (breakpoint.isWeb$ | async) {
     <button
       class="app-trailing-button"
       mat-stroked-button
@@ -106,5 +28,42 @@
       </mat-icon>
       <span>Delete</span>
     </button>
-  </app-page-toolbar>
-}
+  } @else {
+    <button
+      aria-label="More actions menu"
+      class="app-trailing-button"
+      mat-icon-button
+      [matMenuTriggerFor]="menu"
+    >
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu" xPosition="before">
+      <button
+        mat-menu-item
+        (click)="onEditConsoleClick()"
+        [disabled]="isEditConsoleDisabled"
+      >
+        <mat-icon
+          aria-label="Edit console configuration"
+          fontSet="material-icons-outlined"
+        >
+          edit
+        </mat-icon>
+        <span>Edit console</span>
+      </button>
+      <button
+        mat-menu-item
+        (click)="onDeleteConsoleClick()"
+        [disabled]="isDeleteConsoleDisabled"
+      >
+        <mat-icon
+          aria-label="Delete console configuration"
+          fontSet="material-icons-outlined"
+        >
+          delete_forever
+        </mat-icon>
+        <span>Delete console</span>
+      </button>
+    </mat-menu>
+  }
+</app-page-toolbar>
