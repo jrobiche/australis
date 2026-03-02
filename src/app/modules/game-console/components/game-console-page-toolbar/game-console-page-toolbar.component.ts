@@ -9,12 +9,11 @@ import { Router } from '@angular/router';
 import { BreakpointService } from '@app/shared/services/breakpoint.service';
 import { DialogService } from '@app/shared/services/dialog.service';
 import { GameConsoleConfigurationStoreService } from '@app/shared/services/game-console-configuration-store.service';
-
 import { GameConsoleConfiguration } from '@app/shared/types/app';
 import { PageToolbarComponent } from '@app/shared/components/page-toolbar/page-toolbar.component';
 
 @Component({
-  selector: 'app-game-console-toolbar',
+  selector: 'app-game-console-page-toolbar',
   imports: [
     AsyncPipe,
     MatButtonModule,
@@ -22,10 +21,10 @@ import { PageToolbarComponent } from '@app/shared/components/page-toolbar/page-t
     MatMenuModule,
     PageToolbarComponent,
   ],
-  templateUrl: './game-console-toolbar.component.html',
-  styleUrl: './game-console-toolbar.component.sass',
+  templateUrl: './game-console-page-toolbar.component.html',
+  styleUrl: './game-console-page-toolbar.component.sass',
 })
-export class GameConsoleToolbarComponent {
+export class GameConsolePageToolbarComponent {
   readonly #dialogService = inject(DialogService);
   readonly #gameConsoleConfigurationStore = inject(
     GameConsoleConfigurationStoreService,
