@@ -16,7 +16,7 @@
       <button
         mat-flat-button
         aria-label="Add console"
-        class="trailing-button"
+        class="app-trailing-button"
         (click)="onAddConsoleClick()"
       >
         <mat-icon fontSet="material-icons-round">add</mat-icon>
@@ -56,7 +56,7 @@
     <p>Add a console and it will show up here.</p>
   } @else {
     <app-console-navigation-list
-      class="navigation-list-wrapper"
+      class="app-navigation-list-wrapper"
       [configurations]="gameConsoleConfigurations"
     />
   }

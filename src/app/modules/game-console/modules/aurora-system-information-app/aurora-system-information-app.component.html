@@ -1,7 +1,7 @@
-<mat-toolbar class="game-console-app-toolbar">
+<mat-toolbar class="app-game-console-app-toolbar">
   <button
     mat-icon-button
-    class="leading-button"
+    class="app-leading-button"
     aria-label="Toggle game list"
     (click)="drawer.toggle()"
   >
@@ -13,7 +13,7 @@
     @if (breakpoint.isHandset$ | async) {
       <button
         aria-label="Reconnect to console"
-        class="trailing-button"
+        class="app-trailing-button"
         mat-icon-button
         (click)="onReconnectClick()"
       >
@@ -22,7 +22,7 @@
     } @else {
       <button
         aria-label="Reconnect to console"
-        class="trailing-button"
+        class="app-trailing-button"
         mat-flat-button
         (click)="onReconnectClick()"
       >
@@ -33,7 +33,7 @@
   }
 </mat-toolbar>
 <mat-drawer-container
-  class="navigation-drawer"
+  class="app-navigation-drawer"
   [hasBackdrop]="!(breakpoint.isWeb$ | async)"
   [class.layout-web]="breakpoint.isWeb$ | async"
 >

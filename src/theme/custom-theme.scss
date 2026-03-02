@@ -49,20 +49,21 @@ app-game-details-card {
   ));
 }
 
-.divider-variant {
+.app-divider-variant {
   @include mat.divider-overrides((
     color: var(--mat-sys-outline-variant),
   ));
 }
 
-.game-console-app-toolbar {
+// TODO define component
+.app-game-console-app-toolbar {
   @include mat.toolbar-overrides((
     mobile-height: variables.$game-console-app-toolbar-height,
     standard-height: variables.$game-console-app-toolbar-height,
   ));
 }
 
-.navigation-drawer {
+.app-navigation-drawer {
   @include mat.list-overrides((
     active-indicator-shape: 20px,
     list-item-container-shape: 80px,
@@ -75,14 +76,14 @@ app-game-details-card {
   }
 }
 
-.navigation-drawer.layout-web {
+.app-navigation-drawer.layout-web {
   @include mat.sidenav-overrides((
     container-divider-color: var(--mat-sys-outline-variant),
     container-shape: 0px,
   ));
 }
 
-.navigation-list-wrapper {
+.app-navigation-list-wrapper {
   @include mat.list-overrides((
     list-item-container-color: var(--mat-sys-surface-container-high),
     list-item-label-text-color: var(--mat-sys-on-surface),
@@ -129,10 +130,10 @@ body.color-scheme-light {
   color-scheme: light;
 }
 
-.leading-button {
+.app-leading-button {
   margin-right: 4px;
 }
 
-.trailing-button {
+.app-trailing-button {
   margin-left: 4px;
 }
