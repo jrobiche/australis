@@ -49,6 +49,14 @@ app-game-details-card {
   ));
 }
 
+app-navigation-list {
+  @include mat.list-overrides((
+    list-item-container-color: var(--mat-sys-surface-container-high),
+    list-item-label-text-color: var(--mat-sys-on-surface),
+    list-item-one-line-container-height: variables.$nav-list-card-height,
+  ));
+}
+
 .app-divider-variant {
   @include mat.divider-overrides((
     color: var(--mat-sys-outline-variant),
@@ -81,28 +89,6 @@ app-game-details-card {
     container-divider-color: var(--mat-sys-outline-variant),
     container-shape: 0px,
   ));
-}
-
-.app-navigation-list-wrapper {
-  @include mat.list-overrides((
-    list-item-container-color: var(--mat-sys-surface-container-high),
-    list-item-label-text-color: var(--mat-sys-on-surface),
-    list-item-one-line-container-height: variables.$console-nav-list-card-height,
-  ));
-
-  mat-nav-list {
-     padding-top: 0px;
-     padding-bottom: 0px;
-  }
-
-  mat-nav-list a:not(:first-of-type) {
-     margin-top: 8px;
-  }
-
-  // list-item-container-shape override not supported for `mat-nav-list`
-  .mat-mdc-nav-list .mat-mdc-list-item {
-    border-radius: variables.$console-nav-list-card-border-radius;
-  }
 }
 
 html {
