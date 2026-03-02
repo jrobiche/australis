@@ -2,11 +2,11 @@ import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 
 import { GameConsoleConfiguration } from '@app/shared/types/app';
-import { GameConsoleToolbarComponent } from '../game-console-toolbar/game-console-toolbar.component';
+import { GameConsolePageToolbarComponent } from '../game-console-page-toolbar/game-console-page-toolbar.component';
 
 @Component({
   selector: 'app-game-console-page',
-  imports: [RouterModule, GameConsoleToolbarComponent],
+  imports: [RouterModule, GameConsolePageToolbarComponent],
   templateUrl: './game-console-page.component.html',
   styleUrl: './game-console-page.component.sass',
 })
