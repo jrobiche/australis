@@ -7,7 +7,7 @@
     @if (breakpoint.isHandset$ | async) {
       <button
         aria-label="Resume threads"
-        class="trailing-button"
+        class="app-trailing-button"
         (click)="onResumeThreads()"
         [disabled]="isResumeThreadsDisabled"
         mat-icon-button
@@ -16,7 +16,7 @@
       </button>
       <button
         aria-label="Suspend threads"
-        class="trailing-button"
+        class="app-trailing-button"
         (click)="onSuspendThreads()"
         [disabled]="isSuspendThreadsDisabled"
         mat-icon-button
@@ -29,7 +29,7 @@
         (click)="onResumeThreads()"
         [disabled]="isResumeThreadsDisabled"
         mat-stroked-button
-        class="trailing-button"
+        class="app-trailing-button"
       >
         <mat-icon fontSet="material-icons-round">play_arrow</mat-icon>
         Resume
@@ -39,7 +39,7 @@
         (click)="onSuspendThreads()"
         [disabled]="isSuspendThreadsDisabled"
         mat-stroked-button
-        class="trailing-button"
+        class="app-trailing-button"
       >
         <mat-icon fontSet="material-icons-round">pause</mat-icon>
         Suspend

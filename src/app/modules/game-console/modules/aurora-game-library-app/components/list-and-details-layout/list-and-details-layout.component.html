@@ -1,7 +1,7 @@
-<mat-toolbar class="game-console-app-toolbar">
+<mat-toolbar class="app-game-console-app-toolbar">
   <button
     mat-icon-button
-    class="leading-button"
+    class="app-leading-button"
     aria-label="Toggle game list"
     (click)="drawer.toggle()"
   >
@@ -19,7 +19,7 @@
     </button>
   } @else if (breakpoint.isTablet$ | async) {
     <button
-      class="trailing-button"
+      class="app-trailing-button"
       mat-flat-button
       (click)="onDownloadGameDataClick()"
     >
@@ -30,7 +30,7 @@
     </button>
   } @else {
     <button
-      class="trailing-button"
+      class="app-trailing-button"
       mat-flat-button
       (click)="onDownloadGameDataClick()"
     >
@@ -42,7 +42,7 @@
   }
 </mat-toolbar>
 <mat-drawer-container
-  class="navigation-drawer"
+  class="app-navigation-drawer"
   [hasBackdrop]="!(breakpoint.isWeb$ | async)"
   [class.layout-web]="breakpoint.isWeb$ | async"
 >

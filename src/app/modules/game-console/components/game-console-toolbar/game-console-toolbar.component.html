@@ -2,7 +2,7 @@
   <app-page-toolbar [heading]="heading">
     <button
       aria-label="More actions menu"
-      class="trailing-button"
+      class="app-trailing-button"
       mat-icon-button
       [matMenuTriggerFor]="menu"
     >
@@ -41,7 +41,7 @@
   <app-page-toolbar [heading]="heading">
     <button
       aria-label="More actions menu"
-      class="trailing-button"
+      class="app-trailing-button"
       mat-icon-button
       [matMenuTriggerFor]="menu"
     >
@@ -79,7 +79,7 @@
 } @else {
   <app-page-toolbar [heading]="heading">
     <button
-      class="trailing-button"
+      class="app-trailing-button"
       mat-stroked-button
       (click)="onEditConsoleClick()"
       [disabled]="isEditConsoleDisabled"
@@ -93,7 +93,7 @@
       <span>Edit</span>
     </button>
     <button
-      class="trailing-button"
+      class="app-trailing-button"
       mat-stroked-button
       (click)="onDeleteConsoleClick()"
       [disabled]="isDeleteConsoleDisabled"
