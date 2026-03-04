@@ -1,6 +1,6 @@
 <app-page-toolbar heading="Home" [backButton]="false">
   @if (breakpoint.isHandset$ | async) {
-    <button mat-icon-button aria-label="About" [routerLink]="['/', 'about']">
+    <button matIconButton aria-label="About" [routerLink]="['/', 'about']">
       <mat-icon fontSet="material-icons-outlined">info</mat-icon>
     </button>
   } @else {
