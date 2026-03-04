@@ -2,10 +2,14 @@ import { Component, inject, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
 import { getName, getVersion } from '@tauri-apps/api/app';
 import { openUrl } from '@tauri-apps/plugin-opener';
 
+import { AppService } from '@app/shared/services/app.service';
 import { AppSettingsService } from '@app/shared/services/app-settings.service';
+import { ConfirmationDialogData } from '@app/shared/types/app';
+import { DialogService } from '@app/shared/services/dialog.service';
 import { NotificationCardComponent } from '@app/shared/components/notification-card/notification-card.component';
 import { PageToolbarComponent } from '@app/shared/components/page-toolbar/page-toolbar.component';
 import { ResponsiveWidthContainerComponent } from '@app/shared/components/responsive-width-container/responsive-width-container.component';
@@ -16,6 +20,7 @@ import { ResponsiveWidthContainerComponent } from '@app/shared/components/respon
     MatButtonModule,
     MatCardModule,
     MatIconModule,
+    MatListModule,
     NotificationCardComponent,
     PageToolbarComponent,
     ResponsiveWidthContainerComponent,
@@ -24,12 +29,18 @@ import { ResponsiveWidthContainerComponent } from '@app/shared/components/respon
   styleUrl: './about-page.component.sass',
 })
 export class AboutPageComponent {
+  readonly #appService = inject(AppService);
   readonly appSettings = inject(AppSettingsService);
+  readonly #dialogService = inject(DialogService);
+  #appCacheSize: number | null;
+  #appDataSize: number | null;
   #appName: string | null;
   #appVersion: string | null;
   errorMessages: string[];
 
   constructor() {
+    this.#appCacheSize = null;
+    this.#appDataSize = null;
     this.#appName = null;
     this.#appVersion = null;
     this.errorMessages = [];
@@ -58,6 +69,22 @@ export class AboutPageComponent {
         );
         this.errorMessages.push('Failed to determine application version.');
       });
+    this.#loadAppCacheSize();
+    this.#loadAppDataSize();
+  }
+
+  get appCacheSizeText(): string {
+    if (this.#appCacheSize == null) {
+      return 'Unknown';
+    }
+    return this.#fileSizeSI(this.#appCacheSize);
+  }
+
+  get appDataSizeText(): string {
+    if (this.#appDataSize == null) {
+      return 'Unknown';
+    }
+    return this.#fileSizeSI(this.#appDataSize);
   }
 
   get appName(): string {
@@ -74,6 +101,32 @@ export class AboutPageComponent {
     return `v${this.#appVersion}`;
   }
 
+  onClearCacheClick(): void {
+    let dialogData: ConfirmationDialogData = {
+      title: 'Clear Cache',
+      bodyParagraphs: ['Delete all files in cache?'],
+      confirmButtonText: 'Yes',
+    };
+    this.#dialogService
+      .openConfirmationDialog(dialogData)
+      .subscribe((result) => {
+        if (result) {
+          this.#appService
+            .clearCache()
+            .then(() => {
+              this.#loadAppCacheSize();
+            })
+            .catch((error) => {
+              console.error(
+                'Failed to clear cache. Got the following error:',
+                error,
+              );
+              this.errorMessages.push('Failed to clear cache.');
+            });
+        }
+      });
+  }
+
   onErrorDismissed(index: number): void {
     this.errorMessages.splice(index, 1);
   }
@@ -88,5 +141,45 @@ export class AboutPageComponent {
 
   openSourceCode(): void {
     openUrl('https://github.com/jrobiche/australis');
+  }
+
+  #fileSizeSI(bytes: number): string {
+    const exponent = Math.floor(
+      Math.max(Math.log(bytes), 0.1) / Math.log(1000.0),
+    );
+    const decimal = (bytes / Math.pow(1000.0, exponent)).toFixed(
+      exponent ? 2 : 0,
+    );
+    return `${decimal} ${exponent ? `${'kMGTPEZY'[exponent - 1]}B` : 'B'}`;
+  }
+
+  #loadAppCacheSize(): void {
+    this.#appService
+      .appCacheSize()
+      .then((response) => {
+        this.#appCacheSize = response;
+      })
+      .catch((error) => {
+        console.error(
+          'Failed to determine application cache size. Got the following error:',
+          error,
+        );
+        this.errorMessages.push('Failed to determine application cache size.');
+      });
+  }
+
+  #loadAppDataSize(): void {
+    this.#appService
+      .appDataSize()
+      .then((response) => {
+        this.#appDataSize = response;
+      })
+      .catch((error) => {
+        console.error(
+          'Failed to determine application data size. Got the following error:',
+          error,
+        );
+        this.errorMessages.push('Failed to determine application data size.');
+      });
   }
 }

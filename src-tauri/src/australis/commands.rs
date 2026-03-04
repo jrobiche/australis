@@ -6,8 +6,59 @@ use uuid::Uuid;
 use crate::australis::structs::{
     AuroraGame, GameConsoleConfiguration, GameListEntry, PathResolver,
 };
-use crate::australis::utils::{determine_title_launch_data, write_bin_to_path, write_str_to_path};
+use crate::australis::utils::{
+    determine_title_launch_data, dir_size, remove_dir_contents, write_bin_to_path,
+    write_str_to_path,
+};
 use libaustralis;
+
+////////////////////////////////////////////////////////////////////////////////
+// application commands
+////////////////////////////////////////////////////////////////////////////////
+#[tauri::command]
+pub async fn app_cache_clear(app_handle: tauri::AppHandle) -> Result<(), String> {
+    let path_resolver = PathResolver::new(&app_handle);
+    let dir_path = path_resolver.app_cache_root()?;
+    remove_dir_contents(dir_path).map_err(|err| {
+        let msg = format!(
+            "Failed to delete contents of App Cache directory. Got the following error: {}",
+            err
+        );
+        error!("{}", msg);
+        msg
+    })?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn app_cache_size(app_handle: tauri::AppHandle) -> Result<u64, String> {
+    let path_resolver = PathResolver::new(&app_handle);
+    let dir_path = path_resolver.app_cache_root()?;
+    let bytes = dir_size(dir_path).map_err(|err| {
+        let msg = format!(
+            "Failed to calculate App Cache directory size. Got the following error: {}",
+            err
+        );
+        error!("{}", msg);
+        msg
+    })?;
+    Ok(bytes)
+}
+
+#[tauri::command]
+pub async fn app_data_size(app_handle: tauri::AppHandle) -> Result<u64, String> {
+    let path_resolver = PathResolver::new(&app_handle);
+    let dir_path = path_resolver.app_data_root()?;
+    let bytes = dir_size(dir_path).map_err(|err| {
+        let msg = format!(
+            "Failed to calculate App Data directory size. Got the following error: {}",
+            err
+        );
+        error!("{}", msg);
+        msg
+    })?;
+    Ok(bytes)
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // aurora ftp commands
