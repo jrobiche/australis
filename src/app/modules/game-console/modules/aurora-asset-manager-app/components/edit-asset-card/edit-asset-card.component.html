@@ -40,7 +40,7 @@
       class="hidden-file-input"
     />
     @if (assetImageUrlNew == null) {
-      <button mat-button [matMenuTriggerFor]="menu">New Image</button>
+      <button matButton [matMenuTriggerFor]="menu">New Image</button>
       <mat-menu #menu="matMenu" xPosition="before">
         <button mat-menu-item (click)="fileInput.click()">Local File</button>
         <button mat-menu-item (click)="onXboxCatalogCoversClick()">
@@ -51,10 +51,10 @@
         </button>
       </mat-menu>
     } @else {
-      <button mat-button (click)="onCancelClick()" [disabled]="isLoadingImage">
+      <button matButton (click)="onCancelClick()" [disabled]="isLoadingImage">
         Cancel
       </button>
-      <button mat-button (click)="onApplyClick()" [disabled]="isLoadingImage">
+      <button matButton (click)="onApplyClick()" [disabled]="isLoadingImage">
         Apply
       </button>
     }
