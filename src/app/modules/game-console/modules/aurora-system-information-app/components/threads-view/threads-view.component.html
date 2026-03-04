@@ -28,7 +28,7 @@
         aria-label="Resume threads"
         (click)="onResumeThreads()"
         [disabled]="isResumeThreadsDisabled"
-        mat-stroked-button
+        matButton="outlined"
         class="app-trailing-button"
       >
         <mat-icon fontSet="material-icons-round">play_arrow</mat-icon>
@@ -38,7 +38,7 @@
         aria-label="Suspend threads"
         (click)="onSuspendThreads()"
         [disabled]="isSuspendThreadsDisabled"
-        mat-stroked-button
+        matButton="outlined"
         class="app-trailing-button"
       >
         <mat-icon fontSet="material-icons-round">pause</mat-icon>
