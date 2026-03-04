@@ -17,7 +17,7 @@
             Launch Aurora
           </button>
         </div>
-        <button mat-button matStepperNext>Next</button>
+        <button matButton matStepperNext>Next</button>
       </ng-template>
     </mat-step>
     <mat-step [completed]="isUploadAssetsCompleted">
@@ -34,8 +34,8 @@
             Upload
           </button>
         </div>
-        <button mat-button matStepperPrevious>Back</button>
-        <button mat-button matStepperNext [disabled]="!isUploadAssetsCompleted">
+        <button matButton matStepperPrevious>Back</button>
+        <button matButton matStepperNext [disabled]="!isUploadAssetsCompleted">
           Next
         </button>
       </ng-template>
@@ -53,7 +53,7 @@
             Restart Aurora
           </button>
         </div>
-        <button mat-button matStepperNext>Next</button>
+        <button matButton matStepperNext>Next</button>
       </ng-template>
     </mat-step>
     <mat-step>
@@ -63,11 +63,11 @@
           <p>Uploads complete. This dialog can be closed.</p>
           <button mat-flat-button (click)="onCloseClick()">Close</button>
         </div>
-        <button mat-button matStepperPrevious>Back</button>
+        <button matButton matStepperPrevious>Back</button>
       </ng-template>
     </mat-step>
   </mat-stepper>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button (click)="onCancelClick()">Cancel</button>
+  <button matButton (click)="onCancelClick()">Cancel</button>
 </mat-dialog-actions>

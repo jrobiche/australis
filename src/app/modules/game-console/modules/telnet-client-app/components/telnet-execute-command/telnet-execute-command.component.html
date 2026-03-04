@@ -19,7 +19,7 @@
       <mat-label>Command</mat-label>
       <input matInput formControlName="cmd" type="text" cdkFocusInitial />
     </mat-form-field>
-    <button mat-button type="submit" (click)="onSubmitClick()">Submit</button>
+    <button matButton type="submit" (click)="onSubmitClick()">Submit</button>
   </form>
   @if (errorText) {
     <app-notification-card
