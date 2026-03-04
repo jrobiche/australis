@@ -1,6 +1,6 @@
 <mat-toolbar class="app-game-console-app-toolbar">
   <button
-    mat-icon-button
+    matIconButton
     class="app-leading-button"
     aria-label="Toggle game list"
     (click)="drawer.toggle()"
@@ -12,7 +12,7 @@
   @if (breakpoint.isHandset$ | async) {
     <button
       aria-label="Import Game Data"
-      mat-icon-button
+      matIconButton
       (click)="onDownloadGameDataClick()"
     >
       <mat-icon fontSet="material-icons-round">download</mat-icon>
@@ -20,7 +20,7 @@
     <button
       aria-label="Upload assets to console"
       class="app-trailing-button"
-      mat-icon-button
+      matIconButton
       (click)="onUploadAssetsClick()"
     >
       <mat-icon fontSet="material-icons-round">upload</mat-icon>
