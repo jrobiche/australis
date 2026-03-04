@@ -12,6 +12,14 @@
   ));
 }
 
+app-navigation-list {
+  @include mat.list-overrides((
+    list-item-container-color: var(--mat-sys-surface-container-high),
+    list-item-label-text-color: var(--mat-sys-on-surface),
+    list-item-one-line-container-height: variables.$nav-list-card-height,
+  ));
+}
+
 app-page-toolbar {
   @include mat.toolbar-overrides((
     container-background-color: var(--mat-sys-primary-container),
@@ -33,12 +41,11 @@ app-page-title-toolbar {
 
 app-game-details-section {
   mat-toolbar {
-    // TODO do not use hard coded values
     @include mat.toolbar-overrides((
-      mobile-height: 96px,
-      standard-height: 96px,
+      mobile-height: variables.$game-details-section-toolbar-height,
+      standard-height: variables.$game-details-section-toolbar-height,
     ));
-    border-radius: 24px;
+    border-radius: variables.$game-details-section-toolbar-border-radius;
   }
 }
 
@@ -49,21 +56,6 @@ app-game-details-card {
   ));
 }
 
-app-navigation-list {
-  @include mat.list-overrides((
-    list-item-container-color: var(--mat-sys-surface-container-high),
-    list-item-label-text-color: var(--mat-sys-on-surface),
-    list-item-one-line-container-height: variables.$nav-list-card-height,
-  ));
-}
-
-.app-divider-variant {
-  @include mat.divider-overrides((
-    color: var(--mat-sys-outline-variant),
-  ));
-}
-
-// TODO define component
 .app-game-console-app-toolbar {
   @include mat.toolbar-overrides((
     mobile-height: variables.$game-console-app-toolbar-height,
