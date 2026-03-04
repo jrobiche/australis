@@ -19,6 +19,34 @@ impl PathResolver {
         }
     }
 
+    pub fn app_cache_root(&self) -> Result<PathBuf, String> {
+        self.app_handle
+            .path()
+            .resolve(".", tauri::path::BaseDirectory::AppCache)
+            .map_err(|err| {
+                let msg = format!(
+                    "Failed to resolve App Cache directory. Got the following error: {}",
+                    err
+                );
+                error!("{}", msg);
+                msg
+            })
+    }
+
+    pub fn app_data_root(&self) -> Result<PathBuf, String> {
+        self.app_handle
+            .path()
+            .resolve(".", tauri::path::BaseDirectory::AppData)
+            .map_err(|err| {
+                let msg = format!(
+                    "Failed to resolve App Data directory. Got the following error: {}",
+                    err
+                );
+                error!("{}", msg);
+                msg
+            })
+    }
+
     pub fn cache_path(&self, id: &str) -> Result<PathBuf, String> {
         let id_b64 = STANDARD_NO_PAD.encode(id);
         self.app_handle

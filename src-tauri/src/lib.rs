@@ -17,6 +17,10 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            // app functions
+            commands::app_cache_clear,
+            commands::app_cache_size,
+            commands::app_data_size,
             // aurora ftp functions
             commands::aurora_ftp_download_aurora_databases,
             commands::aurora_ftp_download_aurora_game_data_directory,

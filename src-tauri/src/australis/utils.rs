@@ -1,5 +1,6 @@
 use std::io::Write;
-use std::path::Path;
+use std::path::{Path, PathBuf};
+use std::{fs, io};
 
 use log::{error, warn};
 use uuid::Uuid;
@@ -10,6 +11,36 @@ use crate::australis::structs::{AuroraGame, GameConsoleConfiguration, PathResolv
 
 pub fn uuid_to_string(id: &Uuid) -> String {
     id.as_hyphenated().to_string()
+}
+
+pub fn dir_size(path: impl Into<PathBuf>) -> io::Result<u64> {
+    fn dir_size(mut dir: fs::ReadDir) -> io::Result<u64> {
+        dir.try_fold(0, |acc, file| {
+            let file = file?;
+            let size = match file.metadata()? {
+                data if data.is_dir() => dir_size(fs::read_dir(file.path())?)?,
+                data => data.len(),
+            };
+            Ok(acc + size)
+        })
+    }
+
+    dir_size(fs::read_dir(path.into())?)
+}
+
+pub fn remove_dir_contents<P: AsRef<Path>>(path: P) -> io::Result<()> {
+    for entry in fs::read_dir(path)? {
+        let entry = entry?;
+        let path = entry.path();
+
+        if entry.file_type()?.is_dir() {
+            remove_dir_contents(&path)?;
+            fs::remove_dir(path)?;
+        } else {
+            fs::remove_file(path)?;
+        }
+    }
+    Ok(())
 }
 
 pub fn write_bin_to_path(file_path: &Path, data: &Vec<u8>) -> Result<(), String> {
