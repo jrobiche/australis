@@ -13,7 +13,7 @@
             Click the Launch Aurora button to return to the Aurora dashboard.
           </p>
           <p>Once at the Aurora dashboard, click next to continue.</p>
-          <button mat-flat-button (click)="onLaunchAuroraClick()">
+          <button matButton="filled" (click)="onLaunchAuroraClick()">
             Launch Aurora
           </button>
         </div>
@@ -29,7 +29,7 @@
           </p>
           <p>{{ downloadDatabasesStatusText }}</p>
           <button
-            mat-flat-button
+            matButton="filled"
             (click)="onDownloadDatabasesClick()"
             [disabled]="isDownloadDatabasesDisabled"
           >
@@ -55,7 +55,7 @@
           </p>
           <p>{{ downloadGameDataStatusText }}</p>
           <button
-            mat-flat-button
+            matButton="filled"
             (click)="onDownloadGameDataClick()"
             [disabled]="isDownloadGameDataDisabled"
           >
@@ -77,7 +77,7 @@
       <ng-template matStepContent>
         <div>
           <p>Downloads complete. This dialog can be closed.</p>
-          <button mat-flat-button (click)="onCloseClick()">Close</button>
+          <button matButton="filled" (click)="onCloseClick()">Close</button>
         </div>
         <button matButton matStepperPrevious>Back</button>
       </ng-template>

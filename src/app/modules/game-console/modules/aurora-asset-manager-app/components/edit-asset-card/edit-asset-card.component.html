@@ -34,7 +34,7 @@
     <!-- file input cannot be styled, so hide it and use button in menu to interact with this input -->
     <input
       #fileInput
-      mat-flat-button
+      matButton="filled"
       (change)="onUploadFileChange($event)"
       type="file"
       class="hidden-file-input"
