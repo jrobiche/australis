@@ -13,7 +13,7 @@
             Click the Launch Aurora button to return to the Aurora dashboard.
           </p>
           <p>Once at the Aurora dashboard, click next to continue.</p>
-          <button mat-flat-button (click)="onLaunchAuroraClick()">
+          <button matButton="filled" (click)="onLaunchAuroraClick()">
             Launch Aurora
           </button>
         </div>
@@ -27,7 +27,7 @@
           <p>Click the Upload button to upload assets to the console.</p>
           <p>{{ uploadAssetsStatusText }}</p>
           <button
-            mat-flat-button
+            matButton="filled"
             (click)="onUploadAssetsClick()"
             [disabled]="isUploadAssetsDisabled"
           >
@@ -49,7 +49,7 @@
             Click the Restart Aurora button to return to the Aurora dashboard.
           </p>
           <p>Once at the Aurora dashboard, click next to continue.</p>
-          <button mat-flat-button (click)="onLaunchAuroraClick()">
+          <button matButton="filled" (click)="onLaunchAuroraClick()">
             Restart Aurora
           </button>
         </div>
@@ -61,7 +61,7 @@
       <ng-template matStepContent>
         <div>
           <p>Uploads complete. This dialog can be closed.</p>
-          <button mat-flat-button (click)="onCloseClick()">Close</button>
+          <button matButton="filled" (click)="onCloseClick()">Close</button>
         </div>
         <button matButton matStepperPrevious>Back</button>
       </ng-template>

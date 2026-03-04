@@ -28,7 +28,7 @@
   } @else if (breakpoint.isTablet$ | async) {
     <button
       class="app-trailing-button"
-      mat-flat-button
+      matButton="filled"
       (click)="onDownloadGameDataClick()"
     >
       <mat-icon aria-label="Download game data" fontSet="material-icons-round">
@@ -39,7 +39,7 @@
     <button
       aria-label="Upload assets to console"
       class="app-trailing-button"
-      mat-flat-button
+      matButton="filled"
       (click)="onUploadAssetsClick()"
     >
       <mat-icon fontSet="material-icons-round">upload</mat-icon>
@@ -48,7 +48,7 @@
   } @else {
     <button
       class="app-trailing-button"
-      mat-flat-button
+      matButton="filled"
       (click)="onDownloadGameDataClick()"
     >
       <mat-icon aria-label="Download game data" fontSet="material-icons-round">
@@ -59,7 +59,7 @@
     <button
       aria-label="Upload assets to console"
       class="app-trailing-button"
-      mat-flat-button
+      matButton="filled"
       (click)="onUploadAssetsClick()"
     >
       <mat-icon fontSet="material-icons-round">upload</mat-icon>

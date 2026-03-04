@@ -14,7 +14,7 @@
   <app-page-title-toolbar heading="Consoles">
     @if (breakpoint.isWeb$ | async) {
       <button
-        mat-flat-button
+        matButton="filled"
         aria-label="Add console"
         class="app-trailing-button"
         (click)="onAddConsoleClick()"
