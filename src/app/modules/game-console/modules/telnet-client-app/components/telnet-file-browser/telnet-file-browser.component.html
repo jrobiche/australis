@@ -24,7 +24,7 @@
       <button
         aria-label="Return to launcher"
         class="app-trailing-button"
-        mat-stroked-button
+        matButton="outlined"
         (click)="onLauncherClick()"
       >
         <mat-icon fontSet="material-icons-round">home</mat-icon>
@@ -33,7 +33,7 @@
       <button
         aria-label="Refresh file entries"
         class="app-trailing-button"
-        mat-stroked-button
+        matButton="outlined"
         (click)="onRefreshClick()"
         [disabled]="isRefreshDisabled"
       >

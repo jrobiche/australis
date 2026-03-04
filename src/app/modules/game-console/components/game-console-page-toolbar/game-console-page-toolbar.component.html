@@ -2,7 +2,7 @@
   @if (breakpoint.isWeb$ | async) {
     <button
       class="app-trailing-button"
-      mat-stroked-button
+      matButton="outlined"
       (click)="onEditConsoleClick()"
       [disabled]="isEditConsoleDisabled"
     >
@@ -16,7 +16,7 @@
     </button>
     <button
       class="app-trailing-button"
-      mat-stroked-button
+      matButton="outlined"
       (click)="onDeleteConsoleClick()"
       [disabled]="isDeleteConsoleDisabled"
     >
