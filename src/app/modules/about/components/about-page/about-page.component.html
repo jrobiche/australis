@@ -20,6 +20,24 @@
     <span class="app-subtitle">{{ appName }}</span>
     <span class="app-subtitle">{{ appVersion }}</span>
   </div>
+  <div class="button-row">
+    <button matButton="outlined" (click)="openSourceCode()">
+      <mat-icon
+        aria-hidden="false"
+        aria-label="Open external link to source code"
+        fontIcon="open_in_new"
+      />
+      View Source Code
+    </button>
+    <button matButton="outlined" (click)="openGitHubIssues()">
+      <mat-icon
+        aria-hidden="false"
+        aria-label="Open external link to GitHub issues"
+        fontIcon="open_in_new"
+      />
+      View or Report Issues
+    </button>
+  </div>
   <mat-card class="info-card" appearance="outlined">
     <mat-card-header>
       <mat-card-title>Storage Used</mat-card-title>
@@ -41,48 +59,6 @@
     </mat-card-content>
     <mat-card-actions>
       <button matButton (click)="onClearCacheClick()">Clear Cache</button>
-    </mat-card-actions>
-  </mat-card>
-  <mat-card class="info-card" appearance="outlined">
-    <mat-card-header>
-      <mat-card-title>Looking for the source code?</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <p>
-        Source code for this program is available on GitHub at
-        &lt;https://github.com/jrobiche/australis&gt;
-      </p>
-    </mat-card-content>
-    <mat-card-actions>
-      <button matButton (click)="openSourceCode()">
-        <mat-icon
-          aria-hidden="false"
-          aria-label="Open external link to source code"
-          fontIcon="open_in_new"
-        />
-        Source Code
-      </button>
-    </mat-card-actions>
-  </mat-card>
-  <mat-card class="info-card" appearance="outlined">
-    <mat-card-header>
-      <mat-card-title>Found a problem?</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <p>
-        Open an issue on GitHub at
-        &lt;https://github.com/jrobiche/australis/issues&gt;
-      </p>
-    </mat-card-content>
-    <mat-card-actions>
-      <button matButton (click)="openGitHubIssues()">
-        <mat-icon
-          aria-hidden="false"
-          aria-label="Open external link to GitHub issues"
-          fontIcon="open_in_new"
-        />
-        GitHub Issues
-      </button>
     </mat-card-actions>
   </mat-card>
   <mat-card class="info-card" appearance="outlined">
@@ -113,7 +89,7 @@
           <mat-expansion-panel-header>
             <mat-panel-title>GNU General Public License</mat-panel-title>
           </mat-expansion-panel-header>
-          <pre>{{ gplText }}</pre>
+          <pre class="gpl-text">{{ gplText }}</pre>
         </mat-expansion-panel>
       </mat-accordion>
     </mat-card-content>
