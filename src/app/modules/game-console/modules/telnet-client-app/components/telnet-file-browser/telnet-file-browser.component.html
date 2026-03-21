@@ -64,7 +64,9 @@
     <mat-card-content>
       @if (isLoading) {
         <mat-spinner />
-      } @else if (dirlistEntries.length < 1) {
+      } @else if (
+        drivelistAndFreespaceEntries.length < 1 && dirlistEntries.length < 1
+      ) {
         <span>No entries available.</span>
       } @else {
         <mat-action-list role="list">
