@@ -1,24 +1,27 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
-import { getName, getVersion } from '@tauri-apps/api/app';
-import { openUrl } from '@tauri-apps/plugin-opener';
 
-import { AppService } from '@app/shared/services/app.service';
-import { AppSettingsService } from '@app/shared/services/app-settings.service';
-import { ConfirmationDialogData } from '@app/shared/types/app';
-import { DialogService } from '@app/shared/services/dialog.service';
 import { NotificationCardComponent } from '@app/shared/components/notification-card/notification-card.component';
 import { PageToolbarComponent } from '@app/shared/components/page-toolbar/page-toolbar.component';
 import { ResponsiveWidthContainerComponent } from '@app/shared/components/responsive-width-container/responsive-width-container.component';
+import { AppSettingsService } from '@app/shared/services/app-settings.service';
+import { AppService } from '@app/shared/services/app.service';
+import { DialogService } from '@app/shared/services/dialog.service';
+import { ConfirmationDialogData } from '@app/shared/types/app';
+import { getName, getVersion } from '@tauri-apps/api/app';
+import { openUrl } from '@tauri-apps/plugin-opener';
 
 @Component({
   selector: 'app-about-page',
   imports: [
     MatButtonModule,
     MatCardModule,
+    MatExpansionModule,
     MatIconModule,
     MatListModule,
     NotificationCardComponent,
@@ -32,10 +35,12 @@ export class AboutPageComponent {
   readonly #appService = inject(AppService);
   readonly appSettings = inject(AppSettingsService);
   readonly #dialogService = inject(DialogService);
+  readonly #httpClient = inject(HttpClient);
   #appCacheSize: number | null;
   #appDataSize: number | null;
   #appName: string | null;
   #appVersion: string | null;
+  #gplText: string | null;
   errorMessages: string[];
 
   constructor() {
@@ -43,6 +48,7 @@ export class AboutPageComponent {
     this.#appDataSize = null;
     this.#appName = null;
     this.#appVersion = null;
+    this.#gplText = null;
     this.errorMessages = [];
   }
 
@@ -71,6 +77,7 @@ export class AboutPageComponent {
       });
     this.#loadAppCacheSize();
     this.#loadAppDataSize();
+    this.#loadGPL();
   }
 
   get appCacheSizeText(): string {
@@ -99,6 +106,13 @@ export class AboutPageComponent {
       return 'Unknown';
     }
     return `v${this.#appVersion}`;
+  }
+
+  get gplText(): string {
+    if (this.#gplText == null) {
+      return 'Unknown';
+    }
+    return this.#gplText;
   }
 
   onClearCacheClick(): void {
@@ -180,6 +194,14 @@ export class AboutPageComponent {
           error,
         );
         this.errorMessages.push('Failed to determine application data size.');
+      });
+  }
+
+  #loadGPL(): void {
+    this.#httpClient
+      .get('/assets/licenses/gpl-3.0.txt', { responseType: 'text' })
+      .subscribe((data: string) => {
+        this.#gplText = data;
       });
   }
 }

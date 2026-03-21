@@ -108,6 +108,14 @@
         You should have received a copy of the GNU General Public License along
         with this program. If not, see &lt;https://www.gnu.org/licenses/&gt;.
       </p>
+      <mat-accordion>
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>GNU General Public License</mat-panel-title>
+          </mat-expansion-panel-header>
+          <pre>{{ gplText }}</pre>
+        </mat-expansion-panel>
+      </mat-accordion>
     </mat-card-content>
     <mat-card-actions>
       <button matButton (click)="openGPL()">
@@ -116,7 +124,7 @@
           aria-label="Open external link to GPL"
           fontIcon="open_in_new"
         />
-        GNU General Public License
+        Latest GNU General Public License
       </button>
     </mat-card-actions>
   </mat-card>
